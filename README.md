@@ -4,7 +4,7 @@
 
 ---
 
-![Greg - resting](www/greg/greg-resting.jpg)
+![Greg](www/greg/greg_depressed.png)
 
 ---
 
