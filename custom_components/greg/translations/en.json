@@ -1,0 +1,72 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Set up Greg",
+        "description": "Greg is a Marvin-inspired AI personality for your coffee table. Connect a vibration sensor and a speaker, and Greg will comment on everything happening around him. Mostly negatively.",
+        "data": {
+          "vibration_sensor": "Vibration sensor",
+          "media_player": "Speaker / media player",
+          "volume": "Volume (0.0 - 1.0)",
+          "quiet_hours_enabled": "Enable quiet hours",
+          "quiet_start": "Quiet hours start (HH:MM)",
+          "quiet_end": "Quiet hours end (HH:MM)"
+        },
+        "data_description": {
+          "vibration_sensor": "Any binary sensor that detects vibration. Protocol does not matter.",
+          "media_player": "The speaker Greg will talk through.",
+          "volume": "Default is 0.35. Low enough to not be immediately annoying.",
+          "quiet_hours_enabled": "Greg will stay silent during quiet hours.",
+          "quiet_start": "Greg goes quiet at this time.",
+          "quiet_end": "Greg resumes at this time."
+        }
+      },
+      "advanced": {
+        "title": "Advanced settings",
+        "description": "These settings let you tune Greg's behavior. Defaults are conservative. Adjusting these is your responsibility.",
+        "data": {
+          "soft_threshold": "Soft reaction threshold (vibrations)",
+          "medium_threshold": "Medium reaction threshold (vibrations)",
+          "chaos_threshold": "Chaos reaction threshold (vibrations)",
+          "reset_delay": "Counter reset delay (seconds)",
+          "silence_timeout": "Silence mode timeout (minutes)",
+          "existential_interval": "Existential crisis interval (minutes)",
+          "sensitivity": "Vibration sensitivity (1-100%)",
+          "suppress_chime": "Suppress speaker chime (where supported)"
+        },
+        "data_description": {
+          "soft_threshold": "Vibrations before Greg makes a soft comment. Default: 1.",
+          "medium_threshold": "Vibrations before Greg escalates. Default: 3.",
+          "chaos_threshold": "Vibrations before full chaos mode. Default: 6.",
+          "reset_delay": "Seconds before the vibration counter resets. Default: 8.",
+          "silence_timeout": "Minutes of inactivity before Greg comments on the silence. Default: 20.",
+          "existential_interval": "How often Greg has an unprompted existential crisis, in minutes. Default: 37.",
+          "sensitivity": "How sensitive Greg is to vibration. Higher = more reactive. No upper cap at advanced level.",
+          "suppress_chime": "Attempts to suppress the connection chime on Google/Nest speakers. May not work on all devices — this is a hardware limitation outside Greg's control."
+        }
+      }
+    },
+    "error": {
+      "invalid_sensor": "Could not find that vibration sensor. Check the entity ID.",
+      "invalid_player": "Could not find that media player. Check the entity ID.",
+      "invalid_time": "Time must be in HH:MM format.",
+      "invalid_volume": "Volume must be between 0.0 and 1.0."
+    },
+    "abort": {
+      "already_configured": "Greg is already running. Only one instance is supported per installation in v1.1."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Greg settings",
+        "data": {
+          "volume": "Volume",
+          "quiet_hours_enabled": "Enable quiet hours",
+          "quiet_start": "Quiet hours start (HH:MM)",
+          "quiet_end": "Quiet hours end (HH:MM)"
+        }
+      }
+    }
+  }
+}
