@@ -105,7 +105,7 @@ class GregCoordinator:
             self._unsub_sensor()
             self._unsub_sensor = None
         if self._existential_handle:
-            self._existential_handle.cancel()
+            self._existential_handle()
             self._existential_handle = None
         if self._reset_handle:
             self._reset_handle.cancel()
