@@ -103,12 +103,16 @@ class GregCoordinator:
         """Clean up listeners."""
         if self._unsub_sensor:
             self._unsub_sensor()
+            self._unsub_sensor = None
         if self._existential_handle:
-            self._existential_handle()
+            self._existential_handle.cancel()
+            self._existential_handle = None
         if self._reset_handle:
-            self._reset_handle()
+            self._reset_handle.cancel()
+            self._reset_handle = None
         if self._silence_handle:
-            self._silence_handle()
+            self._silence_handle.cancel()
+            self._silence_handle = None
 
     async def async_reload(self, hass: HomeAssistant, entry: ConfigEntry) -> None:
         """Reload on options change."""
