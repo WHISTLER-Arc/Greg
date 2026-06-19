@@ -15,6 +15,7 @@ from .const import (
     DOMAIN,
     CONF_VIBRATION_SENSOR,
     CONF_MEDIA_PLAYER,
+    CONF_TTS_ENGINE,
     CONF_VOLUME,
     CONF_QUIET_HOURS_ENABLED,
     CONF_QUIET_START,
@@ -71,7 +72,7 @@ class GregCoordinator:
     def __init__(self, hass: HomeAssistant, entry: ConfigEntry) -> None:
         self.hass = hass
         self.entry = entry
-        self._config = entry.data
+        self._config = {**entry.data, **entry.options}
         self._counter = 0
         self._reset_handle = None
         self._silence_handle = None
@@ -111,7 +112,7 @@ class GregCoordinator:
 
     async def async_reload(self, hass: HomeAssistant, entry: ConfigEntry) -> None:
         """Reload on options change."""
-        self._config = entry.data
+        self._config = {**entry.data, **entry.options}
         await self.async_unload()
         await self.async_setup()
 
@@ -242,7 +243,7 @@ class GregCoordinator:
             await self.hass.services.async_call(
                 "tts", "speak",
                 {
-                    "entity_id": "tts.google_en_com",
+                    "entity_id": self._config.get(CONF_TTS_ENGINE, "tts.google_en_com"),
                     "media_player_entity_id": player,
                     "message": line,
                 },

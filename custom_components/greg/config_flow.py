@@ -100,6 +100,9 @@ class GregConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             vol.Required(CONF_MEDIA_PLAYER): selector.EntitySelector(
                 selector.EntitySelectorConfig(domain="media_player")
             ),
+            vol.Required(CONF_TTS_ENGINE): selector.EntitySelector(
+                selector.EntitySelectorConfig(domain="tts")
+            ),
             vol.Optional(CONF_VOLUME, default=DEFAULT_VOLUME): selector.NumberSelector(
                 selector.NumberSelectorConfig(min=0.0, max=1.0, step=0.05, mode="slider")
             ),
@@ -169,20 +172,69 @@ class GregOptionsFlow(config_entries.OptionsFlow):
 
     def __init__(self, config_entry) -> None:
         self._entry = config_entry
+        self._data: dict = {}
+
+    def _get(self, key, default):
+        """Return current value: options override data, both override default."""
+        return self._entry.options.get(key, self._entry.data.get(key, default))
 
     async def async_step_init(self, user_input=None):
         if user_input is not None:
-            return self.async_create_entry(title="", data=user_input)
-
-        current = self._entry.data
+            show_advanced = user_input.pop("show_advanced", False)
+            self._data = user_input
+            if show_advanced:
+                return await self.async_step_advanced()
+            return self.async_create_entry(title="", data=self._data)
 
         schema = vol.Schema({
-            vol.Optional(CONF_VOLUME, default=current.get(CONF_VOLUME, DEFAULT_VOLUME)): selector.NumberSelector(
+            vol.Required(CONF_VIBRATION_SENSOR, default=self._get(CONF_VIBRATION_SENSOR, "")): selector.EntitySelector(
+                selector.EntitySelectorConfig(domain="binary_sensor")
+            ),
+            vol.Required(CONF_MEDIA_PLAYER, default=self._get(CONF_MEDIA_PLAYER, "")): selector.EntitySelector(
+                selector.EntitySelectorConfig(domain="media_player")
+            ),
+            vol.Required(CONF_TTS_ENGINE, default=self._get(CONF_TTS_ENGINE, "")): selector.EntitySelector(
+                selector.EntitySelectorConfig(domain="tts")
+            ),
+            vol.Optional(CONF_VOLUME, default=self._get(CONF_VOLUME, DEFAULT_VOLUME)): selector.NumberSelector(
                 selector.NumberSelectorConfig(min=0.0, max=1.0, step=0.05, mode="slider")
             ),
-            vol.Optional(CONF_QUIET_HOURS_ENABLED, default=current.get(CONF_QUIET_HOURS_ENABLED, True)): selector.BooleanSelector(),
-            vol.Optional(CONF_QUIET_START, default=current.get(CONF_QUIET_START, DEFAULT_QUIET_START)): selector.TextSelector(),
-            vol.Optional(CONF_QUIET_END, default=current.get(CONF_QUIET_END, DEFAULT_QUIET_END)): selector.TextSelector(),
+            vol.Optional(CONF_QUIET_HOURS_ENABLED, default=self._get(CONF_QUIET_HOURS_ENABLED, True)): selector.BooleanSelector(),
+            vol.Optional(CONF_QUIET_START, default=self._get(CONF_QUIET_START, DEFAULT_QUIET_START)): selector.TextSelector(),
+            vol.Optional(CONF_QUIET_END, default=self._get(CONF_QUIET_END, DEFAULT_QUIET_END)): selector.TextSelector(),
+            vol.Optional("show_advanced", default=False): selector.BooleanSelector(),
         })
 
         return self.async_show_form(step_id="init", data_schema=schema)
+
+    async def async_step_advanced(self, user_input=None):
+        if user_input is not None:
+            self._data.update(user_input)
+            return self.async_create_entry(title="", data=self._data)
+
+        schema = vol.Schema({
+            vol.Optional(CONF_SOFT_THRESHOLD, default=self._get(CONF_SOFT_THRESHOLD, DEFAULT_SOFT_THRESHOLD)): selector.NumberSelector(
+                selector.NumberSelectorConfig(min=1, max=10, step=1, mode="slider")
+            ),
+            vol.Optional(CONF_MEDIUM_THRESHOLD, default=self._get(CONF_MEDIUM_THRESHOLD, DEFAULT_MEDIUM_THRESHOLD)): selector.NumberSelector(
+                selector.NumberSelectorConfig(min=2, max=15, step=1, mode="slider")
+            ),
+            vol.Optional(CONF_CHAOS_THRESHOLD, default=self._get(CONF_CHAOS_THRESHOLD, DEFAULT_CHAOS_THRESHOLD)): selector.NumberSelector(
+                selector.NumberSelectorConfig(min=3, max=20, step=1, mode="slider")
+            ),
+            vol.Optional(CONF_RESET_DELAY, default=self._get(CONF_RESET_DELAY, DEFAULT_RESET_DELAY)): selector.NumberSelector(
+                selector.NumberSelectorConfig(min=2, max=30, step=1, mode="slider")
+            ),
+            vol.Optional(CONF_SILENCE_TIMEOUT, default=self._get(CONF_SILENCE_TIMEOUT, DEFAULT_SILENCE_TIMEOUT)): selector.NumberSelector(
+                selector.NumberSelectorConfig(min=5, max=60, step=5, mode="slider")
+            ),
+            vol.Optional(CONF_EXISTENTIAL_INTERVAL, default=self._get(CONF_EXISTENTIAL_INTERVAL, DEFAULT_EXISTENTIAL_INTERVAL)): selector.NumberSelector(
+                selector.NumberSelectorConfig(min=10, max=120, step=1, mode="slider")
+            ),
+            vol.Optional(CONF_SENSITIVITY, default=self._get(CONF_SENSITIVITY, DEFAULT_SENSITIVITY)): selector.NumberSelector(
+                selector.NumberSelectorConfig(min=1, max=100, step=1, mode="slider")
+            ),
+            vol.Optional(CONF_SUPPRESS_CHIME, default=self._get(CONF_SUPPRESS_CHIME, DEFAULT_SUPPRESS_CHIME)): selector.BooleanSelector(),
+        })
+
+        return self.async_show_form(step_id="advanced", data_schema=schema)
