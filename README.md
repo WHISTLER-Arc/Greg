@@ -2,6 +2,12 @@
 
 **A Marvin-inspired Home Assistant integration. Your coffee table has feelings. Mostly bad ones.**
 
+[
+
+![Support me on Ko-fi](https://img.shields.io/badge/Support%20me%20on%20Ko--fi-FF5E5B?style=for-the-badge&logo=ko-fi&logoColor=white)
+
+](https://ko-fi.com/whistlerarc)
+
 ---
 
 ![Greg](www/greg/greg_judging.png)
@@ -166,6 +172,10 @@ Greg respects quiet hours (configurable during setup). You can also toggle quiet
 Issues and pull requests are welcome. If you have new lines that fit Greg's character — dry, resigned, built by the same company as Marvin — open a PR. Keep them original. No direct quotes from the books or films.
 
 ---
+
+## Support
+
+If Greg made you laugh or saved you a weekend, you can [buy WHISTLER a coffee](https://ko-fi.com/whistlerarc). Greg will not personally benefit. He has no pockets.
 
 ## License
 
