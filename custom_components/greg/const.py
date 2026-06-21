@@ -1,8 +1,8 @@
 """Constants for Greg integration."""
 
 DOMAIN = "greg"
-VERSION = "1.1.0"
-VERSION_DISPLAY = "v1.1"
+VERSION = "1.3.0"
+VERSION_DISPLAY = "v1.3"
 
 # Config keys
 CONF_VIBRATION_SENSOR = "vibration_sensor"
@@ -37,17 +37,37 @@ DEFAULT_SENSITIVITY = 75
 DEFAULT_SUPPRESS_CHIME = True
 
 # Mood states
+MOOD_RESTING = "resting"
 MOOD_ANNOYED = "annoyed"
 MOOD_JUDGING = "judging"
 MOOD_EXISTENTIAL = "existential"
-MOOD_OPTIONS = [MOOD_ANNOYED, MOOD_JUDGING, MOOD_EXISTENTIAL]
+MOOD_OPTIONS = [MOOD_RESTING, MOOD_ANNOYED, MOOD_JUDGING, MOOD_EXISTENTIAL]
 
-# Helper entity IDs (prefixed with domain to avoid conflicts)
-HELPER_VIBRATION_COUNTER = "input_number.greg_vibration_counter"
-HELPER_MOOD = "input_select.greg_mood"
-HELPER_MOOD_LEVEL = "input_number.greg_mood_level"
-HELPER_LAST_EVENT = "input_text.greg_last_event"
-HELPER_QUIET_MODE = "input_boolean.greg_quiet_mode"
+# Single source of truth for mood -> image filename.
+# Filenames intentionally match mood labels 1:1 so nothing needs translating.
+# Change a filename here and the card, panel, and docs all follow.
+MOOD_IMAGES = {
+    MOOD_RESTING: "greg_resting.png",
+    MOOD_ANNOYED: "greg_annoyed.png",
+    MOOD_JUDGING: "greg_judging.png",
+    MOOD_EXISTENTIAL: "greg_existential.png",
+}
+
+# Platforms owned by this integration
+PLATFORMS = ["sensor", "switch"]
+
+# Service
+SERVICE_POKE = "poke"
+
+# Panel
+PANEL_URL_PATH = "greg"
+PANEL_TITLE = "Greg"
+PANEL_ICON = "mdi:robot-outline"
+PANEL_STATIC_URL_BASE = "/greg_panel"
+PANEL_JS_URL = "/greg_panel/greg-panel.js"
+PANEL_DATA_KEY = f"{DOMAIN}_panel"
+# Images are served to the panel from here (maps to www/greg in repo, copied into integration)
+IMG_STATIC_URL_BASE = "/greg_images"
 
 # Line pools
 LINES_SOFT = [
