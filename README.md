@@ -2,11 +2,9 @@
 
 **A Marvin-inspired Home Assistant integration. Your coffee table has feelings. Mostly bad ones.**
 
-[
-
 ![Support me on Ko-fi](https://img.shields.io/badge/Support%20me%20on%20Ko--fi-FF5E5B?style=for-the-badge&logo=ko-fi&logoColor=white)
 
-](https://ko-fi.com/whistlerarc)
+(https://ko-fi.com/whistlerarc)
 
 ---
 
