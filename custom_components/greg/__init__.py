@@ -2,17 +2,31 @@
 from __future__ import annotations
 
 import logging
+import os
 import random
 import asyncio
-from datetime import datetime, time
+import shutil
+from datetime import datetime, time, timedelta
+
+import voluptuous as vol
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant, callback
-from homeassistant.helpers.event import async_track_state_change_event, async_track_time_interval
-from homeassistant.helpers import entity_registry as er
-from datetime import timedelta
+from homeassistant.helpers import config_validation as cv
+from homeassistant.helpers.dispatcher import async_dispatcher_send
+from homeassistant.helpers.event import (
+    async_track_state_change_event,
+    async_track_time_interval,
+    async_track_time_change,
+)
+from homeassistant.components.frontend import (
+    async_register_built_in_panel,
+    async_remove_panel,
+)
+from homeassistant.components.http import StaticPathConfig
 
 from .const import (
     DOMAIN,
+    PLATFORMS,
     CONF_VIBRATION_SENSOR,
     CONF_MEDIA_PLAYER,
     CONF_TTS_ENGINE,
@@ -27,22 +41,65 @@ from .const import (
     CONF_SILENCE_TIMEOUT,
     CONF_EXISTENTIAL_INTERVAL,
     CONF_SUPPRESS_CHIME,
-    HELPER_VIBRATION_COUNTER,
-    HELPER_MOOD,
-    HELPER_MOOD_LEVEL,
-    HELPER_LAST_EVENT,
-    HELPER_QUIET_MODE,
+    MOOD_RESTING,
     MOOD_ANNOYED,
     MOOD_JUDGING,
     MOOD_EXISTENTIAL,
+    MOOD_IMAGES,
+    SERVICE_POKE,
     LINES_SOFT,
     LINES_MEDIUM,
     LINES_CHAOS,
     LINES_EXISTENTIAL,
     LINES_SILENCE,
+    PANEL_URL_PATH,
+    PANEL_TITLE,
+    PANEL_ICON,
+    PANEL_STATIC_URL_BASE,
+    PANEL_JS_URL,
+    PANEL_DATA_KEY,
+    IMG_STATIC_URL_BASE,
 )
 
 _LOGGER = logging.getLogger(__name__)
+
+# Dispatcher signals so entities update the instant coordinator state changes.
+SIGNAL_STATE_UPDATED = f"{DOMAIN}_state_updated"
+
+
+async def _async_register_panel(hass: HomeAssistant) -> None:
+    """Register Greg's sidebar panel and static asset paths. Idempotent."""
+    panel_state = hass.data.setdefault(PANEL_DATA_KEY, {"registered": False})
+    if panel_state["registered"]:
+        return
+
+    panel_dir = os.path.join(os.path.dirname(__file__), "panel")
+    img_dir = os.path.join(os.path.dirname(__file__), "images")
+
+    await hass.http.async_register_static_paths(
+        [
+            StaticPathConfig(PANEL_STATIC_URL_BASE, panel_dir, False),
+            StaticPathConfig(IMG_STATIC_URL_BASE, img_dir, True),
+        ]
+    )
+
+    async_register_built_in_panel(
+        hass,
+        component_name="custom",
+        sidebar_title=PANEL_TITLE,
+        sidebar_icon=PANEL_ICON,
+        frontend_url_path=PANEL_URL_PATH,
+        require_admin=False,
+        config={
+            "_panel_custom": {
+                "name": "greg-panel",
+                "embed_iframe": False,
+                "trust_external": False,
+                "js_url": PANEL_JS_URL,
+            }
+        },
+    )
+    panel_state["registered"] = True
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
@@ -53,38 +110,78 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     hass.data[DOMAIN][entry.entry_id] = coordinator
     await coordinator.async_setup()
 
+    # Entity platforms (sensor + switch) own Greg's state now.
+    await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
+
     entry.async_on_unload(entry.add_update_listener(coordinator.async_reload))
+
+    await _async_register_panel(hass)
+    _async_register_services(hass)
 
     return True
 
 
 async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Unload Greg."""
+    unload_ok = await hass.config_entries.async_unload_platforms(entry, PLATFORMS)
+
     coordinator = hass.data[DOMAIN].pop(entry.entry_id, None)
     if coordinator:
         await coordinator.async_unload()
-    return True
+
+    # If no Greg entries remain, tear down panel + services.
+    if not hass.data[DOMAIN]:
+        panel_state = hass.data.get(PANEL_DATA_KEY)
+        if panel_state and panel_state["registered"]:
+            async_remove_panel(hass, PANEL_URL_PATH)
+            panel_state["registered"] = False
+        if hass.services.has_service(DOMAIN, SERVICE_POKE):
+            hass.services.async_remove(DOMAIN, SERVICE_POKE)
+
+    return unload_ok
+
+
+@callback
+def _async_register_services(hass: HomeAssistant) -> None:
+    """Register the greg.poke service once."""
+    if hass.services.has_service(DOMAIN, SERVICE_POKE):
+        return
+
+    async def _handle_poke(call) -> None:
+        """Force Greg to react on demand."""
+        for coordinator in hass.data.get(DOMAIN, {}).values():
+            if isinstance(coordinator, GregCoordinator):
+                await coordinator.async_poke()
+
+    hass.services.async_register(DOMAIN, SERVICE_POKE, _handle_poke)
 
 
 class GregCoordinator:
-    """Manages Greg's state, reactions, and TTS output."""
+    """Manages Greg's state, reactions, and TTS output. Source of truth for entities."""
 
     def __init__(self, hass: HomeAssistant, entry: ConfigEntry) -> None:
         self.hass = hass
         self.entry = entry
         self._config = {**entry.data, **entry.options}
+        # Internal session counter (churns fast, not entity-worthy)
         self._counter = 0
+        # Persistent / entity-facing state
+        self.enabled = True
+        self.mood = MOOD_RESTING
+        self.mood_level = 0
+        self.last_line = ""
+        self.vibrations_today = 0
+        # Timers / listeners
         self._reset_handle = None
         self._silence_handle = None
         self._existential_handle = None
         self._unsub_sensor = None
-        self._last_spoken = None
+        self._unsub_midnight = None
         self._last_lines_used: dict[str, str] = {}
 
-    async def async_setup(self) -> None:
-        """Set up helpers and listeners."""
-        await self._ensure_helpers()
+    # ---- lifecycle -------------------------------------------------------
 
+    async def async_setup(self) -> None:
         sensor = self._config[CONF_VIBRATION_SENSOR]
         self._unsub_sensor = async_track_state_change_event(
             self.hass, [sensor], self._handle_vibration
@@ -92,94 +189,86 @@ class GregCoordinator:
 
         interval = self._config.get(CONF_EXISTENTIAL_INTERVAL, 37)
         self._existential_handle = async_track_time_interval(
-            self.hass,
-            self._handle_existential,
-            timedelta(minutes=interval),
+            self.hass, self._handle_existential, timedelta(minutes=interval)
+        )
+
+        # Daily tally reset at local midnight.
+        self._unsub_midnight = async_track_time_change(
+            self.hass, self._reset_daily_tally, hour=0, minute=0, second=0
         )
 
         _LOGGER.info("Greg is running. He is not pleased about it.")
 
     async def async_unload(self) -> None:
-        """Clean up listeners."""
-        if self._unsub_sensor:
-            self._unsub_sensor()
-            self._unsub_sensor = None
-        if self._existential_handle:
-            self._existential_handle()
-            self._existential_handle = None
-        if self._reset_handle:
-            self._reset_handle.cancel()
-            self._reset_handle = None
-        if self._silence_handle:
-            self._silence_handle.cancel()
-            self._silence_handle = None
+        for handle_attr in ("_unsub_sensor", "_existential_handle", "_unsub_midnight"):
+            handle = getattr(self, handle_attr)
+            if handle:
+                handle()
+                setattr(self, handle_attr, None)
+        for timer_attr in ("_reset_handle", "_silence_handle"):
+            timer = getattr(self, timer_attr)
+            if timer:
+                timer.cancel()
+                setattr(self, timer_attr, None)
 
     async def async_reload(self, hass: HomeAssistant, entry: ConfigEntry) -> None:
-        """Reload on options change."""
         self._config = {**entry.data, **entry.options}
         await self.async_unload()
         await self.async_setup()
 
-    async def _ensure_helpers(self) -> None:
-        """Create required helpers if they don't exist."""
-        # Vibration counter
-        if not self.hass.states.get(HELPER_VIBRATION_COUNTER):
-            await self.hass.services.async_call(
-                "input_number", "set_value",
-                {"entity_id": HELPER_VIBRATION_COUNTER, "value": 0},
-                blocking=False,
-            )
+    # ---- entity helpers --------------------------------------------------
 
-        # Mood select
-        if not self.hass.states.get(HELPER_MOOD):
-            await self.hass.services.async_call(
-                "input_select", "select_option",
-                {"entity_id": HELPER_MOOD, "option": MOOD_ANNOYED},
-                blocking=False,
-            )
+    @callback
+    def _notify(self) -> None:
+        """Tell entities to refresh from current coordinator state."""
+        async_dispatcher_send(self.hass, SIGNAL_STATE_UPDATED)
 
-        # Quiet mode boolean
-        if not self.hass.states.get(HELPER_QUIET_MODE):
-            await self.hass.services.async_call(
-                "input_boolean", "turn_off",
-                {"entity_id": HELPER_QUIET_MODE},
-                blocking=False,
-            )
+    def set_enabled(self, value: bool) -> None:
+        """Called by the switch entity."""
+        self.enabled = value
+        if not value:
+            # Going silent: drop to resting, clear counter.
+            self._counter = 0
+            self.mood = MOOD_RESTING
+            self.mood_level = 0
+        self._notify()
+
+    # ---- reactions -------------------------------------------------------
 
     @callback
     def _handle_vibration(self, event) -> None:
-        """Handle vibration sensor trigger."""
         new_state = event.data.get("new_state")
         if new_state is None or new_state.state not in ("on", "vibrating", "detected"):
             return
-
-        if self._is_quiet_time():
+        if not self.enabled or self._is_quiet_time():
             return
 
         self._counter += 1
+        self.vibrations_today += 1
 
-        # Update helpers
-        self.hass.async_create_task(self._update_helpers())
-
-        # Cancel existing reset
         if self._reset_handle:
             self._reset_handle.cancel()
-
-        # Cancel silence timer
         if self._silence_handle:
             self._silence_handle.cancel()
 
-        # Schedule counter reset
         reset_delay = self._config.get(CONF_RESET_DELAY, 8)
         self._reset_handle = self.hass.loop.call_later(
             reset_delay, lambda: self.hass.async_create_task(self._reset_counter())
         )
 
-        # React based on counter
+        self._update_mood()
         self.hass.async_create_task(self._react())
 
+    async def async_poke(self) -> None:
+        """Force a reaction regardless of sensor (greg.poke service / panel button)."""
+        if not self.enabled or self._is_quiet_time():
+            return
+        self._counter += 1
+        self.vibrations_today += 1
+        self._update_mood()
+        await self._react()
+
     async def _react(self) -> None:
-        """Choose and speak the appropriate reaction."""
         soft = self._config.get(CONF_SOFT_THRESHOLD, 1)
         medium = self._config.get(CONF_MEDIUM_THRESHOLD, 3)
         chaos = self._config.get(CONF_CHAOS_THRESHOLD, 6)
@@ -192,45 +281,69 @@ class GregCoordinator:
             await self._speak(LINES_SOFT, "soft")
 
     async def _reset_counter(self) -> None:
-        """Reset vibration counter and start silence timer."""
         self._counter = 0
-        await self._update_helpers()
-
-        # Start silence countdown
+        self._update_mood()
         silence_mins = self._config.get(CONF_SILENCE_TIMEOUT, 20)
         self._silence_handle = self.hass.loop.call_later(
             silence_mins * 60,
-            lambda: self.hass.async_create_task(self._handle_silence())
+            lambda: self.hass.async_create_task(self._handle_silence()),
         )
 
     async def _handle_silence(self) -> None:
-        """Speak silence mode line."""
-        if self._is_quiet_time():
+        if not self.enabled or self._is_quiet_time():
             return
         await self._speak(LINES_SILENCE, "silence")
 
     @callback
     def _handle_existential(self, now=None) -> None:
-        """Periodic existential crisis."""
-        if self._counter > 0 and not self._is_quiet_time():
-            self.hass.async_create_task(self._speak(LINES_EXISTENTIAL, "existential"))
+        if self._counter > 0 and self.enabled and not self._is_quiet_time():
+            self.hass.async_create_task(
+                self._speak(LINES_EXISTENTIAL, "existential")
+            )
+
+    @callback
+    def _reset_daily_tally(self, now=None) -> None:
+        self.vibrations_today = 0
+        self._notify()
+
+    # ---- mood + speech ---------------------------------------------------
+
+    @callback
+    def _update_mood(self) -> None:
+        """Compute mood + level from the session counter and notify entities."""
+        medium = self._config.get(CONF_MEDIUM_THRESHOLD, 3)
+        chaos = self._config.get(CONF_CHAOS_THRESHOLD, 6)
+        soft = self._config.get(CONF_SOFT_THRESHOLD, 1)
+
+        if self._counter >= chaos:
+            self.mood = MOOD_EXISTENTIAL
+            self.mood_level = 100
+        elif self._counter >= medium:
+            self.mood = MOOD_JUDGING
+            self.mood_level = 50 + int((self._counter / chaos) * 50)
+        elif self._counter >= soft:
+            self.mood = MOOD_ANNOYED
+            self.mood_level = int((self._counter / medium) * 50)
+        else:
+            self.mood = MOOD_RESTING
+            self.mood_level = 0
+        self.mood_level = max(0, min(100, self.mood_level))
+        self._notify()
 
     async def _speak(self, pool: list, pool_key: str) -> None:
-        """Pick a line and speak it, avoiding immediate repeats."""
         last = self._last_lines_used.get(pool_key)
-        available = [l for l in pool if l != last]
-        if not available:
-            available = pool
-
+        available = [l for l in pool if l != last] or pool
         line = random.choice(available)
         self._last_lines_used[pool_key] = line
+
+        self.last_line = line
+        self._notify()
 
         player = self._config[CONF_MEDIA_PLAYER]
         volume = self._config.get(CONF_VOLUME, 0.35)
         suppress_chime = self._config.get(CONF_SUPPRESS_CHIME, True)
 
         try:
-            # Attempt chime suppression by briefly setting volume to 0 then back
             if suppress_chime:
                 await self.hass.services.async_call(
                     "media_player", "volume_set",
@@ -253,76 +366,26 @@ class GregCoordinator:
                 },
                 blocking=False,
             )
-
-            # Update last event
-            await self.hass.services.async_call(
-                "input_text", "set_value",
-                {"entity_id": HELPER_LAST_EVENT, "value": str(datetime.now())},
-                blocking=False,
-            )
-
         except Exception as err:
             _LOGGER.error("Greg failed to speak: %s", err)
 
-    async def _update_helpers(self) -> None:
-        """Sync helper states with internal counter."""
-        try:
-            await self.hass.services.async_call(
-                "input_number", "set_value",
-                {"entity_id": HELPER_VIBRATION_COUNTER, "value": self._counter},
-                blocking=False,
-            )
-
-            # Update mood
-            soft = self._config.get(CONF_SOFT_THRESHOLD, 1)
-            medium = self._config.get(CONF_MEDIUM_THRESHOLD, 3)
-            chaos = self._config.get(CONF_CHAOS_THRESHOLD, 6)
-
-            if self._counter >= chaos:
-                mood = MOOD_EXISTENTIAL
-                mood_level = 100
-            elif self._counter >= medium:
-                mood = MOOD_JUDGING
-                mood_level = 50 + int((self._counter / chaos) * 50)
-            else:
-                mood = MOOD_ANNOYED
-                mood_level = int((self._counter / medium) * 50)
-
-            await self.hass.services.async_call(
-                "input_select", "select_option",
-                {"entity_id": HELPER_MOOD, "option": mood},
-                blocking=False,
-            )
-
-            await self.hass.services.async_call(
-                "input_number", "set_value",
-                {"entity_id": HELPER_MOOD_LEVEL, "value": mood_level},
-                blocking=False,
-            )
-
-        except Exception as err:
-            _LOGGER.error("Greg helper update failed: %s", err)
+    # ---- quiet hours -----------------------------------------------------
 
     def _is_quiet_time(self) -> bool:
-        """Check if current time falls in quiet hours."""
         if not self._config.get(CONF_QUIET_HOURS_ENABLED):
             return False
-
-        # Also check the manual quiet mode toggle
-        quiet_state = self.hass.states.get(HELPER_QUIET_MODE)
-        if quiet_state and quiet_state.state == "on":
-            return True
-
         try:
             start_str = self._config.get(CONF_QUIET_START, "22:00")
             end_str = self._config.get(CONF_QUIET_END, "08:00")
             start = time(*map(int, start_str.split(":")))
             end = time(*map(int, end_str.split(":")))
             now = datetime.now().time()
-
-            if start > end:  # Spans midnight
+            if start > end:  # spans midnight
                 return now >= start or now < end
             return start <= now < end
-
         except Exception:
             return False
+
+    @property
+    def is_quiet_now(self) -> bool:
+        return self._is_quiet_time()
