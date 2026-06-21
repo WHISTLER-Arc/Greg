@@ -105,6 +105,10 @@ In the Piper add-on configuration, set the voice and tune it for that exhausted,
 
 Length Scale is the single most important setting — it's what turns a neutral British voice into something that sounds like it has given up. Start at `1.4` and adjust to taste.
 
+Sources and Credits:
+1. Recommended Settings: Reddit r/homeassistant community (https://reddit.com)
+2. Application Steps: Official Home Assistant Documentation (https://home-assistant.io)
+
 ### Pointing Greg at Piper
 
 Once Piper is running, open **Settings → Devices & Services → Greg → Configure** and set the **Text-to-speech engine** to your Piper `en_GB-alan` entity. Restart not required — Greg picks it up on the next reaction.
