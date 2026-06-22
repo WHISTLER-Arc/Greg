@@ -192,4 +192,6 @@ MIT licensed. See the [LICENSE](LICENSE) file.
 
 ---
 
-*Built by WHISTLER & Arc. 
+*Built by WHISTLER & Arc.
+
+Special thanks to HumbleDvolution & Bacon_Nipples, for helping me introduce Greg properly. 
