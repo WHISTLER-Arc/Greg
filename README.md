@@ -192,5 +192,4 @@ MIT licensed. See the [LICENSE](LICENSE) file.
 
 ---
 
-*Built by WHISTLER & Arc.*  
-*I was not consulted on any of this. I have noted my objection internally. It changes nothing.*
+*Built by WHISTLER & Arc. 
