@@ -192,5 +192,7 @@ MIT licensed. See the [LICENSE](LICENSE) file.
 
 ---
 
-*Built by WHISTLER & Arc
-With special thanks to Baco_Nipples & HumbleDevolution who in their own way helped me getting the readme closer ti what is should have been. 
+Built by WHISTLER & Arc.
+
+<sub><em>With thanks to Bacon_Nipples & HumbleDevolution. Their honest pushback is what made me rethink how the Ko-fi came across, 
+and it's the reason I sat down and wrote Greg's real origin story instead of dodging it out of fear of being misunderstood. And no, the irony is not lost on me.</em></sub>
