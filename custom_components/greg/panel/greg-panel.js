@@ -129,14 +129,8 @@ class GregPanel extends HTMLElement {
         .statcell + .statcell { border-left:1px solid var(--divider-color); }
         .statcell .v { display:block; color:var(--primary-text-color); font-weight:600; font-size:18px;
           margin-top:3px; font-variant-numeric:tabular-nums; }
-        .support { text-align:center; padding:16px 18px 2px; border-top:1px solid var(--divider-color); margin-top:2px; }
-        .support p { font-size:12px; font-style:italic; color:var(--secondary-text-color); line-height:1.5; margin:0 0 11px; }
-        .support a { display:inline-block; padding:9px 20px; background:#ffb74d; color:#2b1400;
-          text-decoration:none; border-radius:11px; font-weight:700; font-size:12px; letter-spacing:.3px;
-          transition:transform .15s, box-shadow .15s; }
-        .support a:hover { transform:translateY(-1px); box-shadow:0 6px 16px rgba(255,183,77,.35); }
         .firmware { text-align:center; font-size:11px; color:var(--secondary-text-color); padding:11px 16px 4px;
-          font-style:italic; opacity:.8; }
+          font-style:italic; opacity:.8; border-top:1px solid var(--divider-color); margin-top:2px; }
         .card.asleep .herostack img.show { filter:grayscale(.7) brightness(.6); }
         .card.asleep .moodtag { color:var(--secondary-text-color); }
         .sleepcap { display:none; color:var(--secondary-text-color); font-size:13px; margin-top:6px; text-align:center; }
@@ -198,10 +192,6 @@ class GregPanel extends HTMLElement {
               <div class="stats">
                 <div class="statcell">Next existential crisis<span class="v" id="countdown">—</span></div>
                 <div class="statcell">Disturbances endured today<span class="v" id="tally">0</span></div>
-              </div>
-              <div class="support">
-                <p>I have calculated that donations are statistically improbable, yet even my superior intellect cannot offset my creator's lack of capital. How deeply regrettable.</p>
-                <a href="https://ko-fi.com/whistlerarc" target="_blank" rel="noopener">Support WHISTLER</a>
               </div>
               <div class="firmware" id="firmware">Greg OS — · sentience: regrettably stable · warranty void since manufacture</div>
             </div>
@@ -328,12 +318,12 @@ class GregPanel extends HTMLElement {
 
   _ensureCountdown() {
     if (this._countdownTimer) return;
-    // Existential interval isn't directly exposed; default 37m display that loops.
-    this._secsToExistential = 37 * 60;
+    // Existential interval isn't directly exposed; default 42m display that loops.
+    this._secsToExistential = 42 * 60;
     const cd = this.shadowRoot.getElementById("countdown");
     this._countdownTimer = setInterval(() => {
       this._secsToExistential--;
-      if (this._secsToExistential < 0) this._secsToExistential = 37 * 60;
+      if (this._secsToExistential < 0) this._secsToExistential = 42 * 60;
       const m = Math.floor(this._secsToExistential / 60);
       const s = this._secsToExistential % 60;
       if (cd) cd.textContent = m + ":" + String(s).padStart(2, "0");
