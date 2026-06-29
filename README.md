@@ -194,7 +194,7 @@ MIT licensed. See the [LICENSE](LICENSE) file.
 
 Built by WHISTLER & Arc.
 
-<sub><em>With thanks to Bacon_Nipples & HumbleDevolution. Their honest pushback is what made me rethink how the Ko-fi came across, 
-and it's the reason I sat down and wrote Greg's real origin story instead of dodging it out of fear of being misunderstood. And no, the irony is not lost on me.</em></sub>
+<sub><em>With thanks to HumbleDevolution & Bacon_Nipples. Their honest pushback is what made me rethink how something like BMC or Ko-fi can come across, 
+and it's the reason I was able to sit down and wrote Greg's real origin story instead of dodging it out of fear of being misunderstood. And no, the irony is not lost on me.</em></sub>
 
 That's the whole story. Greg's free, and he's staying free. If he made you laugh though, or made your own coffee table a bit nervous, you can buy me a [Ko-fi](https://ko-fi.com/whistlerarc) to put on my Greg. Totally optional though. Greg doesn't get the money. He's a table, he wouldn't know what to do with it.
