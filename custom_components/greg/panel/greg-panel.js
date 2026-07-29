@@ -21,7 +21,7 @@ const DISASSEMBLY_ITEMS = [
   "Config entry removed",
   "Sensors and switches gone",
   "Panel unregistered",
-  "Static paths released",
+  "Static paths pending restart",
   "Mood images deleted",
 ];
 
