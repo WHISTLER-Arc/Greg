@@ -1,0 +1,36 @@
+name: Retag releases
+on:
+  workflow_dispatch:
+jobs:
+  retag:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Move v1.3.3 and v1.3.4 onto rewritten commits
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          SHA133=4d4af5349e5d05e26dfff3756f5951335b85c658
+          SHA134=fc2adb845d2aa8bdd9fcc00d7d9ed70475109809
+
+          gh release delete v1.3.3 --repo WHISTLER-Arc/Greg --yes --cleanup-tag || true
+          gh release delete v1.3.4 --repo WHISTLER-Arc/Greg --yes --cleanup-tag || true
+          git push origin :refs/tags/v1.3.3 || true
+          git push origin :refs/tags/v1.3.4 || true
+          sleep 5
+
+          git tag -f v1.3.3 "$SHA133"
+          git tag -f v1.3.4 "$SHA134"
+          git push -f origin refs/tags/v1.3.3
+          git push -f origin refs/tags/v1.3.4
+
+          gh release create v1.3.3 --repo WHISTLER-Arc/Greg --title v1.3.3 --notes-file .github/release-notes-133.md
+          gh release create v1.3.4 --repo WHISTLER-Arc/Greg --title v1.3.4 --notes-file .github/release-notes-134.md
+
+          gh release view v1.3.3 --repo WHISTLER-Arc/Greg --json tagName,isDraft
+          gh release view v1.3.4 --repo WHISTLER-Arc/Greg --json tagName,isDraft
