@@ -252,7 +252,8 @@ class GregCoordinator:
         self._existential_handle = None
         self._unsub_sensor = None
         self._unsub_midnight = None
-        self._last_lines_used: dict[str, str] = {}
+        self._decks: dict[str, list] = {}
+        self._deck_pos: dict[str, int] = {}
         # Monotonic timestamp of the last sensor event Greg actually accepted.
         self._last_accepted: float | None = None
 
@@ -441,11 +442,32 @@ class GregCoordinator:
         self.mood_level = max(0, min(100, self.mood_level))
         self._notify()
 
+    def _next_line(self, pool: list, pool_key: str) -> str:
+        """Return the next line from the shuffled deck for this pool.
+
+        Plays every line before repeating any. On reshuffle, guards the boundary
+        so the last line of one cycle cannot be the first of the next.
+        """
+        deck = self._decks.get(pool_key, [])
+        pos = self._deck_pos.get(pool_key, 0)
+
+        if pos >= len(deck):
+            last_line = deck[pos - 1] if deck else None
+            new_deck = list(pool)
+            random.shuffle(new_deck)
+            if last_line is not None and new_deck[0] == last_line and len(new_deck) > 1:
+                swap_idx = random.randrange(1, len(new_deck))
+                new_deck[0], new_deck[swap_idx] = new_deck[swap_idx], new_deck[0]
+            self._decks[pool_key] = new_deck
+            self._deck_pos[pool_key] = 0
+            deck = new_deck
+            pos = 0
+
+        self._deck_pos[pool_key] = pos + 1
+        return deck[pos]
+
     async def _speak(self, pool: list, pool_key: str) -> None:
-        last = self._last_lines_used.get(pool_key)
-        available = [l for l in pool if l != last] or pool
-        line = random.choice(available)
-        self._last_lines_used[pool_key] = line
+        line = self._next_line(pool, pool_key)
 
         self.last_line = line
         self._notify()
