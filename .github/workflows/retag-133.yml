@@ -15,30 +15,7 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           set -euo pipefail
-          TARGET=d0a7512
           gh release delete v1.3.3 --repo WHISTLER-Arc/Greg --yes --cleanup-tag || true
           git push origin :refs/tags/v1.3.3 || true
           sleep 5
-          gh release create v1.3.3 \
-            --repo WHISTLER-Arc/Greg \
-            --target "$TARGET" \
-            --title "v1.3.3" \
-            --notes "$(cat <<'NOTES'
-## v1.3.3
-
-### Uninstall wizard
-
-Greg can now take himself apart. There is an **Uninstall Greg** section at the bottom of his panel that walks through it in five steps: confirm, disassembly, restart, cache clearing, goodbye.
-
-He removes only what his own config entry owns. Your automations, your vibration sensor, your other integrations and any helper you made yourself are left alone. Nothing is matched by entity name, so if you happen to own entities called `greg_something`, they survive.
-
-Afterwards, remove the repository in HACS. Greg cannot delete his own code while he is running it.
-
-There is also a `greg.uninstall` service if you would rather script it. It takes an optional `restart` boolean.
-
-### Also in this release
-
-- Options flow reaches the advanced settings page properly, and includes the TTS engine picker.
-- `manifest.json` and `const.py` versions are back in sync.
-NOTES
-)"
+          gh release create v1.3.3 --repo WHISTLER-Arc/Greg --target d0a7512 --title v1.3.3 --notes-file .github/release-notes-133.md
