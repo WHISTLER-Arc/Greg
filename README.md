@@ -38,7 +38,7 @@ Attach a vibration sensor to a surface, point Greg at a speaker, and he'll have 
 - **Existential crisis.** Unprompted, roughly every 42 minutes if the room's been active. Greg's been thinking again.
 - **Silence.** Twenty minutes of nothing and Greg exhales. Metaphorically. He's a table.
 
-He started life with about 25 lines in total. He's got 125 now, 25 for each reaction, all written in the spirit of Douglas Adams. No direct quotes. Just the same DNA.
+He started life with about 25 lines in total. He's got 250 now, 50 for each reaction, all written in the spirit of Douglas Adams. No direct quotes. Just the same DNA.
 
 <p align="center"><img src="www/greg/greg_judging.png" width="320"></p>
 <p align="center"><em>How Greg sees himself. He has seen what you did, by the way.</em></p>
@@ -180,6 +180,64 @@ His four faces:
 ## Quiet mode
 
 Greg respects quiet hours (you set them during setup), and you can flip quiet mode on or off straight from the dashboard card without digging into HA settings. Even a depressed table needs to sleep.
+
+---
+
+## Hooking Greg up to your own stuff
+
+As of v1.4, every time Greg picks something to say he fires a `greg_line` event. Nothing listens to it unless you write an automation, so it costs you nothing if you don't want it.
+
+The event carries the line, his mood, and the speaker and TTS engine he's already configured with, so your automation doesn't need to hardcode any of that:
+
+```yaml
+event_type: greg_line
+data:
+  entry_id: 01JQ...          # which Greg, if you somehow have more than one
+  message: "I felt that. For the record, I would have preferred not to."
+  category: soft             # soft | medium | chaos | existential | silence
+  mood: annoyed              # resting | annoyed | judging | existential
+  mood_level: 40
+  vibrations_today: 12
+  quiet_hours: false
+  spoken: true               # did Greg say it himself
+  media_player: media_player.lounge
+  tts_engine: tts.piper_en_gb_alan
+  volume: 0.35
+```
+
+### Letting something else do the talking
+
+In Greg's advanced settings, **Who does the talking** has two positions. Leave it on Greg and nothing changes. Set it to stay quiet and he picks his line, fires the event, and says nothing, which leaves the floor to you.
+
+That's the interesting one. Greg writes the thought, your local model rewrites it, your speaker delivers the result:
+
+```yaml
+automation:
+  - alias: "Greg, but wordier"
+    triggers:
+      - trigger: event
+        event_type: greg_line
+    actions:
+      - action: conversation.process
+        data:
+          agent_id: conversation.my_local_llm
+          text: >
+            Rewrite this in the same tired, deadpan voice, one or two sentences,
+            no em-dashes: {{ trigger.event.data.message }}
+        response_variable: reply
+      - action: tts.speak
+        target:
+          entity_id: "{{ trigger.event.data.tts_engine }}"
+        data:
+          media_player_entity_id: "{{ trigger.event.data.media_player }}"
+          message: "{{ reply.response.speech.plain.speech }}"
+```
+
+Swap `conversation.my_local_llm` for whichever agent you run. Ollama, LocalAI, or a cloud one if you don't mind a table with a subscription.
+
+You can also turn the event off entirely in advanced settings if you'd rather he kept his thoughts to himself.
+
+> Thanks to **teskanoo** for asking for this one, twice, and offering to fork it and do it himself. That is usually the point where a feature stops being optional.
 
 ---
 

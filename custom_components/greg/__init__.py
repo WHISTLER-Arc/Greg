@@ -43,8 +43,15 @@ from .const import (
     CONF_EXISTENTIAL_INTERVAL,
     CONF_SENSITIVITY,
     CONF_SUPPRESS_CHIME,
+    CONF_EMIT_EVENTS,
+    CONF_SPEECH_MODE,
     DEFAULT_SENSITIVITY,
+    DEFAULT_VOLUME,
+    DEFAULT_EMIT_EVENTS,
+    DEFAULT_SPEECH_MODE,
+    SPEECH_MODE_EVENT_ONLY,
     SENSITIVITY_MAX_DEBOUNCE,
+    EVENT_LINE,
     MOOD_RESTING,
     MOOD_ANNOYED,
     MOOD_JUDGING,
@@ -444,8 +451,36 @@ class GregCoordinator:
         self._notify()
 
         player = self._config[CONF_MEDIA_PLAYER]
-        volume = self._config.get(CONF_VOLUME, 0.35)
+        volume = self._config.get(CONF_VOLUME, DEFAULT_VOLUME)
+        tts_engine = self._config.get(CONF_TTS_ENGINE, "tts.google_en_com")
         suppress_chime = self._config.get(CONF_SUPPRESS_CHIME, True)
+
+        speech_mode = self._config.get(CONF_SPEECH_MODE, DEFAULT_SPEECH_MODE)
+        will_speak = speech_mode != SPEECH_MODE_EVENT_ONLY
+
+        # Fired before the speaking, so a listener that wants to say something
+        # cleverer instead is not racing Greg's own audio. The speaker and engine
+        # ride along so an automation can reuse Greg's setup without hardcoding it.
+        if self._config.get(CONF_EMIT_EVENTS, DEFAULT_EMIT_EVENTS):
+            self.hass.bus.async_fire(
+                EVENT_LINE,
+                {
+                    "entry_id": self.entry.entry_id,
+                    "message": line,
+                    "category": pool_key,
+                    "mood": self.mood,
+                    "mood_level": self.mood_level,
+                    "vibrations_today": self.vibrations_today,
+                    "quiet_hours": self._is_quiet_time(),
+                    "spoken": will_speak,
+                    "media_player": player,
+                    "tts_engine": tts_engine,
+                    "volume": volume,
+                },
+            )
+
+        if not will_speak:
+            return
 
         try:
             if suppress_chime:
@@ -464,7 +499,7 @@ class GregCoordinator:
             await self.hass.services.async_call(
                 "tts", "speak",
                 {
-                    "entity_id": self._config.get(CONF_TTS_ENGINE, "tts.google_en_com"),
+                    "entity_id": tts_engine,
                     "media_player_entity_id": player,
                     "message": line,
                 },

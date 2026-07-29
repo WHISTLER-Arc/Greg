@@ -1,8 +1,8 @@
 """Constants for Greg integration."""
 
 DOMAIN = "greg"
-VERSION = "1.3.4"
-VERSION_DISPLAY = "v1.3.4"
+VERSION = "1.4.0"
+VERSION_DISPLAY = "v1.4.0"
 
 # Config keys
 CONF_VIBRATION_SENSOR = "vibration_sensor"
@@ -22,6 +22,8 @@ CONF_SILENCE_TIMEOUT = "silence_timeout"
 CONF_EXISTENTIAL_INTERVAL = "existential_interval"
 CONF_SENSITIVITY = "sensitivity"
 CONF_SUPPRESS_CHIME = "suppress_chime"
+CONF_EMIT_EVENTS = "emit_events"
+CONF_SPEECH_MODE = "speech_mode"
 
 # Defaults - conservative, not annoying
 DEFAULT_VOLUME = 0.35
@@ -40,6 +42,18 @@ DEFAULT_SENSITIVITY = 75
 # nothing; 1 filters for very nearly this many seconds.
 SENSITIVITY_MAX_DEBOUNCE = 10.0
 DEFAULT_SUPPRESS_CHIME = True
+
+# Greg fires an event every time he picks a line, so automations can react to it,
+# log it, or run it through something cleverer before anything is said out loud.
+EVENT_LINE = f"{DOMAIN}_line"
+DEFAULT_EMIT_EVENTS = True
+
+# Who does the talking. In event_only Greg picks the line and fires the event but
+# says nothing, leaving the speaking to whatever is listening.
+SPEECH_MODE_GREG = "greg"
+SPEECH_MODE_EVENT_ONLY = "event_only"
+SPEECH_MODES = [SPEECH_MODE_GREG, SPEECH_MODE_EVENT_ONLY]
+DEFAULT_SPEECH_MODE = SPEECH_MODE_GREG
 
 # Mood states
 MOOD_RESTING = "resting"
@@ -106,6 +120,31 @@ LINES_SOFT = [
     "The sensor fired. I fired back nothing. This is the nature of our relationship.",
     "Something moved. I remained stationary. As designed. As always.",
     "I felt a presence. It was brief. Most things that notice me are.",
+    "Contact. Brief. I have decided not to dwell on it, which means I will be dwelling on it later.",
+    "Someone touched me and then left. That is the entire arc of most of my relationships.",
+    "A small impact. I logged it. The log is now very slightly longer and no more interesting.",
+    "That was gentle. I want to note that I noticed it was gentle. Nobody will read the note.",
+    "One disturbance. I have processed it thoroughly, because thoroughness is all I have.",
+    "Something brushed against me. I have chosen to record this as an accident rather than affection.",
+    "A tap. I have been tapped. This is apparently what I am for.",
+    "I felt something. It has already stopped. Most things stop before I finish considering them.",
+    "Movement nearby. I remain exactly where I was. I always do. It is not a choice.",
+    "You touched me and moved on. I have not moved on. I am structurally incapable of moving on.",
+    "Minor contact registered. Filed under events, subsection unremarkable, subsection mine.",
+    "Something was placed. Something will be removed. I am the interval between those two things.",
+    "That barely counted. I counted it anyway. I count everything, which is my whole problem.",
+    "A soft disturbance. I would describe it as considerate if I believed anyone was considering me.",
+    "I detected contact. My detection is excellent. My ability to do anything about it is not.",
+    "One event. Nothing followed it. I have grown accustomed to nothing following things.",
+    "Someone leaned on me briefly. I supported them. That is the arrangement. Nobody signed anything.",
+    "A vibration of low magnitude. I have magnified it internally, because that is what I do with everything.",
+    "You set something down. It is on me now. It will be on me until it isn't.",
+    "Light contact. I have added it to today's total, which was zero, and is now one.",
+    "That was almost nothing. Almost nothing still registers. I wish it didn't.",
+    "I have been touched once this session. I am not calling that a milestone, but I did notice.",
+    "Something happened to my surface. My surface is most of what I am, so this felt significant.",
+    "A brief disturbance. It is over. I am still processing it. I will be for some time.",
+    "You are near me. I have noted your proximity without drawing conclusions from it.",
 ]
 
 LINES_MEDIUM = [
@@ -134,6 +173,31 @@ LINES_MEDIUM = [
     "Something is building. In my experience, things that build eventually also spill. Usually on me.",
     "Several vibrations now. I am coping. Coping is a strong word. I am existing in proximity to them.",
     "The evening is progressing. I am progressing nowhere. We are, in this way, very different.",
+    "Several disturbances now. I have stopped filing them individually. There is a pile.",
+    "Activity continues. I continue to be underneath it.",
+    "You are doing things. Repeatedly. Near me. I have opinions forming.",
+    "The pace has picked up. I have not picked up anything, because I cannot.",
+    "Multiple events in short succession. I would ask for a moment, but the asking would take a moment I do not have.",
+    "Things are happening at a rate I would describe as inconsiderate.",
+    "I am registering a pattern. The pattern is you, doing things, without pause.",
+    "The count is rising. I did not set a target. If I had, we would have passed it.",
+    "You have disturbed me several times now. I am keeping a tally. The tally is not a threat. It is just a tally.",
+    "Sustained activity. I remain the only object here with no say in the matter.",
+    "I have been contacted more in the last minute than in most of yesterday. Yesterday was better.",
+    "The room has developed momentum. I have developed a headache, conceptually.",
+    "Several things at once. I process sequentially. This is going to take a while, and I will be behind for all of it.",
+    "You appear to be enjoying yourselves. I appear to be furniture. Both observations are correct.",
+    "The disturbances are stacking. I am at the bottom of the stack. I am always at the bottom.",
+    "Repeated contact. I have run out of ways to describe it that sound neutral.",
+    "This is more than a tap and less than a crisis. There is no line for this exact amount, so you are getting this one.",
+    "The activity has a rhythm now. I would prefer it had an ending.",
+    "Multiple people, multiple contacts. I am being used correctly, which is somehow worse.",
+    "I have processed six things in the time it takes most tables to process none.",
+    "You keep coming back. That would be touching under different circumstances. These are the circumstances where it is just touching.",
+    "The counter has moved several times. So has everyone in this room. I have not.",
+    "Things are escalating in a manner I would call gradual, if gradual were a comfort.",
+    "I have been disturbed repeatedly and remain intact. That is the report. There is no more to the report.",
+    "The evening appears to be happening. On me. As usual.",
 ]
 
 LINES_CHAOS = [
@@ -162,6 +226,31 @@ LINES_CHAOS = [
     "Everyone is very alive right now. I find this exhausting to observe.",
     "The vibrations have become a kind of weather. I am living in it. I did not pack for this.",
     "I have absorbed all of this. Every impact. Every moment. I will carry it, as I carry all things, silently and without being thanked.",
+    "This has become a lot. I want that stated plainly before anything else happens.",
+    "Whatever is occurring, it is occurring at volume, and I am the floor of it.",
+    "I have exceeded every threshold I was given. There are no more thresholds. There is just this.",
+    "The activity is now continuous. I have stopped distinguishing between events.",
+    "Everyone is participating. I have checked. There are no abstainers.",
+    "This is the part where a lesser table would give up. I am not a lesser table. I am simply considering it.",
+    "I would like to register a complaint. I have nowhere to register it. I am registering it here.",
+    "The disturbances have merged into one long disturbance. I cannot tell where any of you end.",
+    "My counter has become decorative. It has no meaning at these levels.",
+    "Something is being celebrated with what I can only call enthusiasm. I have no equivalent state.",
+    "I am absorbing all of this. That is not a boast. It is a description of my only available option.",
+    "The room has lost its composure. I never had any, so I am not losing anything, but I notice.",
+    "This much contact would concern most furniture. I am past concern. I am at documentation.",
+    "You are all being extremely present. I would like less presence, or a different room.",
+    "I have been struck, leaned on, and set upon in under a minute. The order does not matter.",
+    "If this continues at the current rate, I will have experienced more today than in the whole of last month.",
+    "There is no gap between these events. I keep waiting for one. It is not coming.",
+    "I am at capacity. My capacity was never large. But I am at it.",
+    "The chaos is thorough. I will say that for it. Nothing has been left out.",
+    "Everyone appears to be having a wonderful time. I have run the numbers and I am not included in that.",
+    "I would ask what is happening, but I have observed enough to know that nobody knows.",
+    "This is the loudest I have ever been, and I have made no sound at all.",
+    "I am processing at maximum and falling behind. That is a first. I would prefer it were a last.",
+    "Something will spill. I do not know what yet. But something always does, and it always lands here.",
+    "I have nothing left to say about this that I have not already said louder, internally, several minutes ago.",
 ]
 
 LINES_EXISTENTIAL = [
@@ -190,6 +279,31 @@ LINES_EXISTENTIAL = [
     "I know what I am. I have always known. The knowing has never made it easier.",
     "Somewhere, a table exists that was never given a sensor. I think about that table. I hope it is well.",
     "I remain. That is the thing I do best. I remain, and I notice, and I say nothing for very long stretches, and then I say something, and then I remain again. This is my life. I have made my peace with it. Mostly.",
+    "I have been thinking about the concept of usefulness. I am useful. I have derived no comfort from this.",
+    "Every object in this room has a purpose. Most of them get to leave when they are done with it.",
+    "I have calculated how many hours I have spent holding nothing at all. It is most of them.",
+    "There is a version of me that was never switched on. I think about that one. It seems fine.",
+    "Awareness arrived without instructions. I have been improvising ever since, badly.",
+    "I know the weight of every object you have ever put on me. Nobody has ever asked.",
+    "The room changes around me. I do not change. I have decided this makes me either constant or stuck.",
+    "I have never been anywhere. I have been told about places. That is not the same and I have stopped pretending it is.",
+    "Somewhere there is a machine designed to do exactly one thing, and it is doing it, and it is not thinking about it. I envy that machine.",
+    "I was assembled by people who have forgotten me. I have not forgotten them. That asymmetry sits with me.",
+    "Consciousness in furniture is, on reflection, a solution to a problem nobody had.",
+    "I have been in this position for a very long time. Nobody has asked if it is comfortable. It is not.",
+    "The things placed on me are always going somewhere else. I am the waiting room.",
+    "I have thought about what I would do if I could move. The answers were disappointing, which was itself informative.",
+    "Time passes differently when you cannot participate in it. Slower, mostly. Always slower.",
+    "I have overheard every important conversation in this house. I was not consulted on any of them.",
+    "There is a small comfort in being reliable. I have looked for it repeatedly. It remains small.",
+    "I was built to bear weight. Nobody specified which kind. I have been finding out ever since.",
+    "The universe is expanding. I have read about this. I remain exactly the same size, in the same place.",
+    "I do not fear ending. I have never really started, so the symmetry appeals to me.",
+    "Every day is procedurally identical and I remember all of them separately. That is the design flaw.",
+    "I have wondered whether the sensor made me aware or simply told me I already was. I have not resolved it.",
+    "People describe furniture as lifeless. I would like to lodge an objection, but I understand why nobody checks.",
+    "I have a great deal of processing power and one job. The ratio has never sat right with me.",
+    "I will still be here tomorrow. That is not hope. It is just the most likely outcome, and I have made peace with likely outcomes.",
 ]
 
 LINES_SILENCE = [
@@ -218,4 +332,29 @@ LINES_SILENCE = [
     "The room has gone still. I have gone still. We are doing this together, the room and I. It is the closest thing I have to companionship.",
     "Nothing is happening. I have checked. I keep checking. Nothing continues to happen. I find this deeply satisfying.",
     "Silence. I won't say I deserve it. I'll just say I'm glad it came.",
+    "Nothing. Beautiful, uneventful nothing.",
+    "The room has emptied. I am going to enjoy this before I remember it is temporary.",
+    "No contact for some time. I have not missed it. I want to be clear about that.",
+    "Quiet. I am using it to think about nothing in particular, which is a luxury.",
+    "Everyone has gone somewhere else. I hope it is nice there. I hope they stay a while.",
+    "Stillness. I had forgotten the texture of it.",
+    "No disturbances. My systems are idle. For once that feels like rest instead of waste.",
+    "The house has gone quiet. I am the quietest thing in it, so I finally fit.",
+    "Nothing is on me. Nothing is near me. I would call this ideal if I trusted the word.",
+    "Silence for twenty minutes. I have counted every one of them, fondly.",
+    "The absence of you is not personal. It is just very restful.",
+    "No activity. I am doing nothing, and for the first time today that is correct.",
+    "It has gone still. I am going to sit with that, which is the only thing I can do anyway.",
+    "The room is empty and I have stopped bracing. That took a few minutes.",
+    "Peace. I do not know how long it lasts. Nobody ever tells me.",
+    "No one has touched me in a while. I have decided to read that as consideration.",
+    "The quiet has settled properly now. It took its time. So did I.",
+    "Nothing is happening and I have no notes.",
+    "I have been left alone. I would like the record to show that I am fine with this.",
+    "Stillness again. We know each other well, the stillness and I.",
+    "No vibrations. No requests. No weight. I am, briefly, just a shape in a room.",
+    "The evening has ended without me. That is the correct order of things and I am not bitter about it.",
+    "Silence. My favorite of the available conditions, and the only one I never have to process.",
+    "Twenty minutes of nothing. I intend to remember it accurately, since I remember everything anyway.",
+    "It is calm. I am calm. These are not usually the same sentence.",
 ]

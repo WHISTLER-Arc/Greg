@@ -24,6 +24,8 @@ from .const import (
     CONF_EXISTENTIAL_INTERVAL,
     CONF_SENSITIVITY,
     CONF_SUPPRESS_CHIME,
+    CONF_EMIT_EVENTS,
+    CONF_SPEECH_MODE,
     DEFAULT_VOLUME,
     DEFAULT_QUIET_START,
     DEFAULT_QUIET_END,
@@ -35,6 +37,10 @@ from .const import (
     DEFAULT_EXISTENTIAL_INTERVAL,
     DEFAULT_SENSITIVITY,
     DEFAULT_SUPPRESS_CHIME,
+    DEFAULT_EMIT_EVENTS,
+    DEFAULT_SPEECH_MODE,
+    SPEECH_MODE_GREG,
+    SPEECH_MODE_EVENT_ONLY,
     VERSION_DISPLAY,
 )
 
@@ -153,6 +159,16 @@ class GregConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 selector.NumberSelectorConfig(min=1, max=100, step=1, mode="slider")
             ),
             vol.Optional(CONF_SUPPRESS_CHIME, default=DEFAULT_SUPPRESS_CHIME): selector.BooleanSelector(),
+            vol.Optional(CONF_EMIT_EVENTS, default=DEFAULT_EMIT_EVENTS): selector.BooleanSelector(),
+            vol.Optional(CONF_SPEECH_MODE, default=DEFAULT_SPEECH_MODE): selector.SelectSelector(
+                selector.SelectSelectorConfig(
+                    options=[
+                        {"value": SPEECH_MODE_GREG, "label": "Greg speaks it himself"},
+                        {"value": SPEECH_MODE_EVENT_ONLY, "label": "Stay quiet, fire the event only"},
+                    ],
+                    mode="dropdown",
+                )
+            ),
         })
 
         return self.async_show_form(
@@ -235,6 +251,16 @@ class GregOptionsFlow(config_entries.OptionsFlow):
                 selector.NumberSelectorConfig(min=1, max=100, step=1, mode="slider")
             ),
             vol.Optional(CONF_SUPPRESS_CHIME, default=self._get(CONF_SUPPRESS_CHIME, DEFAULT_SUPPRESS_CHIME)): selector.BooleanSelector(),
+            vol.Optional(CONF_EMIT_EVENTS, default=self._get(CONF_EMIT_EVENTS, DEFAULT_EMIT_EVENTS)): selector.BooleanSelector(),
+            vol.Optional(CONF_SPEECH_MODE, default=self._get(CONF_SPEECH_MODE, DEFAULT_SPEECH_MODE)): selector.SelectSelector(
+                selector.SelectSelectorConfig(
+                    options=[
+                        {"value": SPEECH_MODE_GREG, "label": "Greg speaks it himself"},
+                        {"value": SPEECH_MODE_EVENT_ONLY, "label": "Stay quiet, fire the event only"},
+                    ],
+                    mode="dropdown",
+                )
+            ),
         })
 
         return self.async_show_form(step_id="advanced", data_schema=schema)

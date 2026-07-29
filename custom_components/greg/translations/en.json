@@ -25,10 +25,14 @@
           "silence_timeout": "Silence timeout (min)",
           "existential_interval": "Existential crisis interval (min)",
           "sensitivity": "Sensitivity",
-          "suppress_chime": "Attempt to suppress speaker chime"
+          "suppress_chime": "Attempt to suppress speaker chime",
+          "emit_events": "Fire an event for every line",
+          "speech_mode": "Who does the talking"
         },
         "data_description": {
-          "sensitivity": "How readily Greg reacts. 100 counts every sensor event. Lower values make him ignore repeat events for longer, so a twitchy sensor still only registers one disturbance per tap."
+          "sensitivity": "How readily Greg reacts. 100 counts every sensor event. Lower values make him ignore repeat events for longer, so a twitchy sensor still only registers one disturbance per tap.",
+          "emit_events": "Fires a greg_line event whenever Greg picks something to say, carrying the message, his mood, and the speaker he is set up with. Nothing listens unless you write an automation for it.",
+          "speech_mode": "Leave this on Greg and he speaks as usual. Set it to stay quiet and he picks the line and fires the event without saying anything, so your own automation can speak it, or hand it to a local AI first."
         }
       }
     }
@@ -59,10 +63,14 @@
           "silence_timeout": "Silence timeout (min)",
           "existential_interval": "Existential crisis interval (min)",
           "sensitivity": "Sensitivity",
-          "suppress_chime": "Attempt to suppress speaker chime"
+          "suppress_chime": "Attempt to suppress speaker chime",
+          "emit_events": "Fire an event for every line",
+          "speech_mode": "Who does the talking"
         },
         "data_description": {
-          "sensitivity": "How readily Greg reacts. 100 counts every sensor event. Lower values make him ignore repeat events for longer, so a twitchy sensor still only registers one disturbance per tap."
+          "sensitivity": "How readily Greg reacts. 100 counts every sensor event. Lower values make him ignore repeat events for longer, so a twitchy sensor still only registers one disturbance per tap.",
+          "emit_events": "Fires a greg_line event whenever Greg picks something to say, carrying the message, his mood, and the speaker he is set up with. Nothing listens unless you write an automation for it.",
+          "speech_mode": "Leave this on Greg and he speaks as usual. Set it to stay quiet and he picks the line and fires the event without saying anything, so your own automation can speak it, or hand it to a local AI first."
         }
       }
     }
