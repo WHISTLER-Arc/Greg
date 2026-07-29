@@ -10,21 +10,24 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - name: Point all tags at rewritten commits
+      - name: Repoint released tags at rewritten commits
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           set -euo pipefail
-          move() {
-            echo "moving $1 -> $2"
-            git tag -f "$1" "$2"
-            git push -f origin "refs/tags/$1"
+          # A tag with a release attached will not move by force-push alone, so
+          # the release has to be removed and recreated around the tag move.
+          repoint() {
+            tag=$1; sha=$2; notes=$3
+            echo "=== $tag -> $sha"
+            gh release delete "$tag" --repo WHISTLER-Arc/Greg --yes --cleanup-tag || true
+            git push origin ":refs/tags/$tag" || true
+            sleep 5
+            git tag -f "$tag" "$sha"
+            git push -f origin "refs/tags/$tag"
+            gh release create "$tag" --repo WHISTLER-Arc/Greg --title "$tag" --notes-file "$notes"
           }
-          move v1.3.0 dd32a3ecea2f88c9073ea175558420f12dd32601
-          move v1.3.1 e50fcf4575e46944c309ae60ea149de6a1bfb11b
-          move v1.3.2 8c225a2c9e8c1b5d1a897774a5f48bd1a5b72295
-          move v1.3.3 b53da8804ce404c10bad9e57aa9d668ab44112bf
-          move v1.3.4 8a8928c3944928a69087da17af71cffad3a70b21
+          repoint v1.3.3 b53da8804ce404c10bad9e57aa9d668ab44112bf .github/release-notes-133.md
+          repoint v1.3.4 8a8928c3944928a69087da17af71cffad3a70b21 .github/release-notes-134.md
           echo
-          echo "releases after move:"
           gh release list --repo WHISTLER-Arc/Greg
