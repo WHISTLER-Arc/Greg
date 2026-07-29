@@ -141,6 +141,17 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     return unload_ok
 
 
+async def async_remove_entry(hass: HomeAssistant, entry: ConfigEntry) -> None:
+    """Final cleanup when Greg is permanently removed."""
+    panel_state = hass.data.get(PANEL_DATA_KEY)
+    if panel_state and panel_state.get("registered"):
+        async_remove_panel(hass, PANEL_URL_PATH)
+        panel_state["registered"] = False
+    hass.data.pop(PANEL_DATA_KEY, None)
+    hass.data.pop(DOMAIN, None)
+    _LOGGER.info("Greg has been removed. He would have had something to say about this.")
+
+
 @callback
 def _async_register_services(hass: HomeAssistant) -> None:
     """Register the greg.poke service once."""
