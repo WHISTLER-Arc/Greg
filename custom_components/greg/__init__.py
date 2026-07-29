@@ -7,6 +7,7 @@ import random
 import asyncio
 import shutil
 from datetime import datetime, time, timedelta
+from time import monotonic
 
 import voluptuous as vol
 from homeassistant.config_entries import ConfigEntry
@@ -40,7 +41,10 @@ from .const import (
     CONF_RESET_DELAY,
     CONF_SILENCE_TIMEOUT,
     CONF_EXISTENTIAL_INTERVAL,
+    CONF_SENSITIVITY,
     CONF_SUPPRESS_CHIME,
+    DEFAULT_SENSITIVITY,
+    SENSITIVITY_MAX_DEBOUNCE,
     MOOD_RESTING,
     MOOD_ANNOYED,
     MOOD_JUDGING,
@@ -242,6 +246,8 @@ class GregCoordinator:
         self._unsub_sensor = None
         self._unsub_midnight = None
         self._last_lines_used: dict[str, str] = {}
+        # Monotonic timestamp of the last sensor event Greg actually accepted.
+        self._last_accepted: float | None = None
 
     # ---- lifecycle -------------------------------------------------------
 
@@ -274,6 +280,9 @@ class GregCoordinator:
             if timer:
                 timer.cancel()
                 setattr(self, timer_attr, None)
+        # A reload may change the sensor or the sensitivity, so the old
+        # refractory window should not carry over into the new config.
+        self._last_accepted = None
 
     async def async_reload(self, hass: HomeAssistant, entry: ConfigEntry) -> None:
         self._config = {**entry.data, **entry.options}
@@ -299,12 +308,43 @@ class GregCoordinator:
 
     # ---- reactions -------------------------------------------------------
 
+    def _debounce_seconds(self) -> float:
+        """How long Greg ignores the sensor after accepting a disturbance.
+
+        Derived from sensitivity: 100 returns 0 and filters nothing, lower
+        values widen the window. A cheap vibration sensor often fires several
+        times for one physical tap, and without this every one of those counts
+        as a separate disturbance and rockets Greg into chaos over nothing.
+        """
+        raw = self._config.get(CONF_SENSITIVITY, DEFAULT_SENSITIVITY)
+        try:
+            sensitivity = float(raw)
+        except (TypeError, ValueError):
+            sensitivity = float(DEFAULT_SENSITIVITY)
+        sensitivity = max(1.0, min(100.0, sensitivity))
+        return (100.0 - sensitivity) / 100.0 * SENSITIVITY_MAX_DEBOUNCE
+
+    @callback
+    def _is_bounce(self) -> bool:
+        """True when this event lands inside the refractory window."""
+        now = monotonic()
+        window = self._debounce_seconds()
+        if window > 0 and self._last_accepted is not None:
+            if now - self._last_accepted < window:
+                return True
+        self._last_accepted = now
+        return False
+
     @callback
     def _handle_vibration(self, event) -> None:
         new_state = event.data.get("new_state")
         if new_state is None or new_state.state not in ("on", "vibrating", "detected"):
             return
         if not self.enabled or self._is_quiet_time():
+            return
+        # Filtered before anything is counted, so a bouncy sensor does not
+        # inflate the daily tally either.
+        if self._is_bounce():
             return
 
         self._counter += 1

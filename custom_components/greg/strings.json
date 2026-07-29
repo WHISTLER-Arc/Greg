@@ -26,6 +26,9 @@
           "existential_interval": "Existential crisis interval (min)",
           "sensitivity": "Sensitivity",
           "suppress_chime": "Attempt to suppress speaker chime"
+        },
+        "data_description": {
+          "sensitivity": "How readily Greg reacts. 100 counts every sensor event. Lower values make him ignore repeat events for longer, so a twitchy sensor still only registers one disturbance per tap."
         }
       }
     }
@@ -57,6 +60,9 @@
           "existential_interval": "Existential crisis interval (min)",
           "sensitivity": "Sensitivity",
           "suppress_chime": "Attempt to suppress speaker chime"
+        },
+        "data_description": {
+          "sensitivity": "How readily Greg reacts. 100 counts every sensor event. Lower values make him ignore repeat events for longer, so a twitchy sensor still only registers one disturbance per tap."
         }
       }
     }

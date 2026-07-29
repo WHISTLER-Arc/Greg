@@ -1,8 +1,8 @@
 """Constants for Greg integration."""
 
 DOMAIN = "greg"
-VERSION = "1.3.3"
-VERSION_DISPLAY = "v1.3.3"
+VERSION = "1.3.4"
+VERSION_DISPLAY = "v1.3.4"
 
 # Config keys
 CONF_VIBRATION_SENSOR = "vibration_sensor"
@@ -34,6 +34,11 @@ DEFAULT_RESET_DELAY = 8
 DEFAULT_SILENCE_TIMEOUT = 20
 DEFAULT_EXISTENTIAL_INTERVAL = 42
 DEFAULT_SENSITIVITY = 75
+# Sensitivity is a refractory window, not a gain. Once Greg registers a
+# disturbance he ignores further sensor events for a moment, so a sensor that
+# fires a burst on one physical tap still only counts as one tap. 100 filters
+# nothing; 1 filters for very nearly this many seconds.
+SENSITIVITY_MAX_DEBOUNCE = 10.0
 DEFAULT_SUPPRESS_CHIME = True
 
 # Mood states
