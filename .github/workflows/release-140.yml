@@ -1,0 +1,22 @@
+name: Release v1.4.0
+on:
+  workflow_dispatch:
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Create v1.4.0
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          SHA=4aeb5178e10b574c5caeba5ff63fd6d505018d74
+          git tag -f v1.4.0 "$SHA"
+          git push -f origin refs/tags/v1.4.0
+          gh release create v1.4.0 --repo WHISTLER-Arc/Greg --title v1.4.0 --notes-file .github/release-notes-140.md
+          gh release view v1.4.0 --repo WHISTLER-Arc/Greg --json tagName,isDraft
