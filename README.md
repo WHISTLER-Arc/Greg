@@ -98,7 +98,18 @@ The setup wizard keeps things simple, unless you want to get into the weeds.
 - Fiddle with sensitivity
 - Toggle chime suppression
 
-**About sensitivity.** Cheap vibration sensors are chatty. One tap on the table can make them fire five or six times in a second, and Greg used to count every one of those as a separate disturbance, which sent him into a full existential crisis over a coaster. Sensitivity is the fix. At **100** he counts every event the sensor sends. Lower it and he ignores repeat events for longer, so one physical tap registers as one disturbance. The default of **75** gives him a two and a half second memory, which suits most sensors. Drop it if yours is especially twitchy.
+**About sensitivity.** Cheap vibration sensors are chatty. One tap on the table can make them fire five or six times in a second, and Greg used to count every one of those as a separate disturbance, which sent him into a full existential crisis over a coaster.
+
+Sensitivity now controls a refractory window on the vibration sensor. After Greg accepts a disturbance he ignores the sensor for a moment, so one physical tap counts once instead of five or six times.
+
+| Sensitivity | Window | Effect |
+|---|---|---|
+| 100 | 0s | Counts every event — the old behaviour |
+| 75 (default) | 2.5s | Mild damping, suits most sensors |
+| 50 | 5s | Heavier |
+| 1 | 9.9s | Very twitchy sensors |
+
+Filtering happens before anything is counted, so a bouncy sensor does not inflate the daily disturbance tally either.
 
 ---
 
