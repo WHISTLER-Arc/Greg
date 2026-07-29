@@ -13,31 +13,28 @@ jobs:
       - name: Recut v1.3.3 onto the wizard commit
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: WHISTLER-Arc/Greg
         run: |
           set -euo pipefail
-          gh release delete v1.3.3 --repo WHISTLER-Arc/Greg --yes --cleanup-tag || true
+          {
+            echo "## Uninstall wizard"
+            echo
+            echo "Greg can now take himself apart. There is an **Uninstall Greg** section at the bottom of his panel that walks through it in five steps: confirm, disassembly, restart, cache clearing, goodbye."
+            echo
+            echo "Removing the config entry cascades to his entities, device and stored state. The wizard then unregisters the panel and deletes his mood images from \`/config/www/greg/\`, which Home Assistant does not clean up on its own."
+            echo
+            echo "Nothing is matched by entity name. Your automations, your vibration sensor, your other integrations and any helper you made yourself are left alone, including anything you happen to have named \`greg_*\`."
+            echo
+            echo "Greg cannot delete his own code while he is running it, so remove the repository in HACS once the wizard is finished."
+            echo
+            echo "Also adds a \`greg.uninstall\` service with an optional \`restart\` boolean, for anyone who would rather script it."
+            echo
+            echo "## Other"
+            echo
+            echo "- Options flow carries the full advanced settings and the TTS engine picker."
+            echo "- Versions in \`manifest.json\` and \`const.py\` are back in sync."
+          } > notes.md
+          gh release delete v1.3.3 --repo "$REPO" --yes --cleanup-tag || true
           git push --delete origin refs/tags/v1.3.3 || true
           sleep 5
-          gh release create v1.3.3 \
-            --repo WHISTLER-Arc/Greg \
-            --target "$GITHUB_SHA" \
-            --title "v1.3.3" \
-            --notes "$(cat <<'NOTES'
-## Uninstall wizard
-
-Greg can now take himself apart. There is an **Uninstall Greg** section at the bottom of his panel that walks through it in five steps: confirm, disassembly, restart, cache clearing, goodbye.
-
-Removing the config entry cascades to his entities, device and stored state. The wizard then unregisters the panel and deletes his mood images from `/config/www/greg/`, which Home Assistant does not clean up on its own.
-
-Nothing is matched by entity name. Your automations, your vibration sensor, your other integrations and any helper you made yourself are left alone, including anything you happen to have named `greg_*`.
-
-Greg cannot delete his own code while he is running it, so remove the repository in HACS once the wizard is finished.
-
-Also adds a `greg.uninstall` service with an optional `restart` boolean, for anyone who would rather script it.
-
-## Other
-
-- Options flow carries the full advanced settings and the TTS engine picker.
-- Versions in `manifest.json` and `const.py` are back in sync.
-NOTES
-)"
+          gh release create v1.3.3 --repo "$REPO" --target "$GITHUB_SHA" --title "v1.3.3" --notes-file notes.md
