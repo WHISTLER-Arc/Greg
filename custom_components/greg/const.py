@@ -56,8 +56,13 @@ MOOD_IMAGES = {
 # Platforms owned by this integration
 PLATFORMS = ["sensor", "switch"]
 
-# Service
+# Services
 SERVICE_POKE = "poke"
+SERVICE_UNINSTALL = "uninstall"
+
+# Greg's mood images live here once installed. This is the only path outside
+# the integration folder that Greg owns, and the only one the wizard deletes.
+WWW_ASSET_DIR = "greg"
 
 # Panel
 PANEL_URL_PATH = "greg"

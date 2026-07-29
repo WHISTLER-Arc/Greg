@@ -3,3 +3,19 @@ poke:
   description: >
     Force Greg to react on demand, as though something was set down on him.
     He will not enjoy it.
+
+uninstall:
+  name: Uninstall Greg
+  description: >
+    Remove Greg completely. Deletes his config entry, entities, panel and mood
+    images. Automations, sensors and helpers you own are left alone.
+  fields:
+    restart:
+      name: Restart afterwards
+      description: >
+        Restart Home Assistant once the removal is done, so the last references
+        clear from memory.
+      required: false
+      default: false
+      selector:
+        boolean:

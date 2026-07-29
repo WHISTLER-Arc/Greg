@@ -47,6 +47,8 @@ from .const import (
     MOOD_EXISTENTIAL,
     MOOD_IMAGES,
     SERVICE_POKE,
+    SERVICE_UNINSTALL,
+    WWW_ASSET_DIR,
     LINES_SOFT,
     LINES_MEDIUM,
     LINES_CHAOS,
@@ -135,26 +137,48 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         if panel_state and panel_state["registered"]:
             async_remove_panel(hass, PANEL_URL_PATH)
             panel_state["registered"] = False
-        if hass.services.has_service(DOMAIN, SERVICE_POKE):
-            hass.services.async_remove(DOMAIN, SERVICE_POKE)
+        for service in (SERVICE_POKE, SERVICE_UNINSTALL):
+            if hass.services.has_service(DOMAIN, service):
+                hass.services.async_remove(DOMAIN, service)
 
     return unload_ok
 
 
+def _delete_www_assets(path: str) -> None:
+    """Delete Greg's mood images. Blocking, so this runs in the executor.
+
+    Scoped to /config/www/greg only. Nothing outside that directory is touched.
+    """
+    if os.path.isdir(path):
+        shutil.rmtree(path, ignore_errors=True)
+
+
 async def async_remove_entry(hass: HomeAssistant, entry: ConfigEntry) -> None:
-    """Final cleanup when Greg is permanently removed."""
+    """Final cleanup when Greg is permanently removed.
+
+    Entities, the device and coordinator storage are already gone by this point:
+    HA cascades those off the config entry. What is left is the panel, and the
+    mood images in /config/www, which HA does not clean up for us.
+
+    Static paths registered with async_register_static_paths cannot be released
+    at runtime. They clear on restart, which is why the wizard asks for one.
+    """
     panel_state = hass.data.get(PANEL_DATA_KEY)
     if panel_state and panel_state.get("registered"):
         async_remove_panel(hass, PANEL_URL_PATH)
         panel_state["registered"] = False
     hass.data.pop(PANEL_DATA_KEY, None)
     hass.data.pop(DOMAIN, None)
+
+    www_dir = hass.config.path("www", WWW_ASSET_DIR)
+    await hass.async_add_executor_job(_delete_www_assets, www_dir)
+
     _LOGGER.info("Greg has been removed. He would have had something to say about this.")
 
 
 @callback
 def _async_register_services(hass: HomeAssistant) -> None:
-    """Register the greg.poke service once."""
+    """Register Greg's services once."""
     if hass.services.has_service(DOMAIN, SERVICE_POKE):
         return
 
@@ -164,7 +188,36 @@ def _async_register_services(hass: HomeAssistant) -> None:
             if isinstance(coordinator, GregCoordinator):
                 await coordinator.async_poke()
 
+    async def _handle_uninstall(call) -> None:
+        """Remove Greg. Only what Greg owns, nothing else.
+
+        Removing the config entry cascades through HA: platforms unload, then
+        entities, the device and coordinator storage go with it. async_remove_entry
+        handles the panel and the mood images afterwards.
+
+        Nothing here matches on entity name. A user may legitimately own entities
+        called greg_something that we did not create, and those must survive.
+        """
+        entry_ids = [
+            entry_id
+            for entry_id, value in hass.data.get(DOMAIN, {}).items()
+            if isinstance(value, GregCoordinator)
+        ]
+        for entry_id in entry_ids:
+            await hass.config_entries.async_remove(entry_id)
+
+        if call.data.get("restart"):
+            await hass.services.async_call(
+                "homeassistant", "restart", {}, blocking=False
+            )
+
     hass.services.async_register(DOMAIN, SERVICE_POKE, _handle_poke)
+    hass.services.async_register(
+        DOMAIN,
+        SERVICE_UNINSTALL,
+        _handle_uninstall,
+        schema=vol.Schema({vol.Optional("restart", default=False): cv.boolean}),
+    )
 
 
 class GregCoordinator:

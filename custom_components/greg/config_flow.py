@@ -181,10 +181,7 @@ class GregOptionsFlow(config_entries.OptionsFlow):
     async def async_step_init(self, user_input=None):
         if user_input is not None:
             show_advanced = user_input.pop("show_advanced", False)
-            show_remove = user_input.pop("show_remove", False)
             self._data = user_input
-            if show_remove:
-                return await self.async_step_confirm_remove()
             if show_advanced:
                 return await self.async_step_advanced()
             return self.async_create_entry(title="", data=self._data)
@@ -206,7 +203,6 @@ class GregOptionsFlow(config_entries.OptionsFlow):
             vol.Optional(CONF_QUIET_START, default=self._get(CONF_QUIET_START, DEFAULT_QUIET_START)): selector.TextSelector(),
             vol.Optional(CONF_QUIET_END, default=self._get(CONF_QUIET_END, DEFAULT_QUIET_END)): selector.TextSelector(),
             vol.Optional("show_advanced", default=False): selector.BooleanSelector(),
-            vol.Optional("show_remove", default=False): selector.BooleanSelector(),
         })
 
         return self.async_show_form(step_id="init", data_schema=schema)
@@ -242,17 +238,3 @@ class GregOptionsFlow(config_entries.OptionsFlow):
         })
 
         return self.async_show_form(step_id="advanced", data_schema=schema)
-
-    async def async_step_confirm_remove(self, user_input=None):
-        if user_input is not None:
-            if user_input.get("confirm"):
-                self.hass.async_create_task(
-                    self.hass.config_entries.async_remove(self._entry.entry_id)
-                )
-                return self.async_abort(reason="removed")
-            return await self.async_step_init()
-
-        schema = vol.Schema({
-            vol.Required("confirm", default=False): selector.BooleanSelector(),
-        })
-        return self.async_show_form(step_id="confirm_remove", data_schema=schema)

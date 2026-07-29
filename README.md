@@ -170,6 +170,24 @@ Greg respects quiet hours (you set them during setup), and you can flip quiet mo
 
 ---
 
+## Uninstalling Greg
+
+As of v1.3.3 Greg can take himself apart. There's an **Uninstall Greg** section at the bottom of his panel that walks you through it in five steps.
+
+1. **Confirm.** Tells you exactly what goes and what stays before anything happens.
+2. **Disassembly.** Removes the config entry, which takes his entities, his device and his stored state with it, then unregisters the panel and deletes his mood images from `/config/www/greg/`.
+3. **Restart.** Offers to restart Home Assistant, because a few references hang around in memory until it does. You can skip it.
+4. **The stubborn bits.** Reminds you to force-close the Companion app and hard-refresh your browser, which is the part everyone forgets and then wonders why a ghost of him is still in the sidebar.
+5. **Goodbye.** Greg has something to say about it.
+
+Then remove the repository in HACS. Greg can't delete his own code while he's running it, which he'd tell you is a fitting limitation.
+
+**What he will not touch:** your automations, your vibration sensor, your other integrations, and any helper or entity you made yourself. He only removes things his own config entry owns. Nothing is matched by name, so if you happen to have your own helpers called `greg_something`, they're safe.
+
+There's also a `greg.uninstall` service if you'd rather script it. It takes an optional `restart` boolean.
+
+---
+
 ## Where Greg's going
 
 - **v1.3.** Current release. Single room, no Blueprints, works with any protocol, and he brings his own sidebar panel.
