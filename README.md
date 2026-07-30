@@ -205,11 +205,13 @@ data:
   volume: 0.35
 ```
 
+The event fires even when Greg is speaking normally. That's enough on its own if you just want to do something alongside him — log his lines, push them to your phone, display them on a dashboard. No local AI required.
+
 ### Letting something else do the talking
 
-In Greg's advanced settings, **Who does the talking** has two positions. Leave it on Greg and nothing changes. Set it to stay quiet and he picks his line, fires the event, and says nothing, which leaves the floor to you.
+In Greg's advanced settings, **Who does the talking** has two positions. Leave it on Greg and nothing changes. Set it to stay quiet and he picks his line, fires the event, and says nothing — which leaves the floor to you.
 
-That's the interesting one. Greg writes the thought, your local model rewrites it, your speaker delivers the result:
+That's the one for the local AI path. Greg writes the thought, your model rewrites it, your speaker delivers the result:
 
 ```yaml
 automation:
@@ -233,11 +235,11 @@ automation:
           message: "{{ reply.response.speech.plain.speech }}"
 ```
 
-Swap `conversation.my_local_llm` for whichever agent you run. Ollama, LocalAI, or a cloud one if you don't mind a table with a subscription.
+Swap `conversation.my_local_llm` for whichever agent you run. Ollama, LocalAI, or a cloud one if you don't mind a table with a subscription. Without a local model set up, leave **Who does the talking** on Greg — "stay quiet" with nothing listening just means silence.
 
 You can also turn the event off entirely in advanced settings if you'd rather he kept his thoughts to himself.
 
-> Thanks to **teskanoo** for asking for this one, twice, and offering to fork it and do it himself. That is usually the point where a feature stops being optional.
+> Thanks to **[teskanoo](https://community.home-assistant.io/t/i-gave-my-coffee-table-feelings-mostly-bad-ones-meet-greg/1015547/6?u=whistler-arc)** for asking for this one. That is usually the point where a feature stops being optional.
 
 ---
 
