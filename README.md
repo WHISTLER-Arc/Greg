@@ -94,14 +94,20 @@ The setup wizard keeps things simple, unless you want to get into the weeds.
 - Tune the vibration thresholds for each reaction level
 - Change how long the room has to be quiet before silence mode kicks in
 - Adjust how often the existential crises hit
-- Fiddle with sensitivity
 - Toggle chime suppression
 - Turn his occasional openers on or off
 - Give him a specific TTS voice
 
+**Changing your mind later.** As of v1.4.2 the basic settings live in Greg's own
+panel, in the column on the right. Sensor, speaker, text to speech, volume,
+sensitivity and quiet hours, all editable there without going near the
+integration page. Change what you like and press Apply. Everything in the
+advanced list above still lives in **Settings > Devices & Services > Greg >
+Configure**, and there's a link straight to it from the panel.
+
 **About sensitivity.** Cheap vibration sensors are chatty. One tap on the table can make them fire five or six times in a second, and Greg used to count every one of those as a separate disturbance, which sent him into a full existential crisis over a coaster.
 
-Sensitivity now controls a refractory window on the vibration sensor. After Greg accepts a disturbance he ignores the sensor for a moment, so one physical tap counts once instead of five or six times.
+Sensitivity controls a refractory window on the vibration sensor. After Greg accepts a disturbance he ignores the sensor for a moment, so one physical tap counts once instead of five or six times.
 
 | Sensitivity | Window | Effect |
 |---|---|---|

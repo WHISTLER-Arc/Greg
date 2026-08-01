@@ -19,3 +19,64 @@ uninstall:
       default: false
       selector:
         boolean:
+
+set_options:
+  name: Change basic settings
+  description: >
+    Update Greg's basic settings. Anything left out is untouched. Changing a
+    setting reloads him, so send everything that changed in one call rather
+    than one call per field. This is what his panel uses.
+  fields:
+    vibration_sensor:
+      name: Vibration sensor
+      description: The binary sensor Greg listens to.
+      selector:
+        entity:
+          domain: binary_sensor
+    media_player:
+      name: Speaker
+      description: Where Greg speaks.
+      selector:
+        entity:
+          domain: media_player
+    tts_engine:
+      name: Text to speech engine
+      description: The TTS entity Greg speaks through.
+      selector:
+        entity:
+          domain: tts
+    volume:
+      name: Volume
+      description: Playback volume, 0 to 1.
+      selector:
+        number:
+          min: 0
+          max: 1
+          step: 0.05
+    sensitivity:
+      name: Sensitivity
+      description: >
+        Higher counts more sensor events. Lower widens the refractory window so
+        one physical tap counts once.
+      selector:
+        number:
+          min: 1
+          max: 100
+          step: 1
+    quiet_hours_enabled:
+      name: Quiet hours
+      description: Whether Greg keeps quiet overnight.
+      selector:
+        boolean:
+    quiet_start:
+      name: Quiet from
+      description: 24 hour time, for example 22:00.
+      example: "22:00"
+      selector:
+        text:
+    quiet_end:
+      name: Quiet until
+      description: 24 hour time, for example 08:00.
+      example: "08:00"
+      selector:
+        text:

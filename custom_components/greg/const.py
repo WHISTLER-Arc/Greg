@@ -1,8 +1,8 @@
 """Constants for Greg integration."""
 
 DOMAIN = "greg"
-VERSION = "1.4.1"
-VERSION_DISPLAY = "v1.4.1"
+VERSION = "1.4.2"
+VERSION_DISPLAY = "v1.4.2"
 
 # Config keys
 CONF_VIBRATION_SENSOR = "vibration_sensor"
@@ -104,6 +104,20 @@ PLATFORMS = ["sensor", "switch"]
 # Services
 SERVICE_POKE = "poke"
 SERVICE_UNINSTALL = "uninstall"
+SERVICE_SET_OPTIONS = "set_options"
+
+# The settings Greg's own panel can change. Everything else stays in the options
+# flow, because the panel has no business rendering twelve sliders.
+BASIC_OPTION_KEYS = (
+    CONF_VIBRATION_SENSOR,
+    CONF_MEDIA_PLAYER,
+    CONF_TTS_ENGINE,
+    CONF_VOLUME,
+    CONF_SENSITIVITY,
+    CONF_QUIET_HOURS_ENABLED,
+    CONF_QUIET_START,
+    CONF_QUIET_END,
+)
 
 # Greg's mood images live here once installed. This is the only path outside
 # the integration folder that Greg owns, and the only one the wizard deletes.

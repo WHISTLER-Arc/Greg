@@ -3,6 +3,29 @@
 All notable changes to Greg. He would like it noted that he did not ask to be
 versioned.
 
+## [1.4.2]
+
+### Added
+- **Greg's panel does something now.** The right-hand column held one switch that
+  duplicated the one beside Disturb Greg, and a note telling you to go and look
+  somewhere else. It now holds the settings you picked at install: sensor,
+  speaker, text to speech, volume, sensitivity and quiet hours. Changes are
+  applied together on one button, because writing to the config entry reloads
+  him and doing that per slider nudge would be unpleasant.
+- `greg.set_options` service behind it, so the same settings can be scripted.
+- Sensitivity moved up from advanced, since it is the one people actually
+  adjust after installing.
+
+### Changed
+- The uninstall section moved out of its full-width strip and into the settings
+  column, where it belongs.
+- Quiet hours times fold away when quiet hours are off.
+
+### Fixed
+- **`hacs.json` demanded Home Assistant 2026.3.0.** Nothing in Greg needs it. The
+  README has been promising 2025.1.0 the whole time, and anyone in between was
+  told they were supported and then found they were not. Now says 2025.1.0.
+
 ## [1.4.1]
 
 ### Added
