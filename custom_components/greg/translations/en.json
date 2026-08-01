@@ -26,11 +26,15 @@
           "existential_interval": "Existential crisis interval (min)",
           "sensitivity": "Sensitivity",
           "suppress_chime": "Attempt to suppress speaker chime",
+          "openers": "Occasional openers",
+          "tts_voice": "Voice",
           "emit_events": "Fire an event for every line",
           "speech_mode": "Who does the talking"
         },
         "data_description": {
           "sensitivity": "How readily Greg reacts. 100 counts every sensor event. Lower values make him ignore repeat events for longer, so a twitchy sensor still only registers one disturbance per tap.",
+          "openers": "Every so often Greg starts a line with a Right. or an Ah. before he gets going. Roughly one line in three, and the rest of the time there is nothing there at all, which is the part that stops him sounding like he is reading from a list.",
+          "tts_voice": "Optional. The exact voice name to speak with, for example en_GB-alan-medium. Leave it empty and Greg uses whatever your TTS engine defaults to, which also means changing that default to suit Greg changes it for everything else using the same engine. Engines that take no voice option will reject this, so leave it empty unless you know your engine accepts one.",
           "emit_events": "Fires a greg_line event whenever Greg picks something to say, carrying the message, his mood, and the speaker he is set up with. Nothing listens unless you write an automation for it.",
           "speech_mode": "Leave this on Greg and he speaks as usual. Set it to stay quiet and he picks the line and fires the event without saying anything, so your own automation can speak it, or hand it to a local AI first."
         }
@@ -64,11 +68,15 @@
           "existential_interval": "Existential crisis interval (min)",
           "sensitivity": "Sensitivity",
           "suppress_chime": "Attempt to suppress speaker chime",
+          "openers": "Occasional openers",
+          "tts_voice": "Voice",
           "emit_events": "Fire an event for every line",
           "speech_mode": "Who does the talking"
         },
         "data_description": {
           "sensitivity": "How readily Greg reacts. 100 counts every sensor event. Lower values make him ignore repeat events for longer, so a twitchy sensor still only registers one disturbance per tap.",
+          "openers": "Every so often Greg starts a line with a Right. or an Ah. before he gets going. Roughly one line in three, and the rest of the time there is nothing there at all, which is the part that stops him sounding like he is reading from a list.",
+          "tts_voice": "Optional. The exact voice name to speak with, for example en_GB-alan-medium. Leave it empty and Greg uses whatever your TTS engine defaults to, which also means changing that default to suit Greg changes it for everything else using the same engine. Engines that take no voice option will reject this, so leave it empty unless you know your engine accepts one.",
           "emit_events": "Fires a greg_line event whenever Greg picks something to say, carrying the message, his mood, and the speaker he is set up with. Nothing listens unless you write an automation for it.",
           "speech_mode": "Leave this on Greg and he speaks as usual. Set it to stay quiet and he picks the line and fires the event without saying anything, so your own automation can speak it, or hand it to a local AI first."
         }

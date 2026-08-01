@@ -26,6 +26,8 @@ from .const import (
     CONF_SUPPRESS_CHIME,
     CONF_EMIT_EVENTS,
     CONF_SPEECH_MODE,
+    CONF_OPENERS,
+    CONF_TTS_VOICE,
     DEFAULT_VOLUME,
     DEFAULT_QUIET_START,
     DEFAULT_QUIET_END,
@@ -39,6 +41,8 @@ from .const import (
     DEFAULT_SUPPRESS_CHIME,
     DEFAULT_EMIT_EVENTS,
     DEFAULT_SPEECH_MODE,
+    DEFAULT_OPENERS,
+    DEFAULT_TTS_VOICE,
     SPEECH_MODE_GREG,
     SPEECH_MODE_EVENT_ONLY,
     VERSION_DISPLAY,
@@ -159,6 +163,8 @@ class GregConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 selector.NumberSelectorConfig(min=1, max=100, step=1, mode="slider")
             ),
             vol.Optional(CONF_SUPPRESS_CHIME, default=DEFAULT_SUPPRESS_CHIME): selector.BooleanSelector(),
+            vol.Optional(CONF_OPENERS, default=DEFAULT_OPENERS): selector.BooleanSelector(),
+            vol.Optional(CONF_TTS_VOICE, default=DEFAULT_TTS_VOICE): selector.TextSelector(),
             vol.Optional(CONF_EMIT_EVENTS, default=DEFAULT_EMIT_EVENTS): selector.BooleanSelector(),
             vol.Optional(CONF_SPEECH_MODE, default=DEFAULT_SPEECH_MODE): selector.SelectSelector(
                 selector.SelectSelectorConfig(
@@ -251,6 +257,8 @@ class GregOptionsFlow(config_entries.OptionsFlow):
                 selector.NumberSelectorConfig(min=1, max=100, step=1, mode="slider")
             ),
             vol.Optional(CONF_SUPPRESS_CHIME, default=self._get(CONF_SUPPRESS_CHIME, DEFAULT_SUPPRESS_CHIME)): selector.BooleanSelector(),
+            vol.Optional(CONF_OPENERS, default=self._get(CONF_OPENERS, DEFAULT_OPENERS)): selector.BooleanSelector(),
+            vol.Optional(CONF_TTS_VOICE, default=self._get(CONF_TTS_VOICE, DEFAULT_TTS_VOICE)): selector.TextSelector(),
             vol.Optional(CONF_EMIT_EVENTS, default=self._get(CONF_EMIT_EVENTS, DEFAULT_EMIT_EVENTS)): selector.BooleanSelector(),
             vol.Optional(CONF_SPEECH_MODE, default=self._get(CONF_SPEECH_MODE, DEFAULT_SPEECH_MODE)): selector.SelectSelector(
                 selector.SelectSelectorConfig(

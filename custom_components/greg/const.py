@@ -1,8 +1,8 @@
 """Constants for Greg integration."""
 
 DOMAIN = "greg"
-VERSION = "1.4.0"
-VERSION_DISPLAY = "v1.4.0"
+VERSION = "1.4.1"
+VERSION_DISPLAY = "v1.4.1"
 
 # Config keys
 CONF_VIBRATION_SENSOR = "vibration_sensor"
@@ -24,6 +24,8 @@ CONF_SENSITIVITY = "sensitivity"
 CONF_SUPPRESS_CHIME = "suppress_chime"
 CONF_EMIT_EVENTS = "emit_events"
 CONF_SPEECH_MODE = "speech_mode"
+CONF_OPENERS = "openers"
+CONF_TTS_VOICE = "tts_voice"
 
 # Defaults - conservative, not annoying
 DEFAULT_VOLUME = 0.35
@@ -54,6 +56,30 @@ SPEECH_MODE_GREG = "greg"
 SPEECH_MODE_EVENT_ONLY = "event_only"
 SPEECH_MODES = [SPEECH_MODE_GREG, SPEECH_MODE_EVENT_ONLY]
 DEFAULT_SPEECH_MODE = SPEECH_MODE_GREG
+
+# Greg sometimes clears his throat before a line. The point is not the variety,
+# it is that most of the time there is nothing there at all, which is what stops
+# him sounding like he is reading from a list. Idea from RedKing on the HA forum.
+OPENERS = [
+    "Right.",
+    "Well.",
+    "Ah.",
+    "I see.",
+    "So.",
+    "Very well.",
+]
+OPENER_CHANCE = 0.3
+DEFAULT_OPENERS = True
+
+# How many lines either side of a reshuffle are kept apart. A fair shuffle will
+# happily put a line at the end of one cycle and the start of the next, which
+# sounds like a repeat even though every line is still played exactly once.
+DECK_SEAM_GUARD = 5
+
+# Passed straight through to the TTS engine as options.voice when set. Left empty
+# Greg uses whatever the engine defaults to, which is fine until you also use that
+# engine for something else and would rather it did not sound like a tired table.
+DEFAULT_TTS_VOICE = ""
 
 # Mood states
 MOOD_RESTING = "resting"

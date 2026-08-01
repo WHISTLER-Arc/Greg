@@ -338,7 +338,9 @@ class GregPanel extends HTMLElement {
     // firmware gag bound to actual installed version (device sw_version)
     const fw = r.getElementById("firmware");
     const ver = this._installedVersion();
-    fw.textContent = `Greg OS ${ver} · sentience: regrettably stable · warranty void since manufacture`;
+    fw.textContent = ver
+      ? `Greg OS ${ver} · sentience: regrettably stable · warranty void since manufacture`
+      : "Greg OS · sentience: regrettably stable · warranty void since manufacture";
 
     this._ensureCountdown();
   }
@@ -602,10 +604,12 @@ class GregPanel extends HTMLElement {
   }
 
   _installedVersion() {
-    // pull sw_version from any greg device via an entity's attributes if present
+    // Mood sensor carries sw_version as a state attribute. Anything older than
+    // v1.4.1 did not expose it, so there is no version to report rather than a
+    // hardcoded one that was wrong on every install after the day it was written.
     const moodS = this._moodState();
     if (moodS && moodS.attributes && moodS.attributes.sw_version) return moodS.attributes.sw_version;
-    return "v1.3";
+    return "";
   }
 
   _ensureCountdown() {
