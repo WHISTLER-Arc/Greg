@@ -105,7 +105,7 @@ Sensitivity now controls a refractory window on the vibration sensor. After Greg
 
 | Sensitivity | Window | Effect |
 |---|---|---|
-| 100 | 0s | Counts every event — the old behaviour |
+| 100 | 0s | Counts every event, the old behaviour |
 | 75 (default) | 2.5s | Mild damping, suits most sensors |
 | 50 | 5s | Heavier |
 | 1 | 9.9s | Very twitchy sensors |
@@ -219,11 +219,11 @@ data:
 
 `message` is what Greg actually says, including the opener if one landed. `line` is the written line on its own. Use `line` if you're handing it to something that'll rephrase it anyway, since the opener is just noise in a prompt.
 
-The event fires even when Greg is speaking normally. That's enough on its own if you just want to do something alongside him — log his lines, push them to your phone, display them on a dashboard. No local AI required.
+The event fires even when Greg is speaking normally. That's enough on its own if you just want to do something alongside him. Log his lines, push them to your phone, display them on a dashboard. No local AI required.
 
 ### Letting something else do the talking
 
-In Greg's advanced settings, **Who does the talking** has two positions. Leave it on Greg and nothing changes. Set it to stay quiet and he picks his line, fires the event, and says nothing — which leaves the floor to you.
+In Greg's advanced settings, **Who does the talking** has two positions. Leave it on Greg and nothing changes. Set it to stay quiet and he picks his line, fires the event, and says nothing, which leaves the floor to you.
 
 That's the one for the local AI path. Greg writes the thought, your model rewrites it, your speaker delivers the result:
 
@@ -249,7 +249,7 @@ automation:
           message: "{{ reply.response.speech.plain.speech }}"
 ```
 
-Swap `conversation.my_local_llm` for whichever agent you run. Ollama, LocalAI, or a cloud one if you don't mind a table with a subscription. Without a local model set up, leave **Who does the talking** on Greg — "stay quiet" with nothing listening just means silence.
+Swap `conversation.my_local_llm` for whichever agent you run. Ollama, LocalAI, or a cloud one if you don't mind a table with a subscription. Without a local model set up, leave **Who does the talking** on Greg. "Stay quiet" with nothing listening just means silence.
 
 ### Building your own moans
 

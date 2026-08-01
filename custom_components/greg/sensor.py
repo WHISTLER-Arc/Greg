@@ -1,4 +1,4 @@
-"""Greg sensor entities — mood, level, last line, daily tally."""
+"""Greg sensor entities. Mood, level, last line, daily tally."""
 from __future__ import annotations
 
 from homeassistant.components.sensor import SensorEntity

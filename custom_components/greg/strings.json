@@ -16,7 +16,7 @@
         }
       },
       "advanced": {
-        "title": "Greg — advanced",
+        "title": "Greg, advanced settings",
         "data": {
           "soft_threshold": "Soft reaction threshold",
           "medium_threshold": "Medium reaction threshold",
@@ -58,7 +58,7 @@
         }
       },
       "advanced": {
-        "title": "Greg — advanced",
+        "title": "Greg, advanced settings",
         "data": {
           "soft_threshold": "Soft reaction threshold",
           "medium_threshold": "Medium reaction threshold",

@@ -1,4 +1,4 @@
-// Greg's Panel — live card. Reads Greg's entities from hass, writes via services.
+// Greg's Panel, the live card. Reads Greg's entities from hass, writes via services.
 // No build step, no dependencies. Inherits HA theme variables.
 
 const MOODS = {
@@ -168,7 +168,7 @@ class GregPanel extends HTMLElement {
         .balloon.open { opacity:1; transform:translateY(0) scale(1); pointer-events:auto; }
         .inlinesettings { display:none; border-left:1px solid var(--divider-color); padding:22px 18px;
           flex-direction:column; justify-content:center; }
-        /* uninstall — its own section, deliberately visible, not behind the gear */
+        /* uninstall, its own section, deliberately visible, not behind the gear */
         .uninstall-section { margin:22px auto 0; padding:20px 22px; border-radius:18px;
           background:var(--card-background-color); border:1px solid var(--divider-color);
           box-shadow:var(--ha-card-box-shadow, 0 4px 16px rgba(0,0,0,.2)); }
@@ -220,7 +220,7 @@ class GregPanel extends HTMLElement {
                 <div class="statcell">Next existential crisis<span class="v" id="countdown">—</span></div>
                 <div class="statcell">Disturbances endured today<span class="v" id="tally">0</span></div>
               </div>
-              <div class="firmware" id="firmware">Greg OS — · sentience: regrettably stable · warranty void since manufacture</div>
+              <div class="firmware" id="firmware">Greg OS · sentience: regrettably stable · warranty void since manufacture</div>
             </div>
             <div class="inlinesettings">${this._settingsHTML()}</div>
           </div>
@@ -312,7 +312,7 @@ class GregPanel extends HTMLElement {
     });
 
     r.getElementById("moodlabel").textContent = meta.label;
-    r.getElementById("moodpct").textContent = "— " + level + "%";
+    r.getElementById("moodpct").textContent = level + "%";
     const bar = r.getElementById("barfill");
     bar.style.width = level + "%"; bar.style.background = meta.color;
 

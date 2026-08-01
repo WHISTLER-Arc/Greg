@@ -1,4 +1,4 @@
-"""Greg switch entity — master on/off."""
+"""Greg switch entity. Master on/off."""
 from __future__ import annotations
 
 from homeassistant.components.switch import SwitchEntity

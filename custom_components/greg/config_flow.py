@@ -67,7 +67,7 @@ class GregConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         self._show_advanced: bool = False
 
     async def async_step_user(self, user_input=None):
-        """Simple setup step — sensor, speaker, volume, quiet hours."""
+        """Simple setup step. Sensor, speaker, volume, quiet hours."""
         errors = {}
 
         if user_input is not None:
