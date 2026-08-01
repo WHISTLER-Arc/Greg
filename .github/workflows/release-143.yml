@@ -1,0 +1,22 @@
+name: Release v1.4.3
+on:
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Create tag and release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git tag -f v1.4.3 bfceac4bde0bcf81d1987b37a42f4e31393c14c1
+          git push -f origin refs/tags/v1.4.3
+          gh release create v1.4.3 \
+            --title "Greg v1.4.3" \
+            --notes-file .github/release-notes-143.md \
+            --target bfceac4bde0bcf81d1987b37a42f4e31393c14c1
