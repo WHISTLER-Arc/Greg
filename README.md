@@ -96,6 +96,8 @@ The setup wizard keeps things simple, unless you want to get into the weeds.
 - Adjust how often the existential crises hit
 - Fiddle with sensitivity
 - Toggle chime suppression
+- Turn his occasional openers on or off
+- Give him a specific TTS voice
 
 **About sensitivity.** Cheap vibration sensors are chatty. One tap on the table can make them fire five or six times in a second, and Greg used to count every one of those as a separate disturbance, which sent him into a full existential crisis over a coaster.
 
@@ -103,7 +105,7 @@ Sensitivity now controls a refractory window on the vibration sensor. After Greg
 
 | Sensitivity | Window | Effect |
 |---|---|---|
-| 100 | 0s | Counts every event — the old behaviour |
+| 100 | 0s | Counts every event, the old behaviour |
 | 75 (default) | 2.5s | Mild damping, suits most sensors |
 | 50 | 5s | Heavier |
 | 1 | 9.9s | Very twitchy sensors |
@@ -126,20 +128,30 @@ Piper is a fast text-to-speech engine that runs fully local on your own hardware
 4. Go to **Settings → Devices & Services**. HA should auto-discover the Piper Wyoming service, so click **Configure** to add it. If it doesn't show up, add the **Wyoming Protocol** integration manually and point it at `localhost:10200`.
 5. Piper now appears as a `tts.*` entity. You'll pick it as Greg's TTS engine in the next step.
 
-### The Marvin voice settings
+### Telling Greg which voice to use
 
-In the Piper add-on config, set the voice and tune it for that exhausted, defeated drawl:
+As of v1.4.1 Greg has his own **Voice** field in advanced settings. Put the exact voice name in it, `en_GB-alan-medium` for the full effect, and he'll ask for that voice on every line he speaks.
 
-- **Voice:** `en_GB-alan` (shown as `alan` in some Piper interfaces)
+Do this rather than changing Piper's default. If you already use Piper for a voice assistant, setting the add-on default to Alan means your assistant starts drawling like a depressed table too, which is funny exactly once.
+
+1. Open **Settings → Devices & Services → Greg → Configure**
+2. Set **Text-to-speech engine** to your Piper entity
+3. Tick **Show advanced settings**
+4. Put `en_GB-alan-medium` in **Voice**
+
+Leave the field empty and Greg uses whatever your engine defaults to. Engines that don't take a voice option at all, Google Translate TTS among them, will reject it, so leave it empty for those.
+
+### Tuning the delivery
+
+The voice gets you Alan. These get you the *defeated* Alan, and they live in the Piper add-on config:
+
 - **Quality:** `Medium` or `High`, depending on your hardware
-- **Length Scale:** `1.3` to `1.5`. Slows speech right down for that dragging, defeated delivery.
+- **Length Scale:** `1.3` to `1.5`. Slows speech right down for that dragging delivery.
 - **Speaking Cadence / sentence pause:** `0.7` to `0.8`. Adds pauses between clauses to really sell the misery.
 
 Length Scale is the big one. It's what turns a neutral British voice into something that sounds like it's given up. Start at `1.4` and adjust to taste.
 
-### Pointing Greg at Piper
-
-Once Piper's running, open **Settings → Devices & Services → Greg → Configure** and set the **Text-to-speech engine** to your Piper `en_GB-alan` entity. No restart needed. Greg picks it up on his next reaction.
+These are add-on-wide, so they do affect anything else using Piper. If that's a problem, run a second Piper add-on instance just for Greg. He'd say that was excessive, and he'd be right, but it works.
 
 > **Credit:** these settings come from the Home Assistant community's "Marvin the depressed voice assistant" thread and the Piper/Rhasspy voice docs:
 > - [r/homeassistant, Marvin the depressed voice assistant](https://www.reddit.com/r/homeassistant/comments/1djh5bw/marvin_the_depressed_voice_assistant/)
@@ -192,7 +204,8 @@ The event carries the line, his mood, and the speaker and TTS engine he's alread
 event_type: greg_line
 data:
   entry_id: 01JQ...          # which Greg, if you somehow have more than one
-  message: "I felt that. For the record, I would have preferred not to."
+  message: "Ah. I felt that. For the record, I would have preferred not to."
+  line: "I felt that. For the record, I would have preferred not to."
   category: soft             # soft | medium | chaos | existential | silence
   mood: annoyed              # resting | annoyed | judging | existential
   mood_level: 40
@@ -204,11 +217,13 @@ data:
   volume: 0.35
 ```
 
-The event fires even when Greg is speaking normally. That's enough on its own if you just want to do something alongside him — log his lines, push them to your phone, display them on a dashboard. No local AI required.
+`message` is what Greg actually says, including the opener if one landed. `line` is the written line on its own. Use `line` if you're handing it to something that'll rephrase it anyway, since the opener is just noise in a prompt.
+
+The event fires even when Greg is speaking normally. That's enough on its own if you just want to do something alongside him. Log his lines, push them to your phone, display them on a dashboard. No local AI required.
 
 ### Letting something else do the talking
 
-In Greg's advanced settings, **Who does the talking** has two positions. Leave it on Greg and nothing changes. Set it to stay quiet and he picks his line, fires the event, and says nothing — which leaves the floor to you.
+In Greg's advanced settings, **Who does the talking** has two positions. Leave it on Greg and nothing changes. Set it to stay quiet and he picks his line, fires the event, and says nothing, which leaves the floor to you.
 
 That's the one for the local AI path. Greg writes the thought, your model rewrites it, your speaker delivers the result:
 
@@ -234,11 +249,58 @@ automation:
           message: "{{ reply.response.speech.plain.speech }}"
 ```
 
-Swap `conversation.my_local_llm` for whichever agent you run. Ollama, LocalAI, or a cloud one if you don't mind a table with a subscription. Without a local model set up, leave **Who does the talking** on Greg — "stay quiet" with nothing listening just means silence.
+Swap `conversation.my_local_llm` for whichever agent you run. Ollama, LocalAI, or a cloud one if you don't mind a table with a subscription. Without a local model set up, leave **Who does the talking** on Greg. "Stay quiet" with nothing listening just means silence.
+
+### Building your own moans
+
+RedKing worked out something rather good on the forum thread. Instead of writing whole lines, write columns of fragments and pick one from each. Four columns of six give you 1,296 combinations without anyone having to write 1,296 sentences.
+
+The columns follow an arc, which is what stops the output sounding like a shuffled bag of words: **irritation → complaint → nostalgia → gloom.**
+
+| Irritation | Complaint | Nostalgia | Gloom |
+|---|---|---|---|
+| "Go ahead." | "I am just a table." | "The joinery here was considered." | "Please yourself. You will anyway." |
+| "Don't mind me." | "I am just a lump of wood." | "Not many tables have legs like these." | "I might as well be firewood." |
+| "By all means." | "I used to be an antique." | "Somebody chose this material." | "It makes no difference." |
+| "Marvellous." | "I am load-bearing and nothing else." | "There is a grain under all that." | "I have stopped expecting otherwise." |
+| "Fine." | "I can take it." | "This finish took an afternoon." | "Nobody was going to ask." |
+| "Do carry on." | *(blank)* | *(blank)* | *(blank)* |
+
+Every slot in the first column is filled deliberately. Leave it blankable and every so often all four columns come up empty, and Piper throws an error on being handed nothing to say. RedKing found that one the hard way.
+
+Set **Who does the talking** to stay quiet first, or Greg and your automation will both speak.
+
+```yaml
+automation:
+  - alias: "Greg's moan generator"
+    triggers:
+      - trigger: event
+        event_type: greg_line
+    actions:
+      - variables:
+          moan: >
+            {% set irritation = ["Go ahead.", "Don't mind me.", "By all means.", "Marvellous.", "Fine.", "Do carry on."] %}
+            {% set complaint = ["I am just a table.", "I am just a lump of wood.", "I used to be an antique.", "I am load-bearing and nothing else.", "I can take it.", ""] %}
+            {% set nostalgia = ["The joinery here was considered.", "Not many tables have legs like these.", "Somebody chose this material.", "There is a grain under all that.", "This finish took an afternoon.", ""] %}
+            {% set gloom = ["Please yourself. You will anyway.", "I might as well be firewood.", "It makes no difference.", "I have stopped expecting otherwise.", "Nobody was going to ask.", ""] %}
+            {{ [irritation | random, complaint | random, nostalgia | random, gloom | random] | reject("eq", "") | join(" ") }}
+      - action: tts.speak
+        target:
+          entity_id: "{{ trigger.event.data.tts_engine }}"
+        data:
+          media_player_entity_id: "{{ trigger.event.data.media_player }}"
+          message: "{{ moan }}"
+```
+
+Sample output: *"Don't mind me. I used to be an antique. Not many tables have legs like these. I might as well be firewood."*
+
+One more trick worth stealing, also RedKing's: a comma will move the stress in a sentence. "Nobody bothers about me" lands on *bothers*. "Nobody bothers about, me" lands on *me*. It reads oddly on the page and it isn't how Greg's own lines are written, but if you're tuning fragments by ear it's a genuinely useful lever. Different speaking rates shift the phrasing too, so expect some trial and error.
 
 You can also turn the event off entirely in advanced settings if you'd rather he kept his thoughts to himself.
 
 > Thanks to **[teskanoo](https://community.home-assistant.io/t/i-gave-my-coffee-table-feelings-mostly-bad-ones-meet-greg/1015547/6?u=whistler-arc)** for asking for this one. That is usually the point where a feature stops being optional.
+>
+> Thanks to **[RedKing](https://community.home-assistant.io/t/i-gave-my-coffee-table-feelings-mostly-bad-ones-meet-greg/1015547/11)** for the observation that a phrase sounds spontaneous precisely because it is sometimes absent, for the [moan generator](https://community.home-assistant.io/t/i-gave-my-coffee-table-feelings-mostly-bad-ones-meet-greg/1015547/17) above, and for noticing that Greg was quietly taking whatever voice the TTS engine happened to be set to. Thanks to **[Xornop](https://community.home-assistant.io/t/i-gave-my-coffee-table-feelings-mostly-bad-ones-meet-greg/1015547/13)** for a considerably tidier way to roll for it.
 
 ---
 

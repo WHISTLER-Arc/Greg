@@ -1,4 +1,4 @@
-"""Greg sensor entities — mood, level, last line, daily tally."""
+"""Greg sensor entities. Mood, level, last line, daily tally."""
 from __future__ import annotations
 
 from homeassistant.components.sensor import SensorEntity
@@ -73,6 +73,10 @@ class GregMoodSensor(_GregBase):
             "image_file": MOOD_IMAGES.get(mood),
             "quiet_hours": self.coordinator.is_quiet_now,
             "enabled": self.coordinator.enabled,
+            # The panel reads the running version from here. sw_version lives in
+            # DeviceInfo, which the frontend cannot see from an entity state, so
+            # without this the panel has no way to know what it is running.
+            "sw_version": VERSION_DISPLAY,
         }
 
 

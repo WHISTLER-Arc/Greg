@@ -45,13 +45,21 @@ from .const import (
     CONF_SUPPRESS_CHIME,
     CONF_EMIT_EVENTS,
     CONF_SPEECH_MODE,
+    CONF_OPENERS,
+    CONF_TTS_VOICE,
     DEFAULT_SENSITIVITY,
     DEFAULT_VOLUME,
     DEFAULT_EMIT_EVENTS,
     DEFAULT_SPEECH_MODE,
+    DEFAULT_OPENERS,
+    DEFAULT_TTS_VOICE,
     SPEECH_MODE_EVENT_ONLY,
     SENSITIVITY_MAX_DEBOUNCE,
+    DECK_SEAM_GUARD,
+    OPENERS,
+    OPENER_CHANCE,
     EVENT_LINE,
+    VERSION_DISPLAY,
     MOOD_RESTING,
     MOOD_ANNOYED,
     MOOD_JUDGING,
@@ -118,6 +126,13 @@ async def _async_register_panel(hass: HomeAssistant) -> None:
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Set up Greg from a config entry."""
     hass.data.setdefault(DOMAIN, {})
+
+    # The title is written once at setup and never revisited, so an entry created
+    # on an older Greg keeps advertising that version forever. Correct it here so
+    # an upgrade is reflected without the user having to remove and re-add him.
+    expected_title = f"Greg {VERSION_DISPLAY}"
+    if entry.title != expected_title:
+        hass.config_entries.async_update_entry(entry, title=expected_title)
 
     coordinator = GregCoordinator(hass, entry)
     hass.data[DOMAIN][entry.entry_id] = coordinator
@@ -252,7 +267,8 @@ class GregCoordinator:
         self._existential_handle = None
         self._unsub_sensor = None
         self._unsub_midnight = None
-        self._last_lines_used: dict[str, str] = {}
+        self._decks: dict[str, list] = {}
+        self._deck_pos: dict[str, int] = {}
         # Monotonic timestamp of the last sensor event Greg actually accepted.
         self._last_accepted: float | None = None
 
@@ -441,13 +457,63 @@ class GregCoordinator:
         self.mood_level = max(0, min(100, self.mood_level))
         self._notify()
 
-    async def _speak(self, pool: list, pool_key: str) -> None:
-        last = self._last_lines_used.get(pool_key)
-        available = [l for l in pool if l != last] or pool
-        line = random.choice(available)
-        self._last_lines_used[pool_key] = line
+    def _next_line(self, pool: list, pool_key: str) -> str:
+        """Return the next line from the shuffled deck for this pool.
 
-        self.last_line = line
+        Every line plays once before any of them come round again. The awkward
+        case is the seam between two cycles: a line near the end of one deck can
+        land near the start of the next and be heard twice in quick succession
+        despite the shuffle being perfectly fair. So the last few of the outgoing
+        deck are pushed out of the first few of the incoming one.
+        """
+        deck = self._decks.get(pool_key, [])
+        pos = self._deck_pos.get(pool_key, 0)
+
+        if pos >= len(deck):
+            tail = set(deck[-DECK_SEAM_GUARD:]) if deck else set()
+            new_deck = list(pool)
+            random.shuffle(new_deck)
+
+            if tail and len(new_deck) > DECK_SEAM_GUARD * 2:
+                for i in range(DECK_SEAM_GUARD):
+                    if new_deck[i] not in tail:
+                        continue
+                    candidates = [
+                        j
+                        for j in range(DECK_SEAM_GUARD, len(new_deck))
+                        if new_deck[j] not in tail
+                    ]
+                    if not candidates:
+                        break
+                    j = random.choice(candidates)
+                    new_deck[i], new_deck[j] = new_deck[j], new_deck[i]
+
+            self._decks[pool_key] = new_deck
+            self._deck_pos[pool_key] = 0
+            deck = new_deck
+            pos = 0
+
+        self._deck_pos[pool_key] = pos + 1
+        return deck[pos]
+
+    def _maybe_opener(self) -> str:
+        """Return an opener, or an empty string most of the time.
+
+        Deliberately not deck-managed. Openers are padding and padding repeats,
+        which is exactly what makes it sound like speech rather than a recital.
+        """
+        if not self._config.get(CONF_OPENERS, DEFAULT_OPENERS):
+            return ""
+        if random.random() >= OPENER_CHANCE:
+            return ""
+        return random.choice(OPENERS)
+
+    async def _speak(self, pool: list, pool_key: str) -> None:
+        line = self._next_line(pool, pool_key)
+        opener = self._maybe_opener()
+        spoken_text = f"{opener} {line}" if opener else line
+
+        self.last_line = spoken_text
         self._notify()
 
         player = self._config[CONF_MEDIA_PLAYER]
@@ -466,7 +532,8 @@ class GregCoordinator:
                 EVENT_LINE,
                 {
                     "entry_id": self.entry.entry_id,
-                    "message": line,
+                    "message": spoken_text,
+                    "line": line,
                     "category": pool_key,
                     "mood": self.mood,
                     "mood_level": self.mood_level,
@@ -496,14 +563,20 @@ class GregCoordinator:
                     blocking=True,
                 )
 
+            payload = {
+                "entity_id": tts_engine,
+                "media_player_entity_id": player,
+                "message": spoken_text,
+            }
+            # Only sent when the user has actually named a voice. Engines that
+            # take no voice option (Google Translate, for one) reject the key
+            # outright, so an empty setting has to mean "say nothing about it".
+            voice = self._config.get(CONF_TTS_VOICE, DEFAULT_TTS_VOICE)
+            if voice:
+                payload["options"] = {"voice": voice}
+
             await self.hass.services.async_call(
-                "tts", "speak",
-                {
-                    "entity_id": tts_engine,
-                    "media_player_entity_id": player,
-                    "message": line,
-                },
-                blocking=False,
+                "tts", "speak", payload, blocking=False
             )
         except Exception as err:
             _LOGGER.error("Greg failed to speak: %s", err)
