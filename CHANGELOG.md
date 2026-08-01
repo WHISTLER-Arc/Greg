@@ -3,6 +3,20 @@
 All notable changes to Greg. He would like it noted that he did not ask to be
 versioned.
 
+## [1.4.3]
+
+### Fixed
+- **Panel updates never reached anyone.** The panel's script was served from a
+  URL with no version in it, so once a browser had fetched it that URL never
+  changed and it was never fetched again. Every change to the panel Greg has
+  ever shipped stayed invisible until the user cleared their caches by hand. A
+  hard refresh was not enough either, because Home Assistant's service worker
+  keys on the URL and answers from its own store. The URL now carries the
+  version, so each release serves an address nothing has cached.
+
+  This is also why the uninstall wizard has a step about clearing caches. Same
+  cause, spotted from the other end.
+
 ## [1.4.2]
 
 ### Added

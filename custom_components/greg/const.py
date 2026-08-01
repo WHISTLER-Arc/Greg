@@ -1,8 +1,8 @@
 """Constants for Greg integration."""
 
 DOMAIN = "greg"
-VERSION = "1.4.2"
-VERSION_DISPLAY = "v1.4.2"
+VERSION = "1.4.3"
+VERSION_DISPLAY = "v1.4.3"
 
 # Config keys
 CONF_VIBRATION_SENSOR = "vibration_sensor"
@@ -128,7 +128,12 @@ PANEL_URL_PATH = "greg"
 PANEL_TITLE = "Greg"
 PANEL_ICON = "mdi:robot-outline"
 PANEL_STATIC_URL_BASE = "/greg_panel"
-PANEL_JS_URL = "/greg_panel/greg-panel.js"
+# Versioned so a Greg update actually reaches the browser. Without the query
+# string the URL never changes, so neither the HTTP cache nor Home Assistant's
+# service worker ever refetches, and every panel change stays invisible until
+# the user clears their caches by hand. A hard refresh alone does not do it,
+# because the service worker keys on the URL and answers from its own store.
+PANEL_JS_URL = f"/greg_panel/greg-panel.js?v={VERSION}"
 PANEL_DATA_KEY = f"{DOMAIN}_panel"
 # Images are served to the panel from here (maps to www/greg in repo, copied into integration)
 IMG_STATIC_URL_BASE = "/greg_images"
