@@ -59,18 +59,17 @@ Not much, honestly.
 
 If I did my job right, this is the easy part.
 
-### Via HACS (the easy way)
+### Via HACS (recommended)
+
+Greg's in the HACS default list, so there's no custom repository faff anymore.
 
 1. Open HACS in Home Assistant
-2. Go to **Integrations**
-3. Click the three dots in the top right corner
-4. Select **Custom repositories**
-5. Add `https://github.com/WHISTLER-Arc/Greg` and select **Integration**
-6. Search for **Greg** and install
-7. Restart Home Assistant
-8. Go to **Settings > Devices & Services > Add Integration** and search for **Greg**
+2. Search for **Greg**
+3. Click **Download**
+4. Restart Home Assistant
+5. Go to **Settings > Devices & Services > Add Integration** and search for **Greg**
 
-### Manually
+### Manually (if you'd rather)
 
 1. Copy the `custom_components/greg` folder into your HA `config/custom_components/` directory
 2. Restart Home Assistant
