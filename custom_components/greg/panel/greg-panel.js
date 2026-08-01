@@ -137,6 +137,8 @@ class GregPanel extends HTMLElement {
         .sw::after { content:""; position:absolute; top:3px; left:23px; width:20px; height:20px; border-radius:50%;
           background:#fff; transition:left .25s; }
         .sw.off { background:var(--disabled-text-color, #888); } .sw.off::after { left:3px; }
+        .sw[aria-checked="false"] { background:var(--disabled-text-color, #888); }
+        .sw[aria-checked="false"]::after { left:3px; }
         .poke { background:var(--success-color, #7cc36e); color:#15311a; border:none; font-weight:700;
           padding:12px 20px; border-radius:13px; cursor:pointer; font-size:14px; min-width:150px; transition:background .2s; }
         .poke.cross { background:#d8743f; color:#3a1c0a; }
@@ -161,6 +163,49 @@ class GregPanel extends HTMLElement {
         .si .full { width:100%; margin-top:12px; background:var(--secondary-background-color);
           color:var(--secondary-text-color); border:1px solid var(--divider-color); border-radius:9px;
           padding:9px; font-size:12px; cursor:pointer; text-align:center; }
+        .si { display:flex; flex-direction:column; gap:13px; }
+        .si h3 { font-size:12px; letter-spacing:.09em; text-transform:uppercase;
+          color:var(--secondary-text-color); margin:0; font-weight:600; }
+        .gfield { display:flex; flex-direction:column; gap:5px; }
+        .gfield > label { font-size:12px; color:var(--secondary-text-color);
+          display:flex; justify-content:space-between; align-items:baseline; gap:8px; }
+        .gval { color:var(--primary-text-color); font-weight:600; font-size:12px;
+          font-variant-numeric:tabular-nums; }
+        .ghint { font-size:11px; color:var(--secondary-text-color); opacity:.8; margin:0; }
+        .si select, .si input[type="time"] { width:100%; box-sizing:border-box;
+          background:var(--secondary-background-color); color:var(--primary-text-color);
+          border:1px solid var(--divider-color); border-radius:9px; padding:9px 10px;
+          font-size:13px; font-family:inherit; appearance:none; }
+        .si input[type="time"] { font-variant-numeric:tabular-nums; }
+        .gselwrap { position:relative; }
+        .gselwrap::after { content:""; position:absolute; right:12px; top:50%; width:7px;
+          height:7px; margin-top:-5px; pointer-events:none; transform:rotate(45deg);
+          border-right:1.5px solid var(--secondary-text-color);
+          border-bottom:1.5px solid var(--secondary-text-color); }
+        .si input[type="range"] { width:100%; appearance:none; background:transparent; margin:3px 0; }
+        .si input[type="range"]::-webkit-slider-runnable-track { height:5px; border-radius:4px;
+          background:var(--secondary-background-color); }
+        .si input[type="range"]::-webkit-slider-thumb { appearance:none; width:15px; height:15px;
+          border-radius:50%; background:var(--success-color, #7cc36e); margin-top:-5px; cursor:pointer; }
+        .si input[type="range"]::-moz-range-track { height:5px; border-radius:4px;
+          background:var(--secondary-background-color); }
+        .si input[type="range"]::-moz-range-thumb { width:15px; height:15px; border:0;
+          border-radius:50%; background:var(--success-color, #7cc36e); cursor:pointer; }
+        .grow { display:flex; align-items:center; gap:10px; font-size:13px;
+          background:var(--secondary-background-color); border-radius:11px; padding:10px 12px; }
+        .grow .sw { border:0; padding:0; }
+        .gtimes { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+        .gtimes.hidden { display:none; }
+        .gapply { background:var(--success-color, #7cc36e); color:#14301a; border:0;
+          border-radius:11px; padding:11px; font-size:13px; font-weight:700;
+          font-family:inherit; cursor:pointer; transition:opacity .2s; }
+        .gapply[disabled] { opacity:.32; cursor:default; }
+        .guninstall { border-top:1px solid var(--divider-color); padding-top:14px; margin-top:2px; }
+        .guninstall h4 { margin:0 0 5px; font-size:13px; font-weight:600;
+          color:var(--error-color, #c0504c); }
+        .guninstall p { margin:0 0 10px; font-size:11px; line-height:1.5;
+          color:var(--secondary-text-color); }
+        .si :focus-visible { outline:2px solid var(--success-color, #7cc36e); outline-offset:2px; }
         .balloon { position:absolute; top:58px; right:14px; z-index:10; width:min(300px, calc(100vw - 44px));
           background:var(--card-background-color); border:1px solid var(--divider-color); border-radius:14px;
           box-shadow:0 14px 34px rgba(0,0,0,.4); padding:15px; opacity:0; transform:translateY(-8px) scale(.97);
@@ -169,12 +214,6 @@ class GregPanel extends HTMLElement {
         .inlinesettings { display:none; border-left:1px solid var(--divider-color); padding:22px 18px;
           flex-direction:column; justify-content:center; }
         /* uninstall, its own section, deliberately visible, not behind the gear */
-        .uninstall-section { margin:22px auto 0; padding:20px 22px; border-radius:18px;
-          background:var(--card-background-color); border:1px solid var(--divider-color);
-          box-shadow:var(--ha-card-box-shadow, 0 4px 16px rgba(0,0,0,.2)); }
-        .uninstall-section h2 { margin:0 0 6px; font-size:16px; font-weight:600; }
-        .uninstall-section p { margin:0 0 14px; font-size:13px; line-height:1.5;
-          color:var(--secondary-text-color); }
         .uninstall-btn { background:transparent; color:var(--error-color, #c0504c);
           border:1px solid var(--error-color, #c0504c); border-radius:10px; padding:10px 18px;
           font-size:14px; font-weight:600; font-family:inherit; cursor:pointer; transition:all .18s; }
@@ -225,28 +264,195 @@ class GregPanel extends HTMLElement {
             <div class="inlinesettings">${this._settingsHTML()}</div>
           </div>
         </div>
-        <div class="uninstall-section">
-          <h2>Uninstall Greg</h2>
-          <p>Safe, complete removal with cache clearing. Your automations, sensors
-             and helpers are left alone.</p>
-          <button class="uninstall-btn" id="uninstall-open">Uninstall Greg</button>
-        </div>
       </div>
     `;
     this._wire();
     this._rendered = true;
   }
 
+  // Rendered twice: once in the cog balloon for narrow screens, once inline in
+  // the right-hand column for wide ones. Only one is ever visible, but both are
+  // in the DOM, so everything here is addressed by class and kept in sync. No
+  // ids, or they would collide.
   _settingsHTML() {
     return `<div class="si">
-      <h3>Greg settings</h3>
-      <div class="brow"><span>On / off</span><div class="sw" data-svc="switch"></div></div>
-      <button class="full" data-full>Open full settings →</button>
-      <div style="font-size:11px;color:var(--secondary-text-color);margin-top:8px;opacity:.8">
-        Volume, sensitivity, quiet hours and thresholds live in Greg's options:
-        Settings → Devices &amp; Services → Greg → Configure.
+      <h3>Setup</h3>
+
+      <div class="gfield">
+        <label>Vibration sensor</label>
+        <div class="gselwrap"><select class="gctl" data-key="vibration_sensor" data-domain="binary_sensor"></select></div>
+      </div>
+
+      <div class="gfield">
+        <label>Speaker</label>
+        <div class="gselwrap"><select class="gctl" data-key="media_player" data-domain="media_player"></select></div>
+      </div>
+
+      <div class="gfield">
+        <label>Text to speech</label>
+        <div class="gselwrap"><select class="gctl" data-key="tts_engine" data-domain="tts"></select></div>
+      </div>
+
+      <div class="gfield">
+        <label>Volume <span class="gval" data-out="volume"></span></label>
+        <input class="gctl" type="range" data-key="volume" min="0" max="100" step="5">
+      </div>
+
+      <div class="gfield">
+        <label>Sensitivity <span class="gval" data-out="sensitivity"></span></label>
+        <input class="gctl" type="range" data-key="sensitivity" min="1" max="100" step="1">
+        <span class="ghint">Lower ignores repeat taps for longer.</span>
+      </div>
+
+      <div class="grow">
+        <span>Quiet hours</span>
+        <button class="sw gctl" data-key="quiet_hours_enabled" role="switch"
+                aria-checked="true" aria-label="Quiet hours"></button>
+      </div>
+
+      <div class="gtimes">
+        <div class="gfield"><label>From</label>
+          <input class="gctl" type="time" data-key="quiet_start"></div>
+        <div class="gfield"><label>Until</label>
+          <input class="gctl" type="time" data-key="quiet_end"></div>
+      </div>
+
+      <button class="gapply" disabled>No changes</button>
+      <button class="full" data-full>Advanced settings →</button>
+      <p class="ghint">Thresholds, openers and his voice live in advanced.</p>
+
+      <div class="guninstall">
+        <h4>Uninstall Greg</h4>
+        <p>Safe, complete removal with cache clearing. Your automations, sensors
+           and helpers are left alone.</p>
+        <button class="uninstall-btn">Uninstall Greg</button>
       </div>
     </div>`;
+  }
+
+  // ---- settings plumbing ----------------------------------------------
+  _savedConfig() {
+    const s = this._moodState();
+    return (s && s.attributes && s.attributes.config) || null;
+  }
+
+  _entityOptions(domain) {
+    if (!this._hass) return [];
+    return Object.keys(this._hass.states)
+      .filter((id) => id.startsWith(domain + "."))
+      .map((id) => ({
+        id,
+        name: (this._hass.states[id].attributes || {}).friendly_name || id,
+      }))
+      .sort((a, b) => a.name.localeCompare(b.name));
+  }
+
+  // Selects are rebuilt only when the entity list actually changes, so a state
+  // update mid-edit does not throw away what the user has picked.
+  _fillSelects() {
+    const r = this.shadowRoot;
+    r.querySelectorAll("select.gctl").forEach((sel) => {
+      const opts = this._entityOptions(sel.dataset.domain);
+      const sig = opts.map((o) => o.id).join(",");
+      if (sel.dataset.sig === sig) return;
+      sel.dataset.sig = sig;
+      const keep = sel.value;
+      sel.innerHTML = opts
+        .map((o) => `<option value="${o.id}">${o.name}</option>`)
+        .join("");
+      if (keep && opts.some((o) => o.id === keep)) sel.value = keep;
+    });
+  }
+
+  _readForm(scope) {
+    const g = (k) => scope.querySelector(`.gctl[data-key="${k}"]`);
+    return {
+      vibration_sensor: g("vibration_sensor").value,
+      media_player: g("media_player").value,
+      tts_engine: g("tts_engine").value,
+      volume: Number(g("volume").value) / 100,
+      sensitivity: Number(g("sensitivity").value),
+      quiet_hours_enabled:
+        g("quiet_hours_enabled").getAttribute("aria-checked") === "true",
+      quiet_start: g("quiet_start").value,
+      quiet_end: g("quiet_end").value,
+    };
+  }
+
+  _writeForm(scope, cfg) {
+    const g = (k) => scope.querySelector(`.gctl[data-key="${k}"]`);
+    if (cfg.vibration_sensor) g("vibration_sensor").value = cfg.vibration_sensor;
+    if (cfg.media_player) g("media_player").value = cfg.media_player;
+    if (cfg.tts_engine) g("tts_engine").value = cfg.tts_engine;
+    g("volume").value = Math.round((cfg.volume ?? 0.35) * 100);
+    g("sensitivity").value = cfg.sensitivity ?? 75;
+    g("quiet_hours_enabled").setAttribute(
+      "aria-checked", cfg.quiet_hours_enabled === false ? "false" : "true"
+    );
+    g("quiet_start").value = cfg.quiet_start || "22:00";
+    g("quiet_end").value = cfg.quiet_end || "08:00";
+  }
+
+  _sameConfig(a, b) {
+    if (!a || !b) return false;
+    return ["vibration_sensor", "media_player", "tts_engine", "sensitivity",
+            "quiet_hours_enabled", "quiet_start", "quiet_end"]
+      .every((k) => a[k] === b[k])
+      && Math.abs((a.volume ?? 0) - (b.volume ?? 0)) < 0.001;
+  }
+
+  _refreshSettings(force) {
+    const r = this.shadowRoot;
+    const saved = this._savedConfig();
+    if (!saved) return;
+    this._fillSelects();
+
+    r.querySelectorAll(".si").forEach((scope) => {
+      // Don't stamp saved values over an edit in progress.
+      if (force || !this._dirty) this._writeForm(scope, saved);
+
+      const cur = this._readForm(scope);
+      const dirty = !this._sameConfig(cur, saved);
+      const apply = scope.querySelector(".gapply");
+      apply.disabled = !dirty;
+      apply.textContent = dirty ? "Apply" : "No changes";
+
+      const quiet =
+        scope.querySelector('.gctl[data-key="quiet_hours_enabled"]')
+             .getAttribute("aria-checked") === "true";
+      scope.querySelector(".gtimes").classList.toggle("hidden", !quiet);
+    });
+  }
+
+  _onSettingInput(el) {
+    const scope = el.closest(".si");
+    // Mirror into the other copy so the two never disagree.
+    const state = this._readForm(scope);
+    this.shadowRoot.querySelectorAll(".si").forEach((s) => {
+      if (s !== scope) this._writeForm(s, state);
+    });
+    this._dirty = !this._sameConfig(state, this._savedConfig());
+    this._refreshSettings(false);
+  }
+
+  _applySettings(scope) {
+    if (!this._hass) return;
+    const cfg = this._readForm(scope);
+    // An empty select means that domain has no entities. Sending "" fails
+    // validation on the service side, so leave the field out entirely.
+    ["vibration_sensor", "media_player", "tts_engine"].forEach((k) => {
+      if (!cfg[k]) delete cfg[k];
+    });
+    const apply = scope.querySelector(".gapply");
+    apply.disabled = true;
+    apply.textContent = "Applying…";
+    this._hass.callService("greg", "set_options", cfg).then(
+      () => { this._dirty = false; },
+      () => {
+        apply.textContent = "Failed, check the logs";
+        this._dirty = false;
+      }
+    );
   }
 
   _wire() {
@@ -254,11 +460,30 @@ class GregPanel extends HTMLElement {
     r.getElementById("poke").onclick = () => this._doPoke();
     r.getElementById("herostack").onclick = () => this._doPoke();
     r.getElementById("sw").onclick = () => this._toggle();
-    r.querySelectorAll('[data-svc="switch"]').forEach((el) => (el.onclick = () => this._toggle()));
     r.querySelectorAll("[data-full]").forEach(
       (el) => (el.onclick = () => { window.location.href = "/config/integrations/integration/greg"; })
     );
-    r.getElementById("uninstall-open").onclick = () => this._openWizard();
+    r.querySelectorAll(".uninstall-btn").forEach(
+      (el) => (el.onclick = () => this._openWizard())
+    );
+
+    // Settings controls. The switch is a button so it needs click, the rest
+    // report through input/change.
+    r.querySelectorAll(".gctl").forEach((el) => {
+      if (el.matches('[data-key="quiet_hours_enabled"]')) {
+        el.onclick = () => {
+          const on = el.getAttribute("aria-checked") === "true";
+          el.setAttribute("aria-checked", on ? "false" : "true");
+          this._onSettingInput(el);
+        };
+      } else {
+        el.oninput = () => this._onSettingInput(el);
+        el.onchange = () => this._onSettingInput(el);
+      }
+    });
+    r.querySelectorAll(".gapply").forEach(
+      (el) => (el.onclick = () => this._applySettings(el.closest(".si")))
+    );
     const cog = r.getElementById("cog"), balloon = r.getElementById("balloon");
     cog.onclick = (e) => { e.stopPropagation(); balloon.classList.toggle("open"); };
     document.addEventListener("click", (e) => {
@@ -328,7 +553,7 @@ class GregPanel extends HTMLElement {
     const tallyS = this._tallyState();
     r.getElementById("tally").textContent = tallyS ? tallyS.state : "0";
 
-    r.querySelectorAll(".sw").forEach((el) => el.classList.toggle("off", !enabled));
+    r.querySelectorAll(".sw:not(.gctl)").forEach((el) => el.classList.toggle("off", !enabled));
     r.getElementById("dot").classList.toggle("off", !enabled);
     r.getElementById("card").classList.toggle("asleep", asleep);
     r.getElementById("sleepcap").textContent = !enabled
@@ -341,6 +566,8 @@ class GregPanel extends HTMLElement {
     fw.textContent = ver
       ? `Greg OS ${ver} · sentience: regrettably stable · warranty void since manufacture`
       : "Greg OS · sentience: regrettably stable · warranty void since manufacture";
+
+    this._refreshSettings(false);
 
     this._ensureCountdown();
   }

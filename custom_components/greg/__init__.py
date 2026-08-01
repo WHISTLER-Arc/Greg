@@ -52,6 +52,8 @@ from .const import (
     DEFAULT_EMIT_EVENTS,
     DEFAULT_SPEECH_MODE,
     DEFAULT_OPENERS,
+    DEFAULT_QUIET_START,
+    DEFAULT_QUIET_END,
     DEFAULT_TTS_VOICE,
     SPEECH_MODE_EVENT_ONLY,
     SENSITIVITY_MAX_DEBOUNCE,
@@ -67,6 +69,8 @@ from .const import (
     MOOD_IMAGES,
     SERVICE_POKE,
     SERVICE_UNINSTALL,
+    SERVICE_SET_OPTIONS,
+    BASIC_OPTION_KEYS,
     WWW_ASSET_DIR,
     LINES_SOFT,
     LINES_MEDIUM,
@@ -163,7 +167,7 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         if panel_state and panel_state["registered"]:
             async_remove_panel(hass, PANEL_URL_PATH)
             panel_state["registered"] = False
-        for service in (SERVICE_POKE, SERVICE_UNINSTALL):
+        for service in (SERVICE_POKE, SERVICE_UNINSTALL, SERVICE_SET_OPTIONS):
             if hass.services.has_service(DOMAIN, service):
                 hass.services.async_remove(DOMAIN, service)
 
@@ -237,7 +241,49 @@ def _async_register_services(hass: HomeAssistant) -> None:
                 "homeassistant", "restart", {}, blocking=False
             )
 
+    async def _handle_set_options(call) -> None:
+        """Write basic settings back from Greg's panel.
+
+        Updating the entry fires the update listener, which reloads him, so this
+        deliberately takes every changed field in one call rather than one call
+        per control. That is also why the panel has an Apply button.
+        """
+        fields = {key: call.data[key] for key in BASIC_OPTION_KEYS if key in call.data}
+        if not fields:
+            return
+
+        for entry_id, coordinator in list(hass.data.get(DOMAIN, {}).items()):
+            if not isinstance(coordinator, GregCoordinator):
+                continue
+            entry = hass.config_entries.async_get_entry(entry_id)
+            if entry is None:
+                continue
+            merged = {**entry.options, **fields}
+            if merged != dict(entry.options):
+                hass.config_entries.async_update_entry(entry, options=merged)
+
     hass.services.async_register(DOMAIN, SERVICE_POKE, _handle_poke)
+    hass.services.async_register(
+        DOMAIN,
+        SERVICE_SET_OPTIONS,
+        _handle_set_options,
+        schema=vol.Schema(
+            {
+                vol.Optional(CONF_VIBRATION_SENSOR): cv.entity_id,
+                vol.Optional(CONF_MEDIA_PLAYER): cv.entity_id,
+                vol.Optional(CONF_TTS_ENGINE): cv.entity_id,
+                vol.Optional(CONF_VOLUME): vol.All(
+                    vol.Coerce(float), vol.Range(min=0.0, max=1.0)
+                ),
+                vol.Optional(CONF_SENSITIVITY): vol.All(
+                    vol.Coerce(int), vol.Range(min=1, max=100)
+                ),
+                vol.Optional(CONF_QUIET_HOURS_ENABLED): cv.boolean,
+                vol.Optional(CONF_QUIET_START): cv.matches_regex(r"^\d{2}:\d{2}$"),
+                vol.Optional(CONF_QUIET_END): cv.matches_regex(r"^\d{2}:\d{2}$"),
+            }
+        ),
+    )
     hass.services.async_register(
         DOMAIN,
         SERVICE_UNINSTALL,
@@ -601,3 +647,22 @@ class GregCoordinator:
     @property
     def is_quiet_now(self) -> bool:
         return self._is_quiet_time()
+
+    @property
+    def basic_config(self) -> dict:
+        """The settings Greg's panel is allowed to show and change.
+
+        Published as a state attribute because a custom panel can read entity
+        states and nothing else. It has no route to the config entry.
+        """
+        cfg = self._config
+        return {
+            CONF_VIBRATION_SENSOR: cfg.get(CONF_VIBRATION_SENSOR),
+            CONF_MEDIA_PLAYER: cfg.get(CONF_MEDIA_PLAYER),
+            CONF_TTS_ENGINE: cfg.get(CONF_TTS_ENGINE),
+            CONF_VOLUME: cfg.get(CONF_VOLUME, DEFAULT_VOLUME),
+            CONF_SENSITIVITY: cfg.get(CONF_SENSITIVITY, DEFAULT_SENSITIVITY),
+            CONF_QUIET_HOURS_ENABLED: cfg.get(CONF_QUIET_HOURS_ENABLED, True),
+            CONF_QUIET_START: cfg.get(CONF_QUIET_START, DEFAULT_QUIET_START),
+            CONF_QUIET_END: cfg.get(CONF_QUIET_END, DEFAULT_QUIET_END),
+        }

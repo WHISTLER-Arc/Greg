@@ -77,6 +77,10 @@ class GregMoodSensor(_GregBase):
             # DeviceInfo, which the frontend cannot see from an entity state, so
             # without this the panel has no way to know what it is running.
             "sw_version": VERSION_DISPLAY,
+            # Greg's panel edits these. A custom panel can read entity states and
+            # call services, and has no route to the config entry at all, so the
+            # settings have to travel out here to be shown.
+            "config": self.coordinator.basic_config,
         }
 
 
