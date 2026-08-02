@@ -408,8 +408,11 @@ class GregPanel extends HTMLElement {
     this._fillSelects();
 
     r.querySelectorAll(".si").forEach((scope) => {
-      // Don't stamp saved values over an edit in progress.
-      if (force || !this._dirty) this._writeForm(scope, saved);
+      // Don't stamp saved values over an edit in progress, or over settings
+      // that have been sent but not yet published back.
+      if (force || !(this._dirty || this._awaitingSave(saved))) {
+        this._writeForm(scope, saved);
+      }
 
       const cur = this._readForm(scope);
       const dirty = !this._sameConfig(cur, saved);
@@ -422,6 +425,23 @@ class GregPanel extends HTMLElement {
              .getAttribute("aria-checked") === "true";
       scope.querySelector(".gtimes").classList.toggle("hidden", !quiet);
     });
+  }
+
+  // True while a save is in flight: sent to the service, not yet visible in the
+  // published config. async_update_entry does not await its listeners, so the
+  // service call can return before the new values come back round.
+  _awaitingSave(saved) {
+    if (!this._pending) return false;
+    const settled = Object.keys(this._pending).every((k) =>
+      k === "volume"
+        ? Math.abs((saved[k] ?? 0) - this._pending[k]) < 0.001
+        : saved[k] === this._pending[k]
+    );
+    if (settled || Date.now() - this._pendingAt > 10000) {
+      this._pending = null;
+      return false;
+    }
+    return true;
   }
 
   _onSettingInput(el) {
@@ -446,11 +466,14 @@ class GregPanel extends HTMLElement {
     const apply = scope.querySelector(".gapply");
     apply.disabled = true;
     apply.textContent = "Applying…";
+    this._pending = cfg;
+    this._pendingAt = Date.now();
     this._hass.callService("greg", "set_options", cfg).then(
       () => { this._dirty = false; },
       () => {
         apply.textContent = "Failed, check the logs";
         this._dirty = false;
+        this._pending = null;
       }
     );
   }

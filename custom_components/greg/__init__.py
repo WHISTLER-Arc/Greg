@@ -357,6 +357,11 @@ class GregCoordinator:
         self._config = {**entry.data, **entry.options}
         await self.async_unload()
         await self.async_setup()
+        # The entities survive a reload, so nothing makes them re-read their
+        # attributes unless we ask. basic_config is published from there, and
+        # without this the panel goes on being served the settings as they were
+        # before the change it just made.
+        self._notify()
 
     # ---- entity helpers --------------------------------------------------
 
