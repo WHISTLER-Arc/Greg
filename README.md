@@ -274,7 +274,7 @@ The columns follow an arc, which is what stops the output sounding like a shuffl
 
 Every slot in the first column is filled deliberately. Leave it blankable and every so often all four columns come up empty, and Piper throws an error on being handed nothing to say. RedKing found that one the hard way.
 
-How many blanks. This is the dial that matters most, and RedKing worked it out by actually building one. Push much past half the slots being empty and you get mostly short bad-tempered remarks with the occasional long zinger, which is a completely different comic rhythm. Fewer blanks gives you longer, more even sentences. Worth playing with once you have your own columns.
+**How many blanks.** This is the dial that matters most, and RedKing worked it out by actually building one. Push much past half the slots being empty and you get mostly short bad-tempered remarks with the occasional long zinger, which is a completely different comic rhythm. Fewer blanks gives you longer, more even sentences. Worth playing with once you have your own columns.
 
 RedKing has since taken this considerably further than the example above, into what he calls a grumpier table with less angst and a great many more puns. [His 3.0 version is on the forum](https://community.home-assistant.io/t/i-gave-my-coffee-table-feelings-mostly-bad-ones-meet-greg/1015547/22) and it's worth a look if you're building your own, because it's a different flavour of the same idea and the wordplay is better than mine.
 
