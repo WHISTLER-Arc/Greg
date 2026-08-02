@@ -3,6 +3,19 @@
 All notable changes to Greg. He would like it noted that he did not ask to be
 versioned.
 
+## [1.4.4]
+
+### Fixed
+- **Settings jumped back to their old values after Apply.** Two faults stacked.
+  The coordinator updated its own copy of the config on reload but never told
+  the entities to re-read their attributes, and the settings the panel reads are
+  published from there. Home Assistant went on serving the values as they were
+  before the change, and the panel read those and wrote them back over the edit.
+  Underneath that, updating a config entry schedules its listeners rather than
+  awaiting them, so the service call could return before the new values were
+  published at all. The panel now holds what it sent until the published config
+  agrees, with a timeout so a failed write cannot leave the form stuck.
+
 ## [1.4.3]
 
 ### Fixed
