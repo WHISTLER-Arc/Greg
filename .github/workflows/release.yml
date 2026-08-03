@@ -63,3 +63,20 @@ jobs:
           echo "### Released \`$TAG\`" >> "$GITHUB_STEP_SUMMARY"
           echo "" >> "$GITHUB_STEP_SUMMARY"
           echo "Commit \`$SHA\`" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Tidy up merged working branches
+        if: inputs.prerelease == false
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          git fetch origin --prune
+          # Only branches this workflow's own tooling creates, and only ones
+          # whose commits are already on the released tree. Anything with work
+          # left on it is not merged, so it is not matched here.
+          for ref in $(git branch -r --merged HEAD --format='%(refname:short)' \
+                        | grep '^origin/claude/' || true); do
+            branch="${ref#origin/}"
+            echo "deleting merged branch: $branch"
+            git push origin --delete "$branch" || echo "  could not delete $branch"
+          done
