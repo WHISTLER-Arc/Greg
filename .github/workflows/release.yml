@@ -1,0 +1,65 @@
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version to release, e.g. 1.4.5 or 1.4.5b1. Must match the files."
+        required: true
+        type: string
+      prerelease:
+        description: "Cut as a pre-release (betas)"
+        required: false
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Validate and extract notes from the changelog
+        run: |
+          python3 .github/scripts/prepare_release.py \
+            "${{ inputs.version }}" \
+            --notes-out release-notes.md
+
+      - name: Everything parses
+        run: |
+          python3 -m compileall -q custom_components/greg
+          node --check custom_components/greg/panel/greg-panel.js
+
+      - name: Tag and release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VERSION: ${{ inputs.version }}
+          PRERELEASE: ${{ inputs.prerelease }}
+        run: |
+          set -euo pipefail
+          TAG="v${VERSION}"
+          SHA="$(git rev-parse HEAD)"
+
+          git tag "$TAG" "$SHA"
+          git push origin "refs/tags/$TAG"
+
+          FLAGS=""
+          if [ "$PRERELEASE" = "true" ]; then
+            FLAGS="--prerelease"
+          fi
+
+          gh release create "$TAG" \
+            --title "Greg $TAG" \
+            --notes-file release-notes.md \
+            --target "$SHA" \
+            $FLAGS
+
+          echo "Released $TAG at $SHA"
+          echo "### Released \`$TAG\`" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "Commit \`$SHA\`" >> "$GITHUB_STEP_SUMMARY"

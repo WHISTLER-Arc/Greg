@@ -38,24 +38,38 @@ The version lives in **two** files and they must agree:
 
 CI fails the build if they disagree. See `.github/workflows/checks.yml`.
 
-**A git tag must match what the files say.** This is not currently automated,
-and it has already caused one bug: `v1.4.4-beta.1` was cut while both files
-said `1.4.4`, so the panel reported a stable version for a beta build. When
-cutting a pre-release, set the files to the pre-release version too, for
-example `1.4.5b1`, which is what the panel will then display.
+**A git tag must match what the files say.** This caused one bug already:
+`v1.4.4-beta.1` was cut while both files said `1.4.4`, so the panel reported a
+stable version for a beta build. The release workflow now refuses when they
+disagree, so a pre-release means setting the files to the pre-release version
+too, for example `1.4.5b1`. That is then what the panel displays and what the
+tag is called.
 
 ## Releasing
 
 HACS installs from release tags, not from `main`, so documentation fixes reach
 users as soon as they land on `main` but code does not.
 
-Local git in the working container cannot push tags, so releases go out through
-a one-shot `workflow_dispatch` workflow that is pushed, run, then deleted. Tag
-targets must be full 40 character SHAs, since abbreviated ones are rejected.
+Releases go out through `.github/workflows/release.yml`, run manually with the
+version as input, and a checkbox for pre-releases. It refuses to release unless
 
-Betas are cut as GitHub pre-releases from a feature branch. `main` stays on the
-last stable. HACS shows them to anyone who enables beta versions in the
-Redownload dialog for Greg.
+- `manifest.json`, `const.py` and the version you typed all agree
+- `CHANGELOG.md` has a section for that version, and it is not empty
+- the tag does not already exist
+- everything still parses
+
+**The changelog is the release notes.** The workflow extracts the section for
+the version being released and uses it as the release body. No changelog entry
+means no release, which is deliberate.
+
+Validation lives in `.github/scripts/prepare_release.py` and can be run locally
+before dispatching:
+
+    python3 .github/scripts/prepare_release.py 1.4.5
+
+Betas are cut by dispatching the workflow against a feature branch with the
+pre-release box ticked. `main` stays on the last stable. HACS shows them to
+anyone who enables beta versions in the Redownload dialog for Greg.
 
 ## Things that bite
 
