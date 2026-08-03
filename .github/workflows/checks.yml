@@ -1,0 +1,87 @@
+name: Checks
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  consistency:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Versions must agree
+        run: |
+          python3 - <<'PY'
+          import json, pathlib, re, sys
+
+          base = pathlib.Path("custom_components/greg")
+          manifest = json.loads((base / "manifest.json").read_text())["version"]
+          const = (base / "const.py").read_text()
+
+          version = re.search(r'^VERSION = "([^"]+)"', const, re.M)
+          display = re.search(r'^VERSION_DISPLAY = "([^"]+)"', const, re.M)
+
+          problems = []
+          if not version or not display:
+              problems.append("could not find VERSION / VERSION_DISPLAY in const.py")
+          else:
+              if version.group(1) != manifest:
+                  problems.append(
+                      f"const.py VERSION is {version.group(1)}, manifest.json says {manifest}"
+                  )
+              if display.group(1) != f"v{version.group(1)}":
+                  problems.append(
+                      f"VERSION_DISPLAY is {display.group(1)}, expected v{version.group(1)}"
+                  )
+
+          if problems:
+              print("Version mismatch:")
+              for p in problems:
+                  print(f"  - {p}")
+              sys.exit(1)
+          print(f"Versions agree: {manifest}")
+          PY
+
+      - name: Everything parses
+        run: |
+          python3 -m compileall -q custom_components/greg
+          node --check custom_components/greg/panel/greg-panel.js
+          python3 - <<'PY'
+          import json, pathlib, sys, yaml
+          for f in [
+              "custom_components/greg/manifest.json",
+              "custom_components/greg/strings.json",
+              "custom_components/greg/translations/en.json",
+              "hacs.json",
+          ]:
+              json.loads(pathlib.Path(f).read_text())
+          yaml.safe_load(pathlib.Path("custom_components/greg/services.yaml").read_text())
+          print("json and yaml valid")
+          PY
+
+      - name: Line pools intact
+        run: |
+          python3 - <<'PY'
+          import pathlib, sys
+          ns = {}
+          exec(compile(pathlib.Path("custom_components/greg/const.py").read_text(), "const.py", "exec"), ns)
+          bad = []
+          for name in ["LINES_SOFT", "LINES_MEDIUM", "LINES_CHAOS", "LINES_EXISTENTIAL", "LINES_SILENCE"]:
+              pool = ns[name]
+              if len(pool) != len(set(pool)):
+                  seen, dupes = set(), set()
+                  for line in pool:
+                      if line in seen:
+                          dupes.add(line)
+                      seen.add(line)
+                  bad.append(f"{name} has duplicates: {sorted(dupes)[:3]}")
+              if any(not l.strip() for l in pool):
+                  bad.append(f"{name} contains an empty line")
+          if bad:
+              print("\n".join(bad))
+              sys.exit(1)
+          print("all five pools unique and non-empty")
+          PY
