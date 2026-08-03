@@ -25,6 +25,8 @@ from homeassistant.components.frontend import (
 )
 from homeassistant.components.http import StaticPathConfig
 
+from .lines import openers as openers_for, pool as pool_for, resolve as resolve_language
+
 from .const import (
     DOMAIN,
     PLATFORMS,
@@ -47,6 +49,7 @@ from .const import (
     CONF_SPEECH_MODE,
     CONF_OPENERS,
     CONF_TTS_VOICE,
+    CONF_LANGUAGE,
     DEFAULT_SENSITIVITY,
     DEFAULT_VOLUME,
     DEFAULT_EMIT_EVENTS,
@@ -55,10 +58,10 @@ from .const import (
     DEFAULT_QUIET_START,
     DEFAULT_QUIET_END,
     DEFAULT_TTS_VOICE,
+    DEFAULT_LANGUAGE,
     SPEECH_MODE_EVENT_ONLY,
     SENSITIVITY_MAX_DEBOUNCE,
     DECK_SEAM_GUARD,
-    OPENERS,
     OPENER_CHANCE,
     EVENT_LINE,
     VERSION_DISPLAY,
@@ -72,11 +75,6 @@ from .const import (
     SERVICE_SET_OPTIONS,
     BASIC_OPTION_KEYS,
     WWW_ASSET_DIR,
-    LINES_SOFT,
-    LINES_MEDIUM,
-    LINES_CHAOS,
-    LINES_EXISTENTIAL,
-    LINES_SILENCE,
     PANEL_URL_PATH,
     PANEL_TITLE,
     PANEL_ICON,
@@ -313,8 +311,10 @@ class GregCoordinator:
         self._existential_handle = None
         self._unsub_sensor = None
         self._unsub_midnight = None
-        self._decks: dict[str, list] = {}
-        self._deck_pos: dict[str, int] = {}
+        # Decks are keyed by language and pool, so switching language starts a
+        # clean deck rather than carrying half a cycle of the old one across.
+        self._decks: dict[tuple[str, str], list] = {}
+        self._deck_pos: dict[tuple[str, str], int] = {}
         # Monotonic timestamp of the last sensor event Greg actually accepted.
         self._last_accepted: float | None = None
 
@@ -452,11 +452,11 @@ class GregCoordinator:
         chaos = self._config.get(CONF_CHAOS_THRESHOLD, 6)
 
         if self._counter >= chaos:
-            await self._speak(LINES_CHAOS, "chaos")
+            await self._speak("chaos")
         elif self._counter >= medium:
-            await self._speak(LINES_MEDIUM, "medium")
+            await self._speak("medium")
         elif self._counter >= soft:
-            await self._speak(LINES_SOFT, "soft")
+            await self._speak("soft")
 
     async def _reset_counter(self) -> None:
         self._counter = 0
@@ -470,13 +470,13 @@ class GregCoordinator:
     async def _handle_silence(self) -> None:
         if not self.enabled or self._is_quiet_time():
             return
-        await self._speak(LINES_SILENCE, "silence")
+        await self._speak("silence")
 
     @callback
     def _handle_existential(self, now=None) -> None:
         if self._counter > 0 and self.enabled and not self._is_quiet_time():
             self.hass.async_create_task(
-                self._speak(LINES_EXISTENTIAL, "existential")
+                self._speak("existential")
             )
 
     @callback
@@ -508,7 +508,7 @@ class GregCoordinator:
         self.mood_level = max(0, min(100, self.mood_level))
         self._notify()
 
-    def _next_line(self, pool: list, pool_key: str) -> str:
+    def _next_line(self, pool_key: str) -> str:
         """Return the next line from the shuffled deck for this pool.
 
         Every line plays once before any of them come round again. The awkward
@@ -517,8 +517,12 @@ class GregCoordinator:
         despite the shuffle being perfectly fair. So the last few of the outgoing
         deck are pushed out of the first few of the incoming one.
         """
-        deck = self._decks.get(pool_key, [])
-        pos = self._deck_pos.get(pool_key, 0)
+        language = self.language
+        pool = pool_for(language, pool_key)
+        deck_key = (language, pool_key)
+
+        deck = self._decks.get(deck_key, [])
+        pos = self._deck_pos.get(deck_key, 0)
 
         if pos >= len(deck):
             tail = set(deck[-DECK_SEAM_GUARD:]) if deck else set()
@@ -539,12 +543,12 @@ class GregCoordinator:
                     j = random.choice(candidates)
                     new_deck[i], new_deck[j] = new_deck[j], new_deck[i]
 
-            self._decks[pool_key] = new_deck
-            self._deck_pos[pool_key] = 0
+            self._decks[deck_key] = new_deck
+            self._deck_pos[deck_key] = 0
             deck = new_deck
             pos = 0
 
-        self._deck_pos[pool_key] = pos + 1
+        self._deck_pos[deck_key] = pos + 1
         return deck[pos]
 
     def _maybe_opener(self) -> str:
@@ -557,10 +561,10 @@ class GregCoordinator:
             return ""
         if random.random() >= OPENER_CHANCE:
             return ""
-        return random.choice(OPENERS)
+        return random.choice(openers_for(self.language))
 
-    async def _speak(self, pool: list, pool_key: str) -> None:
-        line = self._next_line(pool, pool_key)
+    async def _speak(self, pool_key: str) -> None:
+        line = self._next_line(pool_key)
         opener = self._maybe_opener()
         spoken_text = f"{opener} {line}" if opener else line
 
@@ -586,6 +590,7 @@ class GregCoordinator:
                     "message": spoken_text,
                     "line": line,
                     "category": pool_key,
+                    "language": self.language,
                     "mood": self.mood,
                     "mood_level": self.mood_level,
                     "vibrations_today": self.vibrations_today,
@@ -650,6 +655,16 @@ class GregCoordinator:
             return False
 
     @property
+    def language(self) -> str:
+        """The language Greg is actually speaking.
+
+        An empty setting means follow Home Assistant, which is what almost
+        everybody wants. Anything Greg does not speak resolves to English.
+        """
+        configured = self._config.get(CONF_LANGUAGE, DEFAULT_LANGUAGE)
+        return resolve_language(configured or self.hass.config.language)
+
+    @property
     def is_quiet_now(self) -> bool:
         return self._is_quiet_time()
 
@@ -670,4 +685,5 @@ class GregCoordinator:
             CONF_QUIET_HOURS_ENABLED: cfg.get(CONF_QUIET_HOURS_ENABLED, True),
             CONF_QUIET_START: cfg.get(CONF_QUIET_START, DEFAULT_QUIET_START),
             CONF_QUIET_END: cfg.get(CONF_QUIET_END, DEFAULT_QUIET_END),
+            CONF_LANGUAGE: self.language,
         }

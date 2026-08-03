@@ -63,25 +63,4 @@ jobs:
           PY
 
       - name: Line pools intact
-        run: |
-          python3 - <<'PY'
-          import pathlib, sys
-          ns = {}
-          exec(compile(pathlib.Path("custom_components/greg/const.py").read_text(), "const.py", "exec"), ns)
-          bad = []
-          for name in ["LINES_SOFT", "LINES_MEDIUM", "LINES_CHAOS", "LINES_EXISTENTIAL", "LINES_SILENCE"]:
-              pool = ns[name]
-              if len(pool) != len(set(pool)):
-                  seen, dupes = set(), set()
-                  for line in pool:
-                      if line in seen:
-                          dupes.add(line)
-                      seen.add(line)
-                  bad.append(f"{name} has duplicates: {sorted(dupes)[:3]}")
-              if any(not l.strip() for l in pool):
-                  bad.append(f"{name} contains an empty line")
-          if bad:
-              print("\n".join(bad))
-              sys.exit(1)
-          print("all five pools unique and non-empty")
-          PY
+        run: python3 .github/scripts/check_lines.py
