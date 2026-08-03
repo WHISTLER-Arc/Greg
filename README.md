@@ -336,6 +336,7 @@ There's also a `greg.uninstall` service if you'd rather script it. It takes an o
 
 - **v1.4.** Current release. Single room, no Blueprints, works with any protocol, and he brings his own sidebar panel.
 - **v1.5.** Greg is a supercomputer. He should speak multiple languages besides English, starting with Dutch & Portuguese.
+- **v1.6.** Write your own lines in his panel, and share the good ones with everyone else.
 - **v1.x.** Small improvements as they come. Feedback very welcome.
 - **v2.0.** Multi-room, multiple Gregs, a full mood dashboard. (One Greg might be plenty for some households. I respect that.)
 

@@ -71,6 +71,11 @@ After a stable release it also deletes any `claude/*` branch whose commits are
 already on the released tree. Branches with unmerged work are not matched, and
 pre-releases skip the step entirely, since the branch is usually still in use.
 
+**Beta first, always.** Every release goes out as a pre-release and is tested
+on real hardware before it is promoted to stable. v1.4.2 through v1.4.4 are
+why: three releases in one evening, two of them fixing the one before, none
+of them tested before they shipped.
+
 Betas are cut by dispatching the workflow against a feature branch with the
 pre-release box ticked. `main` stays on the last stable. HACS shows them to
 anyone who enables beta versions in the Redownload dialog for Greg.
