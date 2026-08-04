@@ -51,6 +51,21 @@ def main() -> None:
     if not lines.en.OPENERS:
         problems.append("en has no openers, and English is the fallback")
 
+    # Resolution rules are behaviour, not data, so pin them here rather than
+    # trusting that nobody widens the fallback by accident later.
+    expected = {
+        "pt-BR": "en",   # Brazilian is deliberately not served European Portuguese
+        "pt_BR": "en",
+        "pt-PT": "pt",
+        "nl-BE": "nl",   # regional variants otherwise collapse to their base
+        "fr": "en",      # anything unwritten degrades to English
+        "": "en",
+    }
+    for probe, want in expected.items():
+        got = lines.resolve(probe)
+        if got != want:
+            problems.append(f"resolve({probe!r}) is {got!r}, expected {want!r}")
+
     if problems:
         print("Line problems:\n")
         for p in problems:

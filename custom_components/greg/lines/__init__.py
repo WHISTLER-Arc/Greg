@@ -23,6 +23,16 @@ LANGUAGES = {
 DEFAULT_LANGUAGE = "en"
 POOL_KEYS = ("soft", "medium", "chaos", "existential", "silence")
 
+# Regional codes that must not be served by their base language, because the
+# two are different enough that the wrong one is worse than English.
+#
+# pt-BR is the case in point. Brazilian and European Portuguese are routinely
+# treated as interchangeable by software that should know better, and being
+# handed the other one when you explicitly asked is its own small insult. A
+# Brazilian gets English until somebody writes pt-br.py, which at least reads
+# as an honest gap rather than a wrong guess.
+DISTINCT_REGIONS = {"pt-br"}
+
 
 def available() -> dict[str, str]:
     """Language codes mapped to what they call themselves."""
@@ -33,15 +43,20 @@ def resolve(language: str | None) -> str:
     """Return a language code we actually have.
 
     Accepts anything Home Assistant might hand over, including regional codes
-    like nl-BE or pt-BR, and falls back to English rather than failing. A user
-    whose HA is set to a language Greg does not speak gets English, not a
-    broken integration.
+    like nl-BE, and falls back to English rather than failing. A user whose HA
+    is set to a language Greg does not speak gets English, not a broken
+    integration.
+
+    Regional codes normally collapse to their base language, so nl-BE is served
+    by nl. The exceptions are in DISTINCT_REGIONS, which go to English instead.
     """
     if not language:
         return DEFAULT_LANGUAGE
     code = str(language).replace("_", "-").lower()
     if code in LANGUAGES:
         return code
+    if code in DISTINCT_REGIONS:
+        return DEFAULT_LANGUAGE
     base = code.split("-")[0]
     if base in LANGUAGES:
         return base
