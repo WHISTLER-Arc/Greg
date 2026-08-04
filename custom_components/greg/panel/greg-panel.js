@@ -294,6 +294,12 @@ class GregPanel extends HTMLElement {
       </div>
 
       <div class="gfield">
+        <label>Language</label>
+        <div class="gselwrap"><select class="gctl" data-key="language" data-optkey="language_options"></select></div>
+        <span class="ghint" data-out="langnote"></span>
+      </div>
+
+      <div class="gfield">
         <label>Volume <span class="gval" data-out="volume"></span></label>
         <input class="gctl" type="range" data-key="volume" min="0" max="100" step="5">
       </div>
@@ -349,10 +355,21 @@ class GregPanel extends HTMLElement {
 
   // Selects are rebuilt only when the entity list actually changes, so a state
   // update mid-edit does not throw away what the user has picked.
+  // Options published by the integration rather than derived from entities.
+  // Language is built from whatever line files exist, so a new language file
+  // appears in this dropdown without the panel being told about it.
+  _listOptions(key) {
+    const s = this._moodState();
+    const raw = (s && s.attributes && s.attributes[key]) || {};
+    return Object.keys(raw).map((k) => ({ id: k, name: raw[k] }));
+  }
+
   _fillSelects() {
     const r = this.shadowRoot;
     r.querySelectorAll("select.gctl").forEach((sel) => {
-      const opts = this._entityOptions(sel.dataset.domain);
+      const opts = sel.dataset.optkey
+        ? this._listOptions(sel.dataset.optkey)
+        : this._entityOptions(sel.dataset.domain);
       const sig = opts.map((o) => o.id).join(",");
       if (sel.dataset.sig === sig) return;
       sel.dataset.sig = sig;
@@ -376,6 +393,7 @@ class GregPanel extends HTMLElement {
         g("quiet_hours_enabled").getAttribute("aria-checked") === "true",
       quiet_start: g("quiet_start").value,
       quiet_end: g("quiet_end").value,
+      language: g("language").value,
     };
   }
 
@@ -391,12 +409,15 @@ class GregPanel extends HTMLElement {
     );
     g("quiet_start").value = cfg.quiet_start || "22:00";
     g("quiet_end").value = cfg.quiet_end || "08:00";
+    // Empty means follow Home Assistant, which is a valid choice rather than
+    // an absent one, so this is set unconditionally.
+    g("language").value = cfg.language ?? "";
   }
 
   _sameConfig(a, b) {
     if (!a || !b) return false;
     return ["vibration_sensor", "media_player", "tts_engine", "sensitivity",
-            "quiet_hours_enabled", "quiet_start", "quiet_end"]
+            "quiet_hours_enabled", "quiet_start", "quiet_end", "language"]
       .every((k) => a[k] === b[k])
       && Math.abs((a.volume ?? 0) - (b.volume ?? 0)) < 0.001;
   }
@@ -424,6 +445,19 @@ class GregPanel extends HTMLElement {
         scope.querySelector('.gctl[data-key="quiet_hours_enabled"]')
              .getAttribute("aria-checked") === "true";
       scope.querySelector(".gtimes").classList.toggle("hidden", !quiet);
+
+      const note = scope.querySelector('[data-out="langnote"]');
+      if (note) {
+        const chosen = scope.querySelector('.gctl[data-key="language"]').value;
+        const s = this._moodState();
+        const effective = (s && s.attributes && s.attributes.language_effective) || "";
+        const names = (s && s.attributes && s.attributes.language_options) || {};
+        note.textContent = chosen
+          ? ""
+          : effective
+          ? `Currently ${names[effective] || effective}.`
+          : "";
+      }
     });
   }
 

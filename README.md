@@ -99,8 +99,8 @@ The setup wizard keeps things simple, unless you want to get into the weeds.
 - Give him a specific TTS voice
 
 **Changing your mind later.** As of v1.4.2 the basic settings live in Greg's own
-panel, in the column on the right. Sensor, speaker, text to speech, volume,
-sensitivity and quiet hours, all editable there without going near the
+panel, in the column on the right. Sensor, speaker, text to speech, language,
+volume, sensitivity and quiet hours, all editable there without going near the
 integration page. Change what you like and press Apply. Everything in the
 advanced list above still lives in **Settings > Devices & Services > Greg >
 Configure**, and there's a link straight to it from the panel.
@@ -164,6 +164,51 @@ These are add-on-wide, so they do affect anything else using Piper. If that's a 
 > - [HA Community, Piper add-on configuration options](https://community.home-assistant.io/t/piper-add-on-configuration-options-per-voice-or-at-runtime/850302)
 > - [Piper voice samples](https://rhasspy.github.io/piper-samples/)
 > - [Piper VOICES.md](https://github.com/rhasspy/piper/blob/master/VOICES.md)
+
+---
+
+## Speaking your language
+
+As of v1.5 Greg moans in more than one language. English, Dutch and European
+Portuguese so far.
+
+The setting is in his panel, under Text to speech, because it is the same sort
+of question: how he sounds. It defaults to following whatever Home Assistant is
+set to, so a Dutch Home Assistant gets a Dutch Greg without anyone touching
+anything.
+
+**He is not translated.** His humour lives in the register rather than the
+words, and a literal translation of "I am load-bearing and nothing else" is
+just a true statement about furniture. So every language is written from
+scratch by somebody who thinks in it, keeping the same character rather than
+the same sentences.
+
+Anything not yet written falls back to English one reaction at a time, so a
+language with three of the five categories done is perfectly usable.
+
+| Home Assistant set to | Greg speaks |
+|---|---|
+| `pt`, `pt-PT` | Português |
+| `pt-BR` | English, deliberately |
+| `nl`, `nl-BE` | Nederlands |
+| Anything else | English |
+
+That second row is on purpose. Brazilian and European Portuguese get treated as
+interchangeable by a great deal of software that ought to know better, and
+being handed the wrong one when you explicitly asked is its own small
+irritation. A Brazilian gets English until somebody writes him a Brazilian
+file, which at least reads as an honest gap rather than a wrong guess.
+
+### Adding a language
+
+One file. Copy `custom_components/greg/lines/TEMPLATE.py` to your language code,
+read the notes at the top, write your version, add one line to the registry in
+`__init__.py`, and open a pull request. The template leads with the part that
+matters, which is that translating the English produces sentences that are
+correct and not funny.
+
+You will want a matching voice too. Piper has `nl_NL-*` and `pt_PT-*` among
+others, and Greg's **Voice** field takes whichever you pick.
 
 ---
 

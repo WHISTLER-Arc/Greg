@@ -81,6 +81,10 @@ class GregMoodSensor(_GregBase):
             # call services, and has no route to the config entry at all, so the
             # settings have to travel out here to be shown.
             "config": self.coordinator.basic_config,
+            "language_options": self.coordinator.language_options,
+            # What an empty language setting actually resolves to, so the
+            # panel can say which language Follow Home Assistant landed on.
+            "language_effective": self.coordinator.language,
         }
 
 

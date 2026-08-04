@@ -1,8 +1,8 @@
 """Constants for Greg integration."""
 
 DOMAIN = "greg"
-VERSION = "1.5.0"
-VERSION_DISPLAY = "v1.5.0"
+VERSION = "1.5.0b1"
+VERSION_DISPLAY = "v1.5.0b1"
 
 # Config keys
 CONF_VIBRATION_SENSOR = "vibration_sensor"
@@ -114,6 +114,7 @@ BASIC_OPTION_KEYS = (
     CONF_QUIET_HOURS_ENABLED,
     CONF_QUIET_START,
     CONF_QUIET_END,
+    CONF_LANGUAGE,
 )
 
 # Greg's mood images live here once installed. This is the only path outside

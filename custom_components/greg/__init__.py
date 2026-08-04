@@ -25,7 +25,12 @@ from homeassistant.components.frontend import (
 )
 from homeassistant.components.http import StaticPathConfig
 
-from .lines import openers as openers_for, pool as pool_for, resolve as resolve_language
+from .lines import (
+    available as available_languages,
+    openers as openers_for,
+    pool as pool_for,
+    resolve as resolve_language,
+)
 
 from .const import (
     DOMAIN,
@@ -279,6 +284,10 @@ def _async_register_services(hass: HomeAssistant) -> None:
                 vol.Optional(CONF_QUIET_HOURS_ENABLED): cv.boolean,
                 vol.Optional(CONF_QUIET_START): cv.matches_regex(r"^\d{2}:\d{2}$"),
                 vol.Optional(CONF_QUIET_END): cv.matches_regex(r"^\d{2}:\d{2}$"),
+                # Empty is valid and means follow Home Assistant.
+                vol.Optional(CONF_LANGUAGE): vol.In(
+                    ["", *available_languages().keys()]
+                ),
             }
         ),
     )
@@ -655,6 +664,15 @@ class GregCoordinator:
             return False
 
     @property
+    def language_options(self) -> dict:
+        """What the panel offers in its language dropdown.
+
+        Built from the lines package, so a new language file appears here on its
+        own without anything else being told about it.
+        """
+        return {"": "Follow Home Assistant", **available_languages()}
+
+    @property
     def language(self) -> str:
         """The language Greg is actually speaking.
 
@@ -685,5 +703,8 @@ class GregCoordinator:
             CONF_QUIET_HOURS_ENABLED: cfg.get(CONF_QUIET_HOURS_ENABLED, True),
             CONF_QUIET_START: cfg.get(CONF_QUIET_START, DEFAULT_QUIET_START),
             CONF_QUIET_END: cfg.get(CONF_QUIET_END, DEFAULT_QUIET_END),
-            CONF_LANGUAGE: self.language,
+            # The configured value, which may be empty meaning follow Home
+            # Assistant. The panel edits this. self.language is what that
+            # resolves to, which is a different question and reported below.
+            CONF_LANGUAGE: cfg.get(CONF_LANGUAGE, DEFAULT_LANGUAGE),
         }
