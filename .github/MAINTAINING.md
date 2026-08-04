@@ -54,7 +54,9 @@ Releases go out through `.github/workflows/release.yml`, run manually with the
 version as input, and a checkbox for pre-releases. It refuses to release unless
 
 - `manifest.json`, `const.py` and the version you typed all agree
-- `CHANGELOG.md` has a section for that version, and it is not empty
+- `CHANGELOG.md` has a section for that version, and it is not empty. A
+  pre-release uses the section for the version it is a candidate for, so
+  `1.5.0b1` is described by `## [1.5.0]` and does not need its own entry
 - the tag does not already exist
 - everything still parses
 

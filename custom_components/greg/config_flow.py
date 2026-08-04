@@ -7,6 +7,8 @@ from homeassistant import config_entries
 from homeassistant.core import callback
 from homeassistant.helpers import selector
 
+from .lines import available as available_languages
+
 from .const import (
     DOMAIN,
     CONF_VIBRATION_SENSOR,
@@ -28,6 +30,7 @@ from .const import (
     CONF_SPEECH_MODE,
     CONF_OPENERS,
     CONF_TTS_VOICE,
+    CONF_LANGUAGE,
     DEFAULT_VOLUME,
     DEFAULT_QUIET_START,
     DEFAULT_QUIET_END,
@@ -43,12 +46,29 @@ from .const import (
     DEFAULT_SPEECH_MODE,
     DEFAULT_OPENERS,
     DEFAULT_TTS_VOICE,
+    DEFAULT_LANGUAGE,
     SPEECH_MODE_GREG,
     SPEECH_MODE_EVENT_ONLY,
     VERSION_DISPLAY,
 )
 
 TIME_PATTERN = re.compile(r"^\d{2}:\d{2}$")
+
+
+def _language_selector() -> selector.SelectSelector:
+    """Whatever languages are actually installed, plus follow Home Assistant.
+
+    Built from the lines package rather than hardcoded, so adding a language
+    file is genuinely the only thing a contributor has to do.
+    """
+    options = [{"value": "", "label": "Follow Home Assistant"}]
+    options += [
+        {"value": code, "label": name}
+        for code, name in available_languages().items()
+    ]
+    return selector.SelectSelector(
+        selector.SelectSelectorConfig(options=options, mode="dropdown")
+    )
 
 
 def _validate_time(value: str) -> str:
@@ -165,6 +185,7 @@ class GregConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             vol.Optional(CONF_SUPPRESS_CHIME, default=DEFAULT_SUPPRESS_CHIME): selector.BooleanSelector(),
             vol.Optional(CONF_OPENERS, default=DEFAULT_OPENERS): selector.BooleanSelector(),
             vol.Optional(CONF_TTS_VOICE, default=DEFAULT_TTS_VOICE): selector.TextSelector(),
+            vol.Optional(CONF_LANGUAGE, default=DEFAULT_LANGUAGE): _language_selector(),
             vol.Optional(CONF_EMIT_EVENTS, default=DEFAULT_EMIT_EVENTS): selector.BooleanSelector(),
             vol.Optional(CONF_SPEECH_MODE, default=DEFAULT_SPEECH_MODE): selector.SelectSelector(
                 selector.SelectSelectorConfig(
@@ -259,6 +280,7 @@ class GregOptionsFlow(config_entries.OptionsFlow):
             vol.Optional(CONF_SUPPRESS_CHIME, default=self._get(CONF_SUPPRESS_CHIME, DEFAULT_SUPPRESS_CHIME)): selector.BooleanSelector(),
             vol.Optional(CONF_OPENERS, default=self._get(CONF_OPENERS, DEFAULT_OPENERS)): selector.BooleanSelector(),
             vol.Optional(CONF_TTS_VOICE, default=self._get(CONF_TTS_VOICE, DEFAULT_TTS_VOICE)): selector.TextSelector(),
+            vol.Optional(CONF_LANGUAGE, default=self._get(CONF_LANGUAGE, DEFAULT_LANGUAGE)): _language_selector(),
             vol.Optional(CONF_EMIT_EVENTS, default=self._get(CONF_EMIT_EVENTS, DEFAULT_EMIT_EVENTS)): selector.BooleanSelector(),
             vol.Optional(CONF_SPEECH_MODE, default=self._get(CONF_SPEECH_MODE, DEFAULT_SPEECH_MODE)): selector.SelectSelector(
                 selector.SelectSelectorConfig(

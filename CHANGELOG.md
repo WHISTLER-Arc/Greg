@@ -3,6 +3,32 @@
 All notable changes to Greg. He would like it noted that he did not ask to be
 versioned.
 
+## [1.5.0]
+
+### Added
+- **Greg speaks more than one language.** English, Dutch and European
+  Portuguese. The setting sits in his panel under Text to speech, and defaults
+  to following whatever Home Assistant is set to. Dutch and Portuguese are
+  stubbed and waiting to be written, and anything unwritten falls back to
+  English one reaction at a time.
+- `greg_line` now carries the `language` a line came out in.
+- `lines/TEMPLATE.py`, so adding a language is one file and a pull request.
+
+### Changed
+- Line pools moved out of `const.py` into a `lines` package, one module per
+  language. `const.py` is 131 lines instead of 405 and holds only constants
+  again. The English lines are byte-identical to before.
+- Shuffled decks are keyed by language, so changing it starts a clean cycle
+  rather than carrying half of the old one across.
+
+### Notes
+- `pt-BR` resolves to English rather than European Portuguese. Regional codes
+  normally collapse to their base language, so `nl-BE` is served by Dutch, but
+  Brazilian and European Portuguese are different enough that the wrong one is
+  worse than none. This is deliberate, not a bug.
+- No new lines in this release. Greg sounds exactly as he did, unless you
+  change the setting.
+
 ## [1.4.4]
 
 ### Fixed

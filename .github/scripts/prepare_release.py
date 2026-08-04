@@ -27,6 +27,16 @@ def fail(problems: list[str]) -> None:
     sys.exit(1)
 
 
+def base_version(version: str) -> str:
+    """Strip a pre-release suffix, so 1.5.0b1 becomes 1.5.0.
+
+    A beta is a candidate for the release it is named after, and is described by
+    that release's changelog section. Giving every beta its own section would be
+    noise, and would mean writing the notes twice.
+    """
+    return re.sub(r"(a|b|rc)\d+$", "", version)
+
+
 def tag_exists(tag: str) -> bool:
     out = subprocess.run(
         ["git", "tag", "--list", tag], capture_output=True, text=True, check=True
@@ -65,19 +75,20 @@ def main() -> None:
                 f"const.py VERSION_DISPLAY is {display_m.group(1)}, expected v{want}"
             )
 
+    notes_version = base_version(want)
     changelog = pathlib.Path("CHANGELOG.md").read_text()
     section = re.search(
-        rf"^## \[{re.escape(want)}\][^\n]*\n(.*?)(?=^## \[|\Z)",
+        rf"^## \[{re.escape(notes_version)}\][^\n]*\n(.*?)(?=^## \[|\Z)",
         changelog,
         re.M | re.S,
     )
     if not section:
         problems.append(
-            f"CHANGELOG.md has no '## [{want}]' section. "
+            f"CHANGELOG.md has no '## [{notes_version}]' section. "
             "Write the changelog before releasing."
         )
     elif not section.group(1).strip():
-        problems.append(f"the '## [{want}]' changelog section is empty")
+        problems.append(f"the '## [{notes_version}]' changelog section is empty")
 
     if not args.allow_existing_tag and tag_exists(tag):
         problems.append(f"tag {tag} already exists")
@@ -86,9 +97,16 @@ def main() -> None:
         fail(problems)
 
     notes = section.group(1).strip()
+    if notes_version != want:
+        notes = (
+            f"Test build of {notes_version}. Not for general use.\n\n"
+            "What it will contain when it ships:\n\n" + notes
+        )
     pathlib.Path(args.notes_out).write_text(notes + "\n", encoding="utf-8")
 
     print(f"Version agrees everywhere: {want}")
+    if notes_version != want:
+        print(f"Pre-release, notes taken from the [{notes_version}] section")
     print(f"Tag to create: {tag}")
     print(f"Notes written to {args.notes_out} ({len(notes.splitlines())} lines)")
 
