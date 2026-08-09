@@ -1,5 +1,3 @@
-![Latest GitHub Release](https://shields.io)
-
 # Greg
 
 **A Home Assistant integration that gives your coffee table feelings. Mostly bad ones.**
