@@ -3,11 +3,13 @@
 Raw record of the Dutch and Portuguese lines, kept here rather than in a
 temporary directory because a session ending should not cost a day of review.
 
-Most of it is reviewed and signed off by WHISTLER-Arc, who is a native speaker
-of both. CHAOS 37-50 is not. Those lines are drafted and awaiting review, and
-until that happens they are a proposal rather than a record. Sign-off is not a
-formality here. These lines are not translations, the register has to be found
+Everything here is reviewed and signed off by WHISTLER-Arc, who is a native
+speaker of both. Nothing enters this file until it has been. Sign-off is not a
+formality. These lines are not translations, the register has to be found
 natively, and a non-native draft can be word-perfect and still not land.
+
+EXISTENTIAL and SILENCE are not started. When they are drafted they will be
+marked NOT SIGNED OFF until reviewed, as CHAOS was.
 
 These are not translations of the English. Each line was written natively and
 then corrected, which is why the wording often diverges. See
@@ -18,15 +20,15 @@ custom_components/greg/lines/TEMPLATE.py for why that matters.
                  drafted    signed off
     SOFT         50 of 50   50 of 50   complete
     MEDIUM       50 of 50   50 of 50   complete
-    CHAOS        50 of 50   36 of 50   37-50 awaiting WHISTLER-Arc
+    CHAOS        50 of 50   50 of 50   complete
     EXISTENTIAL   0 of 50    0 of 50
     SILENCE       0 of 50    0 of 50
 
-    150 of 250 drafted, 136 of 250 signed off
+    150 of 250 drafted and signed off
 
 Counting NL and PT as separate lines, which is how the 500 figure is reached,
-that is 300 of 500 drafted and 272 of 500 signed off. Only the signed-off
-count is a real number. The other 28 lines are provisional.
+that is 300 of 500. Nothing is provisional. The remaining 200 lines are
+EXISTENTIAL and SILENCE, not yet started.
 
 ## English corrections still to apply to lines/en.py
 
@@ -42,6 +44,7 @@ the check rather than the lookup.
     CHAOS  idx 22  "I have now seen peak chaos." -> "I have now seen it."
     CHAOS  idx 24  "I did not pack for this."    -> "I did not dress for this."
     CHAOS  idx 32  gains a fourth sentence, full replacement below
+    CHAOS  idx 43  second and third sentences replaced, full text below
 
 CHAOS 32 in full, from the batch 3 review. Note the straight apostrophe in
 "I'm". en.py uses straight apostrophes throughout, fourteen of them and no
@@ -49,6 +52,10 @@ curly ones, so the curly form must not be pasted in.
 
     I would like to register a complaint. I have nowhere to register it. So
     I'm registering it here. Not that it will make any difference.
+
+CHAOS 43 in full, from the batch 4 review.
+
+    I am at capacity. My capacity was never large enough. It never will be.
 
 ## Numbering does not match en.py. Read this before assembling the pools.
 
@@ -87,9 +94,9 @@ Three defects that came out of this check have been fixed in place:
 
 ## Next
 
-Review CHAOS 25-50, then draft EXISTENTIAL and SILENCE in batches of twelve.
-Then fold everything into lines/nl.py and lines/pt.py, apply the English
-corrections, and only then cut a beta.
+Draft EXISTENTIAL and SILENCE in batches of twelve, each batch reviewed and
+signed off before the next is drafted. Then fold everything into lines/nl.py
+and lines/pt.py, apply the English corrections, and only then cut a beta.
 
 Nothing unsigned goes into nl.py or pt.py. Once a line is in the pool it ships,
 and there is no review step after that. The filenames still say approved, which

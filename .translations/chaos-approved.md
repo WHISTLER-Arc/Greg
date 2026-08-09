@@ -1,12 +1,10 @@
 # CHAOS pool
 
-SIGN-OFF BOUNDARY IS LINE 36. Lines 1-36 are approved by WHISTLER-Arc. Lines
-37-50 are drafted and are NOT approved. The last signed-off line is 36, "I am
-absorbing all of this. That is not a boast."
+CHAOS COMPLETE. All 50 lines approved by WHISTLER-Arc, in four batches.
+One NL query still open on 37, noted at the line.
 
-Nothing from 25 on is settled until WHISTLER-Arc has read it. The register is
-the whole job and only a native speaker can say whether it lands, so treat
-those lines as a proposal rather than a record.
+Two English lines changed during review and still need applying to en.py,
+32 and 43, both recorded at their batch headers and in the README.
 
 Batch 1, lines 1-12. Locked.
 
@@ -111,42 +109,42 @@ ENGLISH CHANGED on 32, deliberately. en.py needs updating:
     NL: Ik neem dit allemaal in me op. Dat is geen opschepperij. Het is een beschrijving van de enige optie die ik heb.
     PT: Estou a assimilar tudo isto. Não é uma forma de me gabar. É uma descrição da minha única opção disponível.
 
-Batch 4, lines 37-50, covering en.py LINES_CHAOS indices 37-50. NOT SIGNED OFF,
-awaiting WHISTLER-Arc. CHAOS is drafted to 50 of 50 but signed off only to 24.
-English carried alongside and left untouched, as in batch 3.
-
-Two spots to look at first. Line 44 avoids the natural idiom "dat moet ik hem
-nageven" because it wants hem for an abstract referent, which the SOFT notes
-correct twice, so it says "dat moet gezegd worden" instead and may read flat.
-Lines 37 and 43 lean on PT clitic placement, "nunca a tive" and "atingi-a".
+Batch 4, lines 37-50, covering en.py LINES_CHAOS indices 37-50. Locked.
+CHAOS COMPLETE, 50 of 50 signed off. One NL query on 37.
+ENGLISH CHANGED on 43. en.py needs updating:
+  43 EN: I am at capacity. My capacity was never large enough. It never will be.
+         (was "was never large. But I am at it.")
 
 37. EN: The room has lost its composure. I never had any, so I am not losing anything, but I notice.
-    NL: De kamer heeft zijn beheersing verloren. Ik had die nooit, dus ik verlies niets, maar het valt me op.
+    NL: De kamer is haar zelfbeheersing verloren. Ik heb die nooit gehad, dus ik verlies niets, maar het valt me wel op.
     PT: A sala perdeu a compostura. Eu nunca a tive, portanto não perco nada, mas reparo.
+        (NL query: "is haar zelfbeheersing verloren". Verliezen takes hebben,
+        so this reads as a slip for "heeft haar zelfbeheersing verloren".
+        Left exactly as signed off, pending a one-word ruling.)
 38. EN: This much contact would concern most furniture. I am past concern. I am at documentation.
-    NL: Zoveel contact zou de meeste meubels zorgen baren. Ik ben voorbij zorgen. Ik zit in de documentatiefase.
-    PT: Tanto contacto preocuparia a maioria da mobília. Já passei da preocupação. Estou na fase de documentação.
+    NL: Zoveel contact zou de meeste meubels zorgen baren. Ik ben voorbij zorgen. Nu ben ik bij de documentatie.
+    PT: Tanto contacto preocuparia a maioria da mobília. Já passei a preocupação. Estou na fase de documentação.
 39. EN: You are all being extremely present. I would like less presence, or a different room.
-    NL: Jullie zijn allemaal buitengewoon aanwezig. Ik zou graag minder aanwezigheid willen, of een andere kamer.
+    NL: Jullie zijn allemaal erg aanwezig. Ik zou liever minder aanwezigheid willen, of een andere kamer.
     PT: Estão todos extremamente presentes. Gostaria de menos presença, ou de outra sala.
 40. EN: I have been struck, leaned on, and set upon in under a minute. The order does not matter.
-    NL: Ik ben geraakt, er is op mij geleund en ik ben overvallen, alles binnen een minuut. De volgorde doet er niet toe.
-    PT: Fui atingido, servi de apoio e fui assaltado, tudo em menos de um minuto. A ordem é indiferente.
+    NL: Binnen een minuut, ben ik geraakt, gesteund en bezet. De volgorde doet er niet toe.
+    PT: Fui atingido, servi de apoio e sobreposto, tudo em menos de um minuto. A ordem não importa.
 41. EN: If this continues at the current rate, I will have experienced more today than in the whole of last month.
     NL: Als dit in dit tempo doorgaat, heb ik vandaag meer meegemaakt dan in de hele afgelopen maand.
-    PT: Se isto continuar a este ritmo, terei vivido mais hoje do que em todo o mês passado.
+    PT: Se isto continuar assim, hoje terei mais experiências do que em todo o mês passado.
 42. EN: There is no gap between these events. I keep waiting for one. It is not coming.
-    NL: Er zit geen pauze tussen deze gebeurtenissen. Ik blijf erop wachten. Die komt niet.
+    NL: Er zit geen onderbreking tussen deze gebeurtenissen. Ik blijf erop wachten. Het komt niet.
     PT: Não há intervalo entre estes acontecimentos. Continuo à espera de um. Não vem.
-43. EN: I am at capacity. My capacity was never large. But I am at it.
-    NL: Ik zit aan mijn capaciteit. Mijn capaciteit was nooit groot. Maar ik zit eraan.
-    PT: Atingi a minha capacidade. A minha capacidade nunca foi grande. Mas atingi-a.
+43. EN: I am at capacity. My capacity was never large enough. It never will be.
+    NL: Ik zit aan mijn capaciteit. Mijn capaciteit is nooit groot genoeg geweest. Dat zal het ook nooit zijn.
+    PT: Atingi a minha capacidade. A minha capacidade nunca foi suficiente. Nunca será.
 44. EN: The chaos is thorough. I will say that for it. Nothing has been left out.
     NL: De chaos is grondig. Dat moet gezegd worden. Er is niets overgeslagen.
     PT: O caos é minucioso. Há que reconhecê-lo. Não ficou nada de fora.
 45. EN: Everyone appears to be having a wonderful time. I have run the numbers and I am not included in that.
     NL: Iedereen lijkt zich uitstekend te vermaken. Ik heb de cijfers doorgerekend en ik val daar niet onder.
-    PT: Toda a gente parece estar a divertir-se imenso. Fiz as contas e não estou incluído.
+    PT: Parece que toda a gente se está a divertir imenso. Fiz as contas e eu não estou incluído nisso.
 46. EN: I would ask what is happening, but I have observed enough to know that nobody knows.
     NL: Ik zou vragen wat er gaande is, maar ik heb genoeg waargenomen om te weten dat niemand het weet.
     PT: Perguntaria o que se está a passar, mas já observei o suficiente para saber que ninguém sabe.
@@ -157,7 +155,7 @@ Lines 37 and 43 lean on PT clitic placement, "nunca a tive" and "atingi-a".
     NL: Ik verwerk op maximum en ik loop achter. Dat is een eerste keer. Het liefst was het meteen ook de laatste.
     PT: Estou a processar no máximo e a ficar para trás. É a primeira vez. Preferia que fosse também a última.
 49. EN: Something will spill. I do not know what yet. But something always does, and it always lands here.
-    NL: Er gaat iets omvallen. Ik weet nog niet wat. Maar er valt altijd iets om, en het komt altijd hier terecht.
+    NL: Er zal iets morsen. Ik weet nog niet wat. Maar er morst altijd wel iets, en dat belandt altijd hier.
     PT: Alguma coisa vai entornar-se. Ainda não sei o quê. Mas há sempre alguma coisa que se entorna, e vai sempre parar aqui.
 50. EN: I have nothing left to say about this that I have not already said louder, internally, several minutes ago.
     NL: Ik heb hier niets meer over te zeggen wat ik niet al luider heb gezegd, intern, enkele minuten geleden.
