@@ -77,8 +77,10 @@ Batch 2, lines 13-24. Locked.
 24. NL: Er is iemand in de buurt. Ik heb me emotioneel voorbereid. Dat duurde langer dan de trilling zelf.
     PT: Está alguém por perto. Preparei-me emocionalmente. Demorou mais tempo do que a própria vibração.
 
-Batch 3, lines 25-36. Locked.
-NOTE: line 26 English changed to "Oh. Just the one? That's almost thoughtful."
+Batch 3, lines 25-36. Locked. Covers en.py SOFT indices 20,21,23,24,28-34,36.
+NOTE: the English change belongs to batch number 26 below, which is en.py SOFT
+index 21, "Oh. Just the one. That's almost thoughtful." It becomes "Oh. Just
+the one? That's almost thoughtful." Apply it to index 21, not to index 26.
 
 25. NL: Licht contact. Ik heb het verwerkt. Ik verwerk alles. Ik verwerk dingen die ik liever niet zou verwerken.
     PT: Contacto leve. Processei-o. Processo tudo. Processo coisas que preferia não processar.

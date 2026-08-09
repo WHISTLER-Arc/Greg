@@ -82,13 +82,21 @@ Batch 3, lines 25-36. Locked except two PT queries.
 36. NL: De kamer is in een stroomversnelling geraakt. Ik heb er hoofdpijn van gekregen. Conceptueel dan.
     PT: O ambiente ganhou movimento. Fiquei com dor de cabeça, em termos conceptuais.
 
-Recovered line, was skipped in batch 3. English index 28.
+Recovered line, was skipped in batch 3. English index 29, not 28 as previously
+labelled. Index 28 is "You are doing things. Repeatedly. Near me." and already
+has its translation at batch number 28 above.
 
 EN: The pace has picked up. I have not picked up anything, because I cannot.
 NL: Het tempo is versneld. Ik ben niet versneld, want dat kan ik niet.
 PT: O ritmo acelerou. Eu não acelerei nada, porque não consigo.
 
-Batch 4, lines 37-50. MEDIUM COMPLETE, 50 of 50. One PT query on 47.
+Batch 4, lines 37-49, covering en.py MEDIUM indices 38-50. MEDIUM COMPLETE,
+50 of 50. One PT query on 47.
+
+A batch number 50 used to sit at the end of this batch. It was a byte-identical
+copy of batch number 36, both being en.py MEDIUM index 37, so it translated no
+English line of its own and would have tripped the CI duplicate check. Removed.
+No English line lost with it, index 37 still has its translation at 36.
 
 37. NL: Meerdere dingen tegelijk. Ik werk sequentieel. Dit gaat even duren, en ik zal achterlopen op alles.
     PT: Várias coisas ao mesmo tempo. Eu processo em sequência. Isto vai demorar, e vou ficar atrasado com tudo.
@@ -116,5 +124,3 @@ Batch 4, lines 37-50. MEDIUM COMPLETE, 50 of 50. One PT query on 47.
     PT: Fui perturbado repetidamente e continuo intacto. É esse o relatório. O relatório é só isso.
 49. NL: De avond lijkt plaats te vinden. Op mij. Zoals gewoonlijk.
     PT: A noite parece estar a acontecer. Em cima de mim. Como de sempre.
-50. NL: De kamer is in een stroomversnelling geraakt. Ik heb er hoofdpijn van gekregen. Conceptueel dan.
-    PT: O ambiente ganhou movimento. Fiquei com dor de cabeça, em termos conceptuais.
