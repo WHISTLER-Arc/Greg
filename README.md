@@ -1,4 +1,4 @@
-![HACS Downloads](https://shields.io)
+![Latest GitHub Release](https://shields.io)
 
 # Greg
 
