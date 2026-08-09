@@ -66,9 +66,10 @@ ENGLISH CHANGED on 19, 22, 24. en.py needs updating:
 24. NL: De trillingen zijn een soort weer geworden. Ik leef erin. Hier had ik me niet op gekleed.
     PT: As vibrações tornaram-se uma espécie de clima. Estou a viver no meio delas. Não estou vestido para isto.
 
-Batch 3, lines 25-36. Locked. One PT query on 27.
+Batch 3, lines 25-36. Locked, no open queries. The 27 PT typo "esteá" was
+ruled a slip and is now "está".
 CHAOS numbering is positional, so these are en.py LINES_CHAOS indices 25-36.
-ENGLISH CHANGED on 32. en.py needs updating:
+ENGLISH CHANGED on 32, deliberately. en.py needs updating:
   32 EN: I would like to register a complaint. I have nowhere to register it.
          So I'm registering it here. Not that it will make any difference.
          (was three sentences ending "I am registering it here.")
@@ -81,10 +82,7 @@ ENGLISH CHANGED on 32. en.py needs updating:
     PT: Isto já é demasiado. Quero que isso fique bem claro antes que aconteça mais alguma coisa.
 27. EN: Whatever is occurring, it is occurring at volume, and I am the floor of it.
     NL: Wat er ook plaatsvindt, het vindt luidruchtig plaats, en ik ben de vloer eronder.
-    PT: Seja o que for que esteá a acontecer, está a acontecer em alto volume, e eu estou ao fundo de tudo.
-        (PT query: "esteá" is not a Portuguese word and appears nowhere else in
-        the repo. Reads as a slip for "está" or "esteja". Left exactly as
-        signed off, pending a one-word ruling.)
+    PT: Seja o que for que está a acontecer, está a acontecer em alto volume, e eu estou ao fundo de tudo.
 28. EN: I have exceeded every threshold I was given. There are no more thresholds. There is just this.
     NL: Ik heb elke drempel overschreden die mij was opgelegd. Er zijn geen drempels meer. Er is alleen dit.
     PT: Excedi todos os limites que me foram dados. Já não há mais limites. Há apenas isto.
