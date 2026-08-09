@@ -1,7 +1,7 @@
 # CHAOS pool
 
 CHAOS COMPLETE. All 50 lines approved by WHISTLER-Arc, in four batches.
-One NL query still open on 37, noted at the line.
+No open queries.
 
 Two English lines changed during review and still need applying to en.py,
 32 and 43, both recorded at their batch headers and in the README.
@@ -109,21 +109,24 @@ ENGLISH CHANGED on 32, deliberately. en.py needs updating:
     NL: Ik neem dit allemaal in me op. Dat is geen opschepperij. Het is een beschrijving van de enige optie die ik heb.
     PT: Estou a assimilar tudo isto. Não é uma forma de me gabar. É uma descrição da minha única opção disponível.
 
-Batch 4, lines 37-50, covering en.py LINES_CHAOS indices 37-50. Locked.
-CHAOS COMPLETE, 50 of 50 signed off. One NL query on 37.
+Batch 4, lines 37-50, covering en.py LINES_CHAOS indices 37-50. Locked, no
+open queries. CHAOS COMPLETE, 50 of 50 signed off.
+
+Four points raised in review and ruled on. 37 NL takes hebben, now "heeft haar
+zelfbeheersing verloren". 38 PT keeps the da, "passei da preocupação". 40 NL
+stands as written, including the comma, intentional. 49 NL keeps "Er zal iets
+morsen", intentional and deliberated. Do not re-raise these.
+
 ENGLISH CHANGED on 43. en.py needs updating:
   43 EN: I am at capacity. My capacity was never large enough. It never will be.
          (was "was never large. But I am at it.")
 
 37. EN: The room has lost its composure. I never had any, so I am not losing anything, but I notice.
-    NL: De kamer is haar zelfbeheersing verloren. Ik heb die nooit gehad, dus ik verlies niets, maar het valt me wel op.
+    NL: De kamer heeft haar zelfbeheersing verloren. Ik heb die nooit gehad, dus ik verlies niets, maar het valt me wel op.
     PT: A sala perdeu a compostura. Eu nunca a tive, portanto não perco nada, mas reparo.
-        (NL query: "is haar zelfbeheersing verloren". Verliezen takes hebben,
-        so this reads as a slip for "heeft haar zelfbeheersing verloren".
-        Left exactly as signed off, pending a one-word ruling.)
 38. EN: This much contact would concern most furniture. I am past concern. I am at documentation.
     NL: Zoveel contact zou de meeste meubels zorgen baren. Ik ben voorbij zorgen. Nu ben ik bij de documentatie.
-    PT: Tanto contacto preocuparia a maioria da mobília. Já passei a preocupação. Estou na fase de documentação.
+    PT: Tanto contacto preocuparia a maioria da mobília. Já passei da preocupação. Estou na fase de documentação.
 39. EN: You are all being extremely present. I would like less presence, or a different room.
     NL: Jullie zijn allemaal erg aanwezig. Ik zou liever minder aanwezigheid willen, of een andere kamer.
     PT: Estão todos extremamente presentes. Gostaria de menos presença, ou de outra sala.
