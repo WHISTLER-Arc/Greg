@@ -4,7 +4,7 @@ Raw record of the Dutch and Portuguese lines, kept here rather than in a
 temporary directory because a session ending should not cost a day of review.
 
 Most of it is reviewed and signed off by WHISTLER-Arc, who is a native speaker
-of both. EXISTENTIAL 13-24 is not, and is marked NOT SIGNED OFF at its batch
+of both. EXISTENTIAL 25-36 is not, and is marked NOT SIGNED OFF at its batch
 header. Sign-off is not a formality. These lines are not translations, the
 register has to be found natively, and a non-native draft can be word-perfect
 and still not land.
@@ -23,13 +23,13 @@ custom_components/greg/lines/TEMPLATE.py for why that matters.
     SOFT         50 of 50   50 of 50   complete
     MEDIUM       50 of 50   50 of 50   complete
     CHAOS        50 of 50   50 of 50   complete
-    EXISTENTIAL  24 of 50   12 of 50   13-24 awaiting WHISTLER-Arc
+    EXISTENTIAL  36 of 50   24 of 50   25-36 awaiting WHISTLER-Arc
     SILENCE       0 of 50    0 of 50
 
-    174 of 250 drafted, 162 of 250 signed off
+    186 of 250 drafted, 174 of 250 signed off
 
 Counting NL and PT as separate lines, which is how the 500 figure is reached,
-that is 348 of 500 drafted and 324 of 500 signed off. Only the signed-off
+that is 372 of 500 drafted and 348 of 500 signed off. Only the signed-off
 count is a real number. The other 24 lines are provisional.
 
 ## English corrections still to apply to lines/en.py
