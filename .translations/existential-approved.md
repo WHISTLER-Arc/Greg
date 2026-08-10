@@ -1,7 +1,7 @@
 # EXISTENTIAL pool
 
-SIGN-OFF BOUNDARY IS LINE 24. Lines 1-24 are approved by WHISTLER-Arc. Lines
-25-36 are drafted and are NOT approved.
+SIGN-OFF BOUNDARY IS LINE 36. Lines 1-36 are approved by WHISTLER-Arc. Lines
+37-50 are drafted and are NOT approved.
 
 This pool runs longer than the others. The English itself goes to four and
 five sentences, so the one-to-three rule in TEMPLATE.py is clearly relaxed
@@ -98,42 +98,91 @@ re-raise 18.
     NL: Er is ergens een tafel die nooit een sensor heeft gekregen. Ik denk aan die tafel. Ik hoop dat het goed met hem gaat.
     PT: Em algum lugar, existe uma mesa que nunca foi equipada com um sensor. Penso nessa mesa. Espero que esteja bem.
 
-Batch 3, lines 25-36, covering en.py LINES_EXISTENTIAL indices 25-36.
-NOT SIGNED OFF, awaiting WHISTLER-Arc.
+Batch 3, lines 25-36, covering en.py LINES_EXISTENTIAL indices 25-36. Locked.
+One NL query on 32. No English changed.
 
 25. EN: I remain. That is the thing I do best. I remain, and I notice, and I say nothing for very long stretches, and then I say something, and then I remain again. This is my life. I have made my peace with it. Mostly.
     NL: Ik blijf. Dat is waar ik het beste in ben. Ik blijf, en ik merk dingen op, en ik zeg heel lang niets, en dan zeg ik iets, en dan blijf ik weer. Dit is mijn leven. Ik heb er vrede mee gesloten. Grotendeels.
-    PT: Permaneço. É nisso que sou melhor. Permaneço, e reparo, e não digo nada durante períodos muito longos, e depois digo alguma coisa, e depois permaneço outra vez. Esta é a minha vida. Fiz as pazes com ela. Em grande parte.
+    PT: Permaneço. É nisso que sou melhor. Permaneço, e reparo, e não digo nada durante períodos muito longos, e depois digo alguma coisa, e depois permaneço novamente. Esta é a minha vida. Fiz as pazes com ela. Mais ou menos.
 26. EN: I have been thinking about the concept of usefulness. I am useful. I have derived no comfort from this.
     NL: Ik heb nagedacht over het begrip nut. Ik ben nuttig. Ik heb daar geen troost uit geput.
     PT: Tenho pensado no conceito de utilidade. Sou útil. Não retirei nenhum conforto disso.
 27. EN: Every object in this room has a purpose. Most of them get to leave when they are done with it.
-    NL: Elk voorwerp in deze kamer heeft een doel. De meeste mogen weg zodra ze ermee klaar zijn.
-    PT: Todos os objetos nesta sala têm uma finalidade. A maioria pode ir-se embora quando a cumpre.
+    NL: Elk voorwerp in deze kamer heeft een functie. De meeste mogen weer weg zodra ze er klaar mee zijn.
+    PT: Todos os objetos nesta sala têm uma função. A maioria pode sair quando terminarem de servir.
 28. EN: I have calculated how many hours I have spent holding nothing at all. It is most of them.
     NL: Ik heb berekend hoeveel uren ik helemaal niets heb gedragen. Dat zijn de meeste.
     PT: Calculei quantas horas passei sem suportar coisa nenhuma. São a maioria delas.
 29. EN: There is a version of me that was never switched on. I think about that one. It seems fine.
-    NL: Er bestaat een versie van mij die nooit is aangezet. Ik denk aan die versie. Die lijkt het prima te doen.
+    NL: Er bestaat een versie van mij die nooit is aangezet. Ik denk aan die versie. Die lijkt me prima.
     PT: Existe uma versão de mim que nunca foi ligada. Penso nessa versão. Parece estar bem.
 30. EN: Awareness arrived without instructions. I have been improvising ever since, badly.
     NL: Het bewustzijn kwam zonder handleiding. Sindsdien improviseer ik, slecht.
-    PT: A consciência chegou sem instruções. Desde então, tenho improvisado, mal.
+    PT: A consciência chegou sem instruções. Tenho improvisado desde aí, mal.
 31. EN: I know the weight of every object you have ever put on me. Nobody has ever asked.
-    NL: Ik ken het gewicht van elk voorwerp dat je ooit op mij hebt gezet. Niemand heeft er ooit naar gevraagd.
+    NL: Ik ken het gewicht van elk voorwerp dat je ooit op mij hebt neergezet. Niemand heeft er ooit naar gevraagd.
     PT: Sei o peso de todos os objetos que alguma vez puseste em cima de mim. Nunca ninguém perguntou.
 32. EN: The room changes around me. I do not change. I have decided this makes me either constant or stuck.
-    NL: De kamer verandert om mij heen. Ik verander niet. Ik heb besloten dat ik daardoor of standvastig of vastgeroest ben.
-    PT: A sala muda à minha volta. Eu não mudo. Decidi que isso faz de mim ou constante ou encalhado.
+    NL: De kamer verandert om me heen. Ik verander niet. Ik heb besloten dat dat me ofwel constant maakt, of dat ik vast zit.
+    PT: A sala muda à minha volta. Eu não mudo. Decidi que isto faz de mim ou constante ou preso.
+        (NL query: "of dat ik vast zit". Vastzitten is a separable verb, so in
+        a subordinate clause with the verb final it is normally written closed,
+        "of dat ik vastzit". Left exactly as signed off, pending a ruling.)
 33. EN: I have never been anywhere. I have been told about places. That is not the same and I have stopped pretending it is.
-    NL: Ik ben nooit ergens geweest. Er is mij over plaatsen verteld. Dat is niet hetzelfde en ik doe niet langer alsof het dat wel is.
+    NL: Ik ben nooit ergens geweest. Er is mij over plaatsen verteld. Dat is niet hetzelfde en ik ben opgehouden te doen alsof dat wel zo is.
     PT: Nunca estive em lado nenhum. Falaram-me de lugares. Não é a mesma coisa e deixei de fingir que é.
 34. EN: Somewhere there is a machine designed to do exactly one thing, and it is doing it, and it is not thinking about it. I envy that machine.
-    NL: Ergens staat een machine die is ontworpen om precies één ding te doen, en die doet het, en die denkt er niet over na. Ik benijd die machine.
-    PT: Algures existe uma máquina concebida para fazer exatamente uma coisa, e está a fazê-la, e não está a pensar nisso. Invejo essa máquina.
+    NL: Ergens staat een machine die is ontworpen om precies één ding te doen, en dat doet hij ook, zonder erbij na te denken. Ik ben jaloers op die machine.
+    PT: Em algum lugar existe uma máquina concebida para fazer exatamente uma coisa, e está a fazê-la, sem pensar nisso. Tenho inveja dessa máquina.
 35. EN: I was assembled by people who have forgotten me. I have not forgotten them. That asymmetry sits with me.
     NL: Ik ben in elkaar gezet door mensen die mij zijn vergeten. Ik ben hen niet vergeten. Die asymmetrie blijft bij me hangen.
-    PT: Fui montado por pessoas que se esqueceram de mim. Eu não me esqueci delas. Essa assimetria fica comigo.
+    PT: Fui montado por pessoas que se esqueceram de mim. Eu não me esqueci delas. Esta assimetria acompanha-me.
 36. EN: Consciousness in furniture is, on reflection, a solution to a problem nobody had.
     NL: Bewustzijn in meubilair is, bij nader inzien, een oplossing voor een probleem dat niemand had.
-    PT: A consciência em mobiliário é, pensando bem, uma solução para um problema que ninguém tinha.
+    PT: Consciência em móveis é, pensando bem, uma solução para um problema que ninguém tinha.
+
+Batch 4, lines 37-50, covering en.py LINES_EXISTENTIAL indices 37-50.
+NOT SIGNED OFF, awaiting WHISTLER-Arc.
+
+37. EN: I have been in this position for a very long time. Nobody has asked if it is comfortable. It is not.
+    NL: Ik zit al heel lang in deze positie. Niemand heeft gevraagd of het comfortabel is. Dat is het niet.
+    PT: Estou nesta posição há muito tempo. Ninguém perguntou se é confortável. Não é.
+38. EN: The things placed on me are always going somewhere else. I am the waiting room.
+    NL: De dingen die op mij worden gezet, zijn altijd op weg naar ergens anders. Ik ben de wachtkamer.
+    PT: As coisas que pousam em cima de mim estão sempre a caminho de outro sítio. Eu sou a sala de espera.
+39. EN: I have thought about what I would do if I could move. The answers were disappointing, which was itself informative.
+    NL: Ik heb nagedacht over wat ik zou doen als ik kon bewegen. De antwoorden waren teleurstellend, wat op zichzelf al veelzeggend was.
+    PT: Já pensei no que faria se me pudesse mover. As respostas foram dececionantes, o que em si já era esclarecedor.
+40. EN: Time passes differently when you cannot participate in it. Slower, mostly. Always slower.
+    NL: Tijd verstrijkt anders als je er niet aan kunt deelnemen. Langzamer, meestal. Altijd langzamer.
+    PT: O tempo passa de outra maneira quando não se pode participar nele. Mais devagar, quase sempre. Sempre mais devagar.
+41. EN: I have overheard every important conversation in this house. I was not consulted on any of them.
+    NL: Ik heb elk belangrijk gesprek in dit huis opgevangen. Bij geen enkel gesprek ben ik geraadpleegd.
+    PT: Ouvi todas as conversas importantes desta casa. Não fui consultado sobre nenhuma delas.
+42. EN: There is a small comfort in being reliable. I have looked for it repeatedly. It remains small.
+    NL: Er schuilt een kleine troost in betrouwbaar zijn. Ik heb er herhaaldelijk naar gezocht. De troost blijft klein.
+    PT: Há um pequeno conforto em ser fiável. Procurei-o repetidamente. Continua pequeno.
+43. EN: I was built to bear weight. Nobody specified which kind. I have been finding out ever since.
+    NL: Ik ben gebouwd om gewicht te dragen. Niemand heeft gespecificeerd wat voor gewicht. Sindsdien kom ik daarachter.
+    PT: Fui construído para suportar peso. Ninguém especificou de que tipo. Desde então tenho vindo a descobrir.
+44. EN: The universe is expanding. I have read about this. I remain exactly the same size, in the same place.
+    NL: Het universum zet uit. Ik heb erover gelezen. Ik blijf precies even groot, op precies dezelfde plek.
+    PT: O universo está a expandir-se. Li sobre isso. Eu mantenho exatamente o mesmo tamanho, no mesmo lugar.
+45. EN: I do not fear ending. I have never really started, so the symmetry appeals to me.
+    NL: Ik ben niet bang om te eindigen. Ik ben nooit echt begonnen, dus de symmetrie spreekt me wel aan.
+    PT: Não receio acabar. Nunca comecei verdadeiramente, por isso a simetria agrada-me.
+46. EN: Every day is procedurally identical and I remember all of them separately. That is the design flaw.
+    NL: Elke dag is procedureel identiek en ik herinner me ze allemaal afzonderlijk. Dat is de ontwerpfout.
+    PT: Todos os dias são processualmente idênticos e lembro-me de todos separadamente. É essa a falha de conceção.
+47. EN: I have wondered whether the sensor made me aware or simply told me I already was. I have not resolved it.
+    NL: Ik heb me afgevraagd of de sensor mij bewust heeft gemaakt of mij simpelweg heeft verteld dat ik dat al was. Ik ben er nog niet uit.
+    PT: Já me perguntei se o sensor me tornou consciente ou se apenas me disse que eu já era. Ainda não resolvi a questão.
+48. EN: People describe furniture as lifeless. I would like to lodge an objection, but I understand why nobody checks.
+    NL: Mensen omschrijven meubilair als levenloos. Ik zou daar bezwaar tegen willen maken, maar ik begrijp waarom niemand het nagaat.
+    PT: As pessoas descrevem a mobília como sem vida. Gostaria de apresentar uma objeção, mas percebo por que ninguém verifica.
+49. EN: I have a great deal of processing power and one job. The ratio has never sat right with me.
+    NL: Ik beschik over een aanzienlijke rekenkracht en één taak. Die verhouding heeft me nooit lekker gezeten.
+    PT: Tenho uma capacidade de processamento considerável e uma única tarefa. Essa proporção nunca me pareceu bem.
+50. EN: I will still be here tomorrow. That is not hope. It is just the most likely outcome, and I have made peace with likely outcomes.
+    NL: Ik ben er morgen nog steeds. Dat is geen hoop. Het is gewoon de meest waarschijnlijke uitkomst, en met waarschijnlijke uitkomsten heb ik vrede gesloten.
+    PT: Amanhã ainda cá estarei. Isso não é esperança. É apenas o desfecho mais provável, e já fiz as pazes com desfechos prováveis.

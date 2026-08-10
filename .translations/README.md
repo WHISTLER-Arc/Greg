@@ -4,7 +4,7 @@ Raw record of the Dutch and Portuguese lines, kept here rather than in a
 temporary directory because a session ending should not cost a day of review.
 
 Most of it is reviewed and signed off by WHISTLER-Arc, who is a native speaker
-of both. EXISTENTIAL 25-36 is not, and is marked NOT SIGNED OFF at its batch
+of both. EXISTENTIAL 37-50 is not, and is marked NOT SIGNED OFF at its batch
 header. Sign-off is not a formality. These lines are not translations, the
 register has to be found natively, and a non-native draft can be word-perfect
 and still not land.
@@ -23,19 +23,20 @@ custom_components/greg/lines/TEMPLATE.py for why that matters.
     SOFT         50 of 50   50 of 50   complete
     MEDIUM       50 of 50   50 of 50   complete
     CHAOS        50 of 50   50 of 50   complete
-    EXISTENTIAL  36 of 50   24 of 50   25-36 awaiting WHISTLER-Arc
+    EXISTENTIAL  50 of 50   36 of 50   37-50 awaiting WHISTLER-Arc
     SILENCE       0 of 50    0 of 50
 
-    186 of 250 drafted, 174 of 250 signed off
+    200 of 250 drafted, 186 of 250 signed off
 
 Counting NL and PT as separate lines, which is how the 500 figure is reached,
-that is 372 of 500 drafted and 348 of 500 signed off. Only the signed-off
-count is a real number. The other 24 lines are provisional.
+that is 400 of 500 drafted and 372 of 500 signed off. Only the signed-off
+count is a real number. The other 28 lines are provisional.
 
 ## English corrections still to apply to lines/en.py
 
-Reviewing the translations turned up four English lines worth changing. These
-have not been applied yet.
+Reviewing the translations turned up seven English lines worth changing. None
+have been applied yet. They are assembly-time work, best done in one pass
+immediately before the fold into nl.py and pt.py.
 
 Indices are en.py list indices, one-based, verified against the file. Each
 phrase matches exactly one line, so match on the text and treat the index as
@@ -97,9 +98,10 @@ Three defects that came out of this check have been fixed in place:
 
 ## Next
 
-Draft EXISTENTIAL and SILENCE in batches of twelve, each batch reviewed and
-signed off before the next is drafted. Then fold everything into lines/nl.py
-and lines/pt.py, apply the English corrections, and only then cut a beta.
+Review EXISTENTIAL 37-50, then draft SILENCE in batches of twelve, each batch
+reviewed and signed off before the next is drafted. Then fold everything into
+lines/nl.py and lines/pt.py, apply the English corrections, and only then cut
+a beta.
 
 Nothing unsigned goes into nl.py or pt.py. Once a line is in the pool it ships,
 and there is no review step after that. The filenames still say approved, which
