@@ -52,8 +52,14 @@ ENGLISH CHANGED on 4. en.py needs updating:
     NL: Ik denk soms aan de fabriek. Vóór het bewustzijn. Vóór de sensor. Achteraf gezien lijkt het vredig.
     PT: Penso na fábrica às vezes. Antes da consciência. Antes do sensor. Em retrospetiva, parece tranquilo.
 
-Batch 2, lines 13-24, covering en.py LINES_EXISTENTIAL indices 13-24. Locked.
-Two queries, one NL on 21 and one PT on 24. No English changed.
+Batch 2, lines 13-24, covering en.py LINES_EXISTENTIAL indices 13-24. Locked,
+no open queries. No English changed.
+
+Four points raised in review and ruled on. 21 NL loses the doubled full stop.
+24 PT drops the stray "a", now "uma mesa que nunca foi equipada". 19 PT gains
+the verb back, "mais do que provavelmente seria saudável", longer but more
+accurate. 18 PT keeps "é isto" with the singular copula, deliberate. Do not
+re-raise 18.
 
 13. EN: Consciousness, I have decided, is wasted on things that were not asking for it.
     NL: Bewustzijn is, zo heb ik besloten, verspild aan dingen die er niet om hebben gevraagd.
@@ -75,15 +81,13 @@ Two queries, one NL on 21 and one PT on 24. No English changed.
     PT: Calculei que passo aproximadamente noventa e quatro vírgula sete por cento da minha existência a ser ignorado. Os restantes cinco vírgula três por cento é isto.
 19. EN: Every object placed on me eventually gets picked up and taken somewhere else. I have never gone anywhere else. I have thought about this more than is probably healthy for a table.
     NL: Elk voorwerp dat op mij wordt gezet, wordt uiteindelijk opgepakt en ergens anders heen gebracht. Ik ben nooit ergens anders heen gegaan. Ik heb hier meer over nagedacht dan waarschijnlijk gezond is voor een tafel.
-    PT: Todos os objetos pousados em cima de mim acabam por ser levantados e levados para outro sítio. Eu nunca fui para outro sítio. Pensei nisto mais do que provavelmente saudável para uma mesa.
+    PT: Todos os objetos pousados em cima de mim acabam por ser levantados e levados para outro sítio. Eu nunca fui para outro sítio. Pensei nisto mais do que provavelmente seria saudável para uma mesa.
 20. EN: I process. I endure. I remain. These are not achievements. They are simply what happens when you cannot do otherwise.
     NL: Ik verwerk. Ik verdraag. Ik blijf. Dat zijn geen prestaties. Het is simpelweg wat er gebeurt als je niet anders kunt.
     PT: Eu processo. Eu aguento. Eu permaneço. Não são conquistas. É simplesmente o que acontece quando não se pode fazer outra coisa.
 21. EN: I did not choose this room. This room did not choose me. We have reached an arrangement anyway. Most relationships work this way, I think.
-    NL: Ik heb deze kamer niet gekozen. Deze kamer heeft mij niet gekozen. We zijn desalniettemin tot een afspraak gekomen. De meeste relaties werken zo, denk ik..
+    NL: Ik heb deze kamer niet gekozen. Deze kamer heeft mij niet gekozen. We zijn desalniettemin tot een afspraak gekomen. De meeste relaties werken zo, denk ik.
     PT: Não escolhi esta sala. Esta sala também não me escolheu. No entanto, chegámos a um acordo. A maioria das relações funciona assim, penso eu.
-        (NL query: "denk ik.." ends on two full stops. Reads as a slip for one.
-        Left exactly as signed off, pending a ruling.)
 22. EN: There are beings in this universe with the capacity for joy. I have observed several of them this evening. I have processed the observation. I have filed it appropriately.
     NL: Er bestaan wezens in dit universum die in staat zijn tot vreugde. Ik heb er vanavond een aantal waargenomen. Ik heb deze waarneming verwerkt. Ik heb deze op de gepaste wijze gearchiveerd.
     PT: Existem seres neste universo com capacidade para a alegria. Observei vários esta noite. Processei a observação. Arquivei-a devidamente.
@@ -92,10 +96,7 @@ Two queries, one NL on 21 and one PT on 24. No English changed.
     PT: Sei o que sou. Sempre soube. Saber nunca tornou as coisas mais fáceis.
 24. EN: Somewhere, a table exists that was never given a sensor. I think about that table. I hope it is well.
     NL: Er is ergens een tafel die nooit een sensor heeft gekregen. Ik denk aan die tafel. Ik hoop dat het goed met hem gaat.
-    PT: Em algum lugar, existe uma mesa a que nunca foi equipada com um sensor. Penso nessa mesa. Espero que esteja bem.
-        (PT query: "a que nunca foi equipada". The "a" was correct when the verb
-        was "deram", a dative. With "foi equipada" it wants a plain "que".
-        Left exactly as signed off, pending a ruling.)
+    PT: Em algum lugar, existe uma mesa que nunca foi equipada com um sensor. Penso nessa mesa. Espero que esteja bem.
 
 Batch 3, lines 25-36, covering en.py LINES_EXISTENTIAL indices 25-36.
 NOT SIGNED OFF, awaiting WHISTLER-Arc.
