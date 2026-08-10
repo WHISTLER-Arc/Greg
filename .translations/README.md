@@ -3,13 +3,15 @@
 Raw record of the Dutch and Portuguese lines, kept here rather than in a
 temporary directory because a session ending should not cost a day of review.
 
-Everything here is reviewed and signed off by WHISTLER-Arc, who is a native
-speaker of both. Nothing enters this file until it has been. Sign-off is not a
-formality. These lines are not translations, the register has to be found
-natively, and a non-native draft can be word-perfect and still not land.
+Most of it is reviewed and signed off by WHISTLER-Arc, who is a native speaker
+of both. EXISTENTIAL 13-24 is not, and is marked NOT SIGNED OFF at its batch
+header. Sign-off is not a formality. These lines are not translations, the
+register has to be found natively, and a non-native draft can be word-perfect
+and still not land.
 
-EXISTENTIAL and SILENCE are not started. When they are drafted they will be
-marked NOT SIGNED OFF until reviewed, as CHAOS was.
+Drafts are committed while still unsigned, so a session ending does not lose
+them, but an unsigned line is a proposal and never counts toward the signed
+total. SILENCE is not started.
 
 These are not translations of the English. Each line was written natively and
 then corrected, which is why the wording often diverges. See
@@ -21,14 +23,14 @@ custom_components/greg/lines/TEMPLATE.py for why that matters.
     SOFT         50 of 50   50 of 50   complete
     MEDIUM       50 of 50   50 of 50   complete
     CHAOS        50 of 50   50 of 50   complete
-    EXISTENTIAL   0 of 50    0 of 50
+    EXISTENTIAL  24 of 50   12 of 50   13-24 awaiting WHISTLER-Arc
     SILENCE       0 of 50    0 of 50
 
-    150 of 250 drafted and signed off
+    174 of 250 drafted, 162 of 250 signed off
 
 Counting NL and PT as separate lines, which is how the 500 figure is reached,
-that is 300 of 500. Nothing is provisional. The remaining 200 lines are
-EXISTENTIAL and SILENCE, not yet started.
+that is 348 of 500 drafted and 324 of 500 signed off. Only the signed-off
+count is a real number. The other 24 lines are provisional.
 
 ## English corrections still to apply to lines/en.py
 
@@ -45,6 +47,7 @@ the check rather than the lookup.
     CHAOS  idx 24  "I did not pack for this."    -> "I did not dress for this."
     CHAOS  idx 32  gains a fourth sentence, full replacement below
     CHAOS  idx 43  second and third sentences replaced, full text below
+    EXIST  idx  4  "happened on top of me" -> "happened around me"
 
 CHAOS 32 in full, from the batch 3 review. Note the straight apostrophe in
 "I'm". en.py uses straight apostrophes throughout, fourteen of them and no
