@@ -444,7 +444,7 @@ class GregCoordinator:
         )
 
         self._update_mood()
-        self.hass.async_create_task(self._react())
+        self._react()
 
     async def async_poke(self) -> None:
         """Force a reaction regardless of sensor (greg.poke service / panel button)."""
@@ -453,19 +453,26 @@ class GregCoordinator:
         self._counter += 1
         self.vibrations_today += 1
         self._update_mood()
-        await self._react()
+        self._react()
 
-    async def _react(self) -> None:
+    def _react(self) -> None:
         soft = self._config.get(CONF_SOFT_THRESHOLD, 1)
         medium = self._config.get(CONF_MEDIUM_THRESHOLD, 3)
         chaos = self._config.get(CONF_CHAOS_THRESHOLD, 6)
 
-        if self._counter >= chaos:
-            await self._speak("chaos")
+        speaktype = None
+
+        if self._counter >= soft:
+           speaktype = "soft"
         elif self._counter >= medium:
-            await self._speak("medium")
-        elif self._counter >= soft:
-            await self._speak("soft")
+            speaktype = "medium"
+        elif self._counter >= chaos:
+            speaktype = "chaos"
+
+        if speaktype is not None:
+            self.hass.async_create_task(
+                self._speak(speaktype)
+            )
 
     async def _reset_counter(self) -> None:
         self._counter = 0
