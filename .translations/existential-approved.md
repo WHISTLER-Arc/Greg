@@ -98,8 +98,8 @@ re-raise 18.
     NL: Er is ergens een tafel die nooit een sensor heeft gekregen. Ik denk aan die tafel. Ik hoop dat het goed met hem gaat.
     PT: Em algum lugar, existe uma mesa que nunca foi equipada com um sensor. Penso nessa mesa. Espero que esteja bem.
 
-Batch 3, lines 25-36, covering en.py LINES_EXISTENTIAL indices 25-36. Locked.
-One NL query on 32. No English changed.
+Batch 3, lines 25-36, covering en.py LINES_EXISTENTIAL indices 25-36. Locked,
+no open queries. No English changed. 32 NL closes vastzit, ruled in review.
 
 25. EN: I remain. That is the thing I do best. I remain, and I notice, and I say nothing for very long stretches, and then I say something, and then I remain again. This is my life. I have made my peace with it. Mostly.
     NL: Ik blijf. Dat is waar ik het beste in ben. Ik blijf, en ik merk dingen op, en ik zeg heel lang niets, en dan zeg ik iets, en dan blijf ik weer. Dit is mijn leven. Ik heb er vrede mee gesloten. Grotendeels.
@@ -123,11 +123,8 @@ One NL query on 32. No English changed.
     NL: Ik ken het gewicht van elk voorwerp dat je ooit op mij hebt neergezet. Niemand heeft er ooit naar gevraagd.
     PT: Sei o peso de todos os objetos que alguma vez puseste em cima de mim. Nunca ninguém perguntou.
 32. EN: The room changes around me. I do not change. I have decided this makes me either constant or stuck.
-    NL: De kamer verandert om me heen. Ik verander niet. Ik heb besloten dat dat me ofwel constant maakt, of dat ik vast zit.
+    NL: De kamer verandert om me heen. Ik verander niet. Ik heb besloten dat dat me ofwel constant maakt, of dat ik vastzit.
     PT: A sala muda à minha volta. Eu não mudo. Decidi que isto faz de mim ou constante ou preso.
-        (NL query: "of dat ik vast zit". Vastzitten is a separable verb, so in
-        a subordinate clause with the verb final it is normally written closed,
-        "of dat ik vastzit". Left exactly as signed off, pending a ruling.)
 33. EN: I have never been anywhere. I have been told about places. That is not the same and I have stopped pretending it is.
     NL: Ik ben nooit ergens geweest. Er is mij over plaatsen verteld. Dat is niet hetzelfde en ik ben opgehouden te doen alsof dat wel zo is.
     PT: Nunca estive em lado nenhum. Falaram-me de lugares. Não é a mesma coisa e deixei de fingir que é.
