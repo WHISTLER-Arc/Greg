@@ -3,9 +3,9 @@
 Raw record of the Dutch and Portuguese lines, kept here rather than in a
 temporary directory because a session ending should not cost a day of review.
 
-Everything drafted so far is reviewed and signed off by WHISTLER-Arc, who is a
-native speaker of both. There are no open queries. Sign-off is not a
-formality. These lines are not translations, the register has to be found
+Most of it is reviewed and signed off by WHISTLER-Arc, who is a native speaker
+of both. SILENCE 1-12 is not, and is marked NOT SIGNED OFF at its batch
+header. There are no open queries. Sign-off is not a formality. These lines are not translations, the register has to be found
 natively, and a non-native draft can be word-perfect and still not land.
 
 Drafts are committed while still unsigned, so a session ending does not lose
@@ -23,13 +23,13 @@ custom_components/greg/lines/TEMPLATE.py for why that matters.
     MEDIUM       50 of 50   50 of 50   complete
     CHAOS        50 of 50   50 of 50   complete
     EXISTENTIAL  50 of 50   50 of 50   complete
-    SILENCE       0 of 50    0 of 50
+    SILENCE      12 of 50    0 of 50   1-12 awaiting WHISTLER-Arc
 
-    200 of 250 drafted and signed off
+    212 of 250 drafted, 200 of 250 signed off
 
 Counting NL and PT as separate lines, which is how the 500 figure is reached,
-that is 400 of 500. Nothing is provisional. The remaining 100 lines are
-SILENCE, not yet started.
+that is 424 of 500 drafted and 400 of 500 signed off. Only the signed-off
+count is a real number. The other 24 lines are provisional.
 
 ## English corrections, all applied to lines/en.py
 
