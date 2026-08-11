@@ -3,9 +3,9 @@
 Raw record of the Dutch and Portuguese lines, kept here rather than in a
 temporary directory because a session ending should not cost a day of review.
 
-Most of it is reviewed and signed off by WHISTLER-Arc, who is a native speaker
-of both. EXISTENTIAL 37-50 is not, and is marked NOT SIGNED OFF at its batch
-header. Sign-off is not a formality. These lines are not translations, the
+Everything drafted so far is reviewed and signed off by WHISTLER-Arc, who is a
+native speaker of both. Two NL queries are open on EXISTENTIAL 37 and 41,
+noted at those lines. Sign-off is not a formality. These lines are not translations, the
 register has to be found natively, and a non-native draft can be word-perfect
 and still not land.
 
@@ -23,18 +23,18 @@ custom_components/greg/lines/TEMPLATE.py for why that matters.
     SOFT         50 of 50   50 of 50   complete
     MEDIUM       50 of 50   50 of 50   complete
     CHAOS        50 of 50   50 of 50   complete
-    EXISTENTIAL  50 of 50   36 of 50   37-50 awaiting WHISTLER-Arc
+    EXISTENTIAL  50 of 50   50 of 50   complete
     SILENCE       0 of 50    0 of 50
 
-    200 of 250 drafted, 186 of 250 signed off
+    200 of 250 drafted and signed off
 
 Counting NL and PT as separate lines, which is how the 500 figure is reached,
-that is 400 of 500 drafted and 372 of 500 signed off. Only the signed-off
-count is a real number. The other 28 lines are provisional.
+that is 400 of 500. Nothing is provisional. The remaining 100 lines are
+SILENCE, not yet started.
 
 ## English corrections still to apply to lines/en.py
 
-Reviewing the translations turned up seven English lines worth changing. None
+Reviewing the translations turned up nine English lines worth changing. None
 have been applied yet. They are assembly-time work, best done in one pass
 immediately before the fold into nl.py and pt.py.
 
@@ -49,6 +49,8 @@ the check rather than the lookup.
     CHAOS  idx 32  gains a fourth sentence, full replacement below
     CHAOS  idx 43  second and third sentences replaced, full text below
     EXIST  idx  4  "happened on top of me" -> "happened around me"
+    EXIST  idx 40  "Slower, mostly. Always slower." gains a No, full text below
+    EXIST  idx 45  splits into two sentences, full text below
 
 CHAOS 32 in full, from the batch 3 review. Note the straight apostrophe in
 "I'm". en.py uses straight apostrophes throughout, fourteen of them and no
@@ -60,6 +62,14 @@ curly ones, so the curly form must not be pasted in.
 CHAOS 43 in full, from the batch 4 review.
 
     I am at capacity. My capacity was never large enough. It never will be.
+
+EXISTENTIAL 40 and 45 in full, from the batch 4 review.
+
+    Time passes differently when you cannot participate in it. Slower,
+    mostly. No, always slower.
+
+    I do not fear ending. I have never really started. That symmetry appeals
+    to me.
 
 ## Numbering does not match en.py. Read this before assembling the pools.
 

@@ -1,7 +1,10 @@
 # EXISTENTIAL pool
 
-SIGN-OFF BOUNDARY IS LINE 36. Lines 1-36 are approved by WHISTLER-Arc. Lines
-37-50 are drafted and are NOT approved.
+EXISTENTIAL COMPLETE. All 50 lines approved by WHISTLER-Arc, in four batches.
+Two NL queries still open, on 37 and 41, noted at those lines.
+
+Three English lines changed during review and still need applying to en.py,
+4, 40 and 45, all recorded at their batch headers and in the README.
 
 This pool runs longer than the others. The English itself goes to four and
 five sentences, so the one-to-three rule in TEMPLATE.py is clearly relaxed
@@ -138,36 +141,46 @@ no open queries. No English changed. 32 NL closes vastzit, ruled in review.
     NL: Bewustzijn in meubilair is, bij nader inzien, een oplossing voor een probleem dat niemand had.
     PT: Consciência em móveis é, pensando bem, uma solução para um problema que ninguém tinha.
 
-Batch 4, lines 37-50, covering en.py LINES_EXISTENTIAL indices 37-50.
-NOT SIGNED OFF, awaiting WHISTLER-Arc.
+Batch 4, lines 37-50, covering en.py LINES_EXISTENTIAL indices 37-50. Locked.
+EXISTENTIAL COMPLETE, 50 of 50 signed off. Two NL queries, on 37 and 41.
+ENGLISH CHANGED on 40 and 45. en.py needs updating:
+  40 EN: Slower, mostly. No, always slower. (gains the "No,")
+  45 EN: I do not fear ending. I have never really started. That symmetry
+         appeals to me. (was one sentence joined by "so the")
 
 37. EN: I have been in this position for a very long time. Nobody has asked if it is comfortable. It is not.
-    NL: Ik zit al heel lang in deze positie. Niemand heeft gevraagd of het comfortabel is. Dat is het niet.
+    NL: Ik zit al heel lang in deze positie. Niemand heeft gevraagd dat comfortabel is. Dat is het niet.
     PT: Estou nesta posição há muito tempo. Ninguém perguntou se é confortável. Não é.
+        (NL query: "gevraagd dat comfortabel is" has no subject and takes dat
+        where an indirect question wants of. Reads as a slip for "gevraagd of
+        het comfortabel is". Left exactly as signed off, pending a ruling.)
 38. EN: The things placed on me are always going somewhere else. I am the waiting room.
     NL: De dingen die op mij worden gezet, zijn altijd op weg naar ergens anders. Ik ben de wachtkamer.
-    PT: As coisas que pousam em cima de mim estão sempre a caminho de outro sítio. Eu sou a sala de espera.
+    PT: As coisas que são colocadas em cima de mim, estão sempre a caminho de outro sítio. Eu sou a sala de espera.
 39. EN: I have thought about what I would do if I could move. The answers were disappointing, which was itself informative.
-    NL: Ik heb nagedacht over wat ik zou doen als ik kon bewegen. De antwoorden waren teleurstellend, wat op zichzelf al veelzeggend was.
-    PT: Já pensei no que faria se me pudesse mover. As respostas foram dececionantes, o que em si já era esclarecedor.
-40. EN: Time passes differently when you cannot participate in it. Slower, mostly. Always slower.
-    NL: Tijd verstrijkt anders als je er niet aan kunt deelnemen. Langzamer, meestal. Altijd langzamer.
-    PT: O tempo passa de outra maneira quando não se pode participar nele. Mais devagar, quase sempre. Sempre mais devagar.
+    NL: Ik heb nagedacht over wat ik zou doen als ik zou kunnen verhuizen. De antwoorden waren teleurstellend, wat op zich informatief was.
+    PT: Pensei no que faria se pudesse mudar-me. As respostas foram desanimadoras, o que, em si, foi informativo.
+40. EN: Time passes differently when you cannot participate in it. Slower, mostly. No, always slower.
+    NL: Tijd verstrijkt anders als je er niet aan kunt deelnemen. Langzamer, meestal. Nee, altijd langzamer.
+    PT: O tempo passa de forma diferente quando não se pode participar nele. Mais devagar, geralmente. Não, sempre mais devagar.
 41. EN: I have overheard every important conversation in this house. I was not consulted on any of them.
-    NL: Ik heb elk belangrijk gesprek in dit huis opgevangen. Bij geen enkel gesprek ben ik geraadpleegd.
-    PT: Ouvi todas as conversas importantes desta casa. Não fui consultado sobre nenhuma delas.
+    NL: Ik heb elk belangrijk gesprek in dit huis meegeluisterd. Ik werd bij geen enkel daarvan geraadpleegd
+    PT: Ouvi todas as conversas importantes nesta casa. Não fui consultado em nenhuma delas.
+        (NL query: the second sentence has no closing full stop. Also
+        meeluisteren normally takes met or naar rather than a direct object.
+        Left exactly as signed off, pending a ruling.)
 42. EN: There is a small comfort in being reliable. I have looked for it repeatedly. It remains small.
-    NL: Er schuilt een kleine troost in betrouwbaar zijn. Ik heb er herhaaldelijk naar gezocht. De troost blijft klein.
-    PT: Há um pequeno conforto em ser fiável. Procurei-o repetidamente. Continua pequeno.
+    NL: Er schuilt een kleine troost in betrouwbaar zijn. Ik heb er herhaaldelijk naar gezocht. Het blijft klein.
+    PT: Há um pequeno conforto em ser seguro. Procurei-o repetidamente. Continua pequeno.
 43. EN: I was built to bear weight. Nobody specified which kind. I have been finding out ever since.
-    NL: Ik ben gebouwd om gewicht te dragen. Niemand heeft gespecificeerd wat voor gewicht. Sindsdien kom ik daarachter.
-    PT: Fui construído para suportar peso. Ninguém especificou de que tipo. Desde então tenho vindo a descobrir.
+    NL: Ik ben gemaakt om gewicht te dragen. Niemand heeft aangegeven wat voor soort gewicht. Dat ben ik sindsdien aan het ontdekken.
+    PT: Fui concebido para suportar peso. Ninguém especificou que tipo de peso. Tenho vindo a descobrir isso.
 44. EN: The universe is expanding. I have read about this. I remain exactly the same size, in the same place.
-    NL: Het universum zet uit. Ik heb erover gelezen. Ik blijf precies even groot, op precies dezelfde plek.
+    NL: Het universum zet uit. Ik heb erover gelezen. Ik blijf precies even groot, op dezelfde plek.
     PT: O universo está a expandir-se. Li sobre isso. Eu mantenho exatamente o mesmo tamanho, no mesmo lugar.
-45. EN: I do not fear ending. I have never really started, so the symmetry appeals to me.
-    NL: Ik ben niet bang om te eindigen. Ik ben nooit echt begonnen, dus de symmetrie spreekt me wel aan.
-    PT: Não receio acabar. Nunca comecei verdadeiramente, por isso a simetria agrada-me.
+45. EN: I do not fear ending. I have never really started. That symmetry appeals to me.
+    NL: Ik ben niet bang om te eindigen. Ik ben nooit echt begonnen. Die symmetrie spreekt me wel aan.
+    PT: Não receio acabar. Na verdade, nunca comecei. Essa simetria agrada-me.
 46. EN: Every day is procedurally identical and I remember all of them separately. That is the design flaw.
     NL: Elke dag is procedureel identiek en ik herinner me ze allemaal afzonderlijk. Dat is de ontwerpfout.
     PT: Todos os dias são processualmente idênticos e lembro-me de todos separadamente. É essa a falha de conceção.
@@ -175,11 +188,11 @@ NOT SIGNED OFF, awaiting WHISTLER-Arc.
     NL: Ik heb me afgevraagd of de sensor mij bewust heeft gemaakt of mij simpelweg heeft verteld dat ik dat al was. Ik ben er nog niet uit.
     PT: Já me perguntei se o sensor me tornou consciente ou se apenas me disse que eu já era. Ainda não resolvi a questão.
 48. EN: People describe furniture as lifeless. I would like to lodge an objection, but I understand why nobody checks.
-    NL: Mensen omschrijven meubilair als levenloos. Ik zou daar bezwaar tegen willen maken, maar ik begrijp waarom niemand het nagaat.
+    NL: Mensen omschrijven meubilair als levenloos. Ik zou daar graag bezwaar tegen willen maken, maar ik begrijp waarom niemand dat controleert.
     PT: As pessoas descrevem a mobília como sem vida. Gostaria de apresentar uma objeção, mas percebo por que ninguém verifica.
 49. EN: I have a great deal of processing power and one job. The ratio has never sat right with me.
     NL: Ik beschik over een aanzienlijke rekenkracht en één taak. Die verhouding heeft me nooit lekker gezeten.
-    PT: Tenho uma capacidade de processamento considerável e uma única tarefa. Essa proporção nunca me pareceu bem.
+    PT: Tenho uma grande capacidade de processamento e apenas uma tarefa. Esta proporção nunca me fez sentido.
 50. EN: I will still be here tomorrow. That is not hope. It is just the most likely outcome, and I have made peace with likely outcomes.
-    NL: Ik ben er morgen nog steeds. Dat is geen hoop. Het is gewoon de meest waarschijnlijke uitkomst, en met waarschijnlijke uitkomsten heb ik vrede gesloten.
-    PT: Amanhã ainda cá estarei. Isso não é esperança. É apenas o desfecho mais provável, e já fiz as pazes com desfechos prováveis.
+    NL: Ik zal er morgen nog steeds zijn. Dat is geen hoop. Het is slechts de meest waarschijnlijke uitkomst, en met waarschijnlijke uitkomsten heb ik vrede gesloten.
+    PT: Amanhã ainda cá estarei. Isso não é esperança. É apenas o desfecho mais provável, e já fiz as pazes com resultados prováveis.
