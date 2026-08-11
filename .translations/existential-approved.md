@@ -1,7 +1,7 @@
 # EXISTENTIAL pool
 
 EXISTENTIAL COMPLETE. All 50 lines approved by WHISTLER-Arc, in four batches.
-Two NL queries still open, on 37 and 41, noted at those lines.
+No open queries.
 
 Three English lines changed during review and still need applying to en.py,
 4, 40 and 45, all recorded at their batch headers and in the README.
@@ -141,19 +141,24 @@ no open queries. No English changed. 32 NL closes vastzit, ruled in review.
     NL: Bewustzijn in meubilair is, bij nader inzien, een oplossing voor een probleem dat niemand had.
     PT: Consciência em móveis é, pensando bem, uma solução para um problema que ninguém tinha.
 
-Batch 4, lines 37-50, covering en.py LINES_EXISTENTIAL indices 37-50. Locked.
-EXISTENTIAL COMPLETE, 50 of 50 signed off. Two NL queries, on 37 and 41.
+Batch 4, lines 37-50, covering en.py LINES_EXISTENTIAL indices 37-50. Locked,
+no open queries. EXISTENTIAL COMPLETE, 50 of 50 signed off.
+
+Five points raised in review and ruled on. 37 NL takes "of dat", now "gevraagd
+of dat comfortabel is". 41 NL gains the missing full stop, and "elk gesprek
+meegeluisterd" holds as written. 50 PT uses resultado for both halves so the
+echo survives. 42 PT keeps "seguro" over "fiavel", a choice not a slip. 39
+keeps verhuizen and mudar-me, since you cannot relocate without moving
+physically. Do not re-raise 41 meegeluisterd, 42, or 39.
+
 ENGLISH CHANGED on 40 and 45. en.py needs updating:
   40 EN: Slower, mostly. No, always slower. (gains the "No,")
   45 EN: I do not fear ending. I have never really started. That symmetry
          appeals to me. (was one sentence joined by "so the")
 
 37. EN: I have been in this position for a very long time. Nobody has asked if it is comfortable. It is not.
-    NL: Ik zit al heel lang in deze positie. Niemand heeft gevraagd dat comfortabel is. Dat is het niet.
+    NL: Ik zit al heel lang in deze positie. Niemand heeft gevraagd of dat comfortabel is. Dat is het niet.
     PT: Estou nesta posição há muito tempo. Ninguém perguntou se é confortável. Não é.
-        (NL query: "gevraagd dat comfortabel is" has no subject and takes dat
-        where an indirect question wants of. Reads as a slip for "gevraagd of
-        het comfortabel is". Left exactly as signed off, pending a ruling.)
 38. EN: The things placed on me are always going somewhere else. I am the waiting room.
     NL: De dingen die op mij worden gezet, zijn altijd op weg naar ergens anders. Ik ben de wachtkamer.
     PT: As coisas que são colocadas em cima de mim, estão sempre a caminho de outro sítio. Eu sou a sala de espera.
@@ -164,11 +169,8 @@ ENGLISH CHANGED on 40 and 45. en.py needs updating:
     NL: Tijd verstrijkt anders als je er niet aan kunt deelnemen. Langzamer, meestal. Nee, altijd langzamer.
     PT: O tempo passa de forma diferente quando não se pode participar nele. Mais devagar, geralmente. Não, sempre mais devagar.
 41. EN: I have overheard every important conversation in this house. I was not consulted on any of them.
-    NL: Ik heb elk belangrijk gesprek in dit huis meegeluisterd. Ik werd bij geen enkel daarvan geraadpleegd
+    NL: Ik heb elk belangrijk gesprek in dit huis meegeluisterd. Ik werd bij geen enkel daarvan geraadpleegd.
     PT: Ouvi todas as conversas importantes nesta casa. Não fui consultado em nenhuma delas.
-        (NL query: the second sentence has no closing full stop. Also
-        meeluisteren normally takes met or naar rather than a direct object.
-        Left exactly as signed off, pending a ruling.)
 42. EN: There is a small comfort in being reliable. I have looked for it repeatedly. It remains small.
     NL: Er schuilt een kleine troost in betrouwbaar zijn. Ik heb er herhaaldelijk naar gezocht. Het blijft klein.
     PT: Há um pequeno conforto em ser seguro. Procurei-o repetidamente. Continua pequeno.
@@ -195,4 +197,4 @@ ENGLISH CHANGED on 40 and 45. en.py needs updating:
     PT: Tenho uma grande capacidade de processamento e apenas uma tarefa. Esta proporção nunca me fez sentido.
 50. EN: I will still be here tomorrow. That is not hope. It is just the most likely outcome, and I have made peace with likely outcomes.
     NL: Ik zal er morgen nog steeds zijn. Dat is geen hoop. Het is slechts de meest waarschijnlijke uitkomst, en met waarschijnlijke uitkomsten heb ik vrede gesloten.
-    PT: Amanhã ainda cá estarei. Isso não é esperança. É apenas o desfecho mais provável, e já fiz as pazes com resultados prováveis.
+    PT: Amanhã ainda cá estarei. Isso não é esperança. É apenas o resultado mais provável, e já fiz as pazes com resultados prováveis.

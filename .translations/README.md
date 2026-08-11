@@ -4,10 +4,9 @@ Raw record of the Dutch and Portuguese lines, kept here rather than in a
 temporary directory because a session ending should not cost a day of review.
 
 Everything drafted so far is reviewed and signed off by WHISTLER-Arc, who is a
-native speaker of both. Two NL queries are open on EXISTENTIAL 37 and 41,
-noted at those lines. Sign-off is not a formality. These lines are not translations, the
-register has to be found natively, and a non-native draft can be word-perfect
-and still not land.
+native speaker of both. There are no open queries. Sign-off is not a
+formality. These lines are not translations, the register has to be found
+natively, and a non-native draft can be word-perfect and still not land.
 
 Drafts are committed while still unsigned, so a session ending does not lose
 them, but an unsigned line is a proposal and never counts toward the signed
@@ -108,10 +107,9 @@ Three defects that came out of this check have been fixed in place:
 
 ## Next
 
-Review EXISTENTIAL 37-50, then draft SILENCE in batches of twelve, each batch
-reviewed and signed off before the next is drafted. Then fold everything into
-lines/nl.py and lines/pt.py, apply the English corrections, and only then cut
-a beta.
+Draft SILENCE in batches of twelve, each batch reviewed and signed off before
+the next is drafted. Then apply the nine English corrections to lines/en.py,
+fold everything into lines/nl.py and lines/pt.py, and only then cut a beta.
 
 Nothing unsigned goes into nl.py or pt.py. Once a line is in the pool it ships,
 and there is no review step after that. The filenames still say approved, which
