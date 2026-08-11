@@ -31,15 +31,18 @@ Counting NL and PT as separate lines, which is how the 500 figure is reached,
 that is 400 of 500. Nothing is provisional. The remaining 100 lines are
 SILENCE, not yet started.
 
-## English corrections still to apply to lines/en.py
+## English corrections, all applied to lines/en.py
 
-Reviewing the translations turned up nine English lines worth changing. None
-have been applied yet. They are assembly-time work, best done in one pass
-immediately before the fold into nl.py and pt.py.
+Reviewing the translations turned up nine English lines worth changing. All
+nine have now been applied. Nothing here is outstanding. The list is kept as
+the record of what changed and why, not as a task.
 
-Indices are en.py list indices, one-based, verified against the file. Each
-phrase matches exactly one line, so match on the text and treat the index as
-the check rather than the lookup.
+Applied in one pass rather than at assembly, so that every English line in
+these files now matches en.py verbatim with no exceptions. That matters
+because the verification previously carried a list of known-pending changes,
+and an exception list is exactly where a real mismatch hides.
+
+Indices are en.py list indices, one-based, verified against the file.
 
     SOFT   idx 21  "Oh. Just the one."           -> "Oh. Just the one?"
     CHAOS  idx 19  "a moment of stillness"       -> "a moment of peace"
@@ -108,8 +111,8 @@ Three defects that came out of this check have been fixed in place:
 ## Next
 
 Draft SILENCE in batches of twelve, each batch reviewed and signed off before
-the next is drafted. Then apply the nine English corrections to lines/en.py,
-fold everything into lines/nl.py and lines/pt.py, and only then cut a beta.
+the next is drafted. Then fold everything into lines/nl.py and lines/pt.py,
+and only then cut a beta. The English corrections are already applied.
 
 Nothing unsigned goes into nl.py or pt.py. Once a line is in the pool it ships,
 and there is no review step after that. The filenames still say approved, which

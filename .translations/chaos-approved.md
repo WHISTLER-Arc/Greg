@@ -3,8 +3,8 @@
 CHAOS COMPLETE. All 50 lines approved by WHISTLER-Arc, in four batches.
 No open queries.
 
-Two English lines changed during review and still need applying to en.py,
-32 and 43, both recorded at their batch headers and in the README.
+Five English lines changed during review, 19, 22, 24, 32 and 43. All have
+now been applied to en.py. The batch headers record what changed.
 
 Batch 1, lines 1-12. Locked.
 
@@ -34,7 +34,7 @@ Batch 1, lines 1-12. Locked.
     PT: Excedi a minha dose diária recomendada de vibração. A garantia não cobre isto. Não há garantia.
 
 Batch 2, lines 13-24. Reviewed version. Two PT queries.
-ENGLISH CHANGED on 19, 22, 24. en.py needs updating:
+ENGLISH CHANGED on 19, 22, 24. APPLIED to en.py:
   19 EN: I would request a moment of peace. (was stillness)
   22 EN: Peak chaos. I have now seen it. (was seen peak chaos)
   24 EN: I did not dress for this. (was pack)
@@ -67,7 +67,7 @@ ENGLISH CHANGED on 19, 22, 24. en.py needs updating:
 Batch 3, lines 25-36. Locked, no open queries. The 27 PT typo "esteá" was
 ruled a slip and is now "está".
 CHAOS numbering is positional, so these are en.py LINES_CHAOS indices 25-36.
-ENGLISH CHANGED on 32, deliberately. en.py needs updating:
+ENGLISH CHANGED on 32, deliberately. APPLIED to en.py:
   32 EN: I would like to register a complaint. I have nowhere to register it.
          So I'm registering it here. Not that it will make any difference.
          (was three sentences ending "I am registering it here.")
@@ -117,7 +117,7 @@ zelfbeheersing verloren". 38 PT keeps the da, "passei da preocupação". 40 NL
 stands as written, including the comma, intentional. 49 NL keeps "Er zal iets
 morsen", intentional and deliberated. Do not re-raise these.
 
-ENGLISH CHANGED on 43. en.py needs updating:
+ENGLISH CHANGED on 43. APPLIED to en.py:
   43 EN: I am at capacity. My capacity was never large enough. It never will be.
          (was "was never large. But I am at it.")
 

@@ -3,8 +3,8 @@
 EXISTENTIAL COMPLETE. All 50 lines approved by WHISTLER-Arc, in four batches.
 No open queries.
 
-Three English lines changed during review and still need applying to en.py,
-4, 40 and 45, all recorded at their batch headers and in the README.
+Three English lines changed during review, 4, 40 and 45. All have now been
+applied to en.py. The batch headers record what changed.
 
 This pool runs longer than the others. The English itself goes to four and
 five sentences, so the one-to-three rule in TEMPLATE.py is clearly relaxed
@@ -14,7 +14,7 @@ SOFT 6 handles its count.
 
 Batch 1, lines 1-12, covering en.py LINES_EXISTENTIAL indices 1-12. Locked,
 no open queries.
-ENGLISH CHANGED on 4. en.py needs updating:
+ENGLISH CHANGED on 4. APPLIED to en.py:
   4 EN: I have been here longer than most of the conversations that have
         happened around me. (was "on top of me")
 
@@ -151,7 +151,7 @@ echo survives. 42 PT keeps "seguro" over "fiavel", a choice not a slip. 39
 keeps verhuizen and mudar-me, since you cannot relocate without moving
 physically. Do not re-raise 41 meegeluisterd, 42, or 39.
 
-ENGLISH CHANGED on 40 and 45. en.py needs updating:
+ENGLISH CHANGED on 40 and 45. APPLIED to en.py:
   40 EN: Slower, mostly. No, always slower. (gains the "No,")
   45 EN: I do not fear ending. I have never really started. That symmetry
          appeals to me. (was one sentence joined by "so the")
