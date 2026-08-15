@@ -222,6 +222,8 @@ Non-Google speakers (Sonos, local media players, that sort of thing) usually don
 
 ## Greg's panel
 
+<img width="1197" height="840" alt="image" src="https://github.com/user-attachments/assets/9036233c-cf83-4e5d-bad4-ce3b0b3f96b8" />
+
 As of v1.3, Greg installs his own **sidebar panel automatically**. No card-pasting, no Lovelace editing, none of that. The second the integration finishes setting up, a **Greg** entry shows up in your sidebar with a live card. It shows his current mood, his mood level, his most recent line, a daily disturbance tally, a live countdown to the next existential crisis, an on/off switch, and a **Disturb Greg** button for when you fancy poking him on purpose. Remove the integration and the panel cleans itself up.
 
 The card just reads Greg's entities (`sensor.greg_mood`, `switch.greg_enabled`, and friends), so if you'd rather build your own dashboard from those, go for it.
