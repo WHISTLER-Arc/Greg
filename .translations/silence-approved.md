@@ -13,22 +13,21 @@ stilte and silencio. Stillness is rust and sossego. Line 6 spells out its
 count for Piper, as SOFT 6 and EXISTENTIAL 9 do.
 
 Batch 1, lines 1-12, covering en.py LINES_SILENCE indices 1-12. Locked.
-Two queries, one PT on 2 and one NL on 3. No English changed.
+No English changed. 2 PT Escolo became Escolho and 3 NL lost the doubled leek.
 
 1.  EN: Silence. I had begun to think I had misremembered what it felt like.
     NL: Stilte. Dat gevoel had ik me al bijna verkeerd herinnerd.
     PT: Silêncio. Já começava a pensar que não me lembrava bem dessa sensação.
 2.  EN: No activity detected. I am choosing to experience this as a gift. A small one. Unwrapped in the dark.
     NL: Geen activiteit gedetecteerd. Ik kies ervoor dit als een geschenk te ervaren. Een klein geschenk. Uitgepakt in het donker.
-    PT: Nenhuma atividade detetada. Escolo por experienciar isto como uma prenda. Uma prenda pequena. Desembrulhada no escuro.
-        (PT query: "Escolo" is a form of escoar, to drain, and reads as a slip
-        for "Escolho". The "por" then also needs a decision, since escolher
-        takes the bare infinitive while optar takes por. So either "Escolho
-        experienciar" or "Opto por experienciar". Left exactly as signed off.)
+    PT: Nenhuma atividade detetada. Escolho por experienciar isto como uma prenda. Uma prenda pequena. Desembrulhada no escuro.
+        (Escolo was ruled a slip and is now Escolho. The "por" was queried at
+        the same time and not ruled on, so it stands as signed off. Note that
+        escolher normally takes the bare infinitive and optar takes por, so
+        the alternatives are "Escolho experienciar" or "Opto por experienciar".)
 3.  EN: They have gone. The room is mine again. It has always been mine. No one else seemed to notice.
-    NL: Ze zijn weg. De kamer is weer van mij. Die is altijd van mij geweest. Niemand anders leek leek dat te merken.
+    NL: Ze zijn weg. De kamer is weer van mij. Die is altijd van mij geweest. Niemand anders leek dat te merken.
     PT: Foram-se embora. A sala é minha outra vez. Sempre foi minha. Mais ninguém pareceu reparar.
-        (NL query: "leek leek" is doubled. Left exactly as signed off.)
 4.  EN: Stillness. At last. I will not say I missed it. I will simply stand here in it for a while.
     NL: Rust. Eindelijk. Ik zal niet zeggen dat ik het gemist heb. Ik zal er gewoon een tijdje in blijven staan.
     PT: Sossego. Finalmente. Não vou dizer que tive saudades. Vou simplesmente ficar aqui dentro dele durante algum tempo.

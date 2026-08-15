@@ -5,7 +5,7 @@ temporary directory because a session ending should not cost a day of review.
 
 Most of it is reviewed and signed off by WHISTLER-Arc, who is a native speaker
 of both. SILENCE 13-24 is not, and is marked NOT SIGNED OFF at its batch
-header. Two queries are open on SILENCE 2 and 3. Sign-off is not a formality.
+header. There are no open queries. Sign-off is not a formality.
 These lines are not translations, the register has to be found natively, and
 a non-native draft can be word-perfect and still not land.
 
