@@ -4,13 +4,14 @@ Raw record of the Dutch and Portuguese lines, kept here rather than in a
 temporary directory because a session ending should not cost a day of review.
 
 Most of it is reviewed and signed off by WHISTLER-Arc, who is a native speaker
-of both. SILENCE 1-12 is not, and is marked NOT SIGNED OFF at its batch
-header. There are no open queries. Sign-off is not a formality. These lines are not translations, the register has to be found
-natively, and a non-native draft can be word-perfect and still not land.
+of both. SILENCE 13-24 is not, and is marked NOT SIGNED OFF at its batch
+header. Two queries are open on SILENCE 2 and 3. Sign-off is not a formality.
+These lines are not translations, the register has to be found natively, and
+a non-native draft can be word-perfect and still not land.
 
 Drafts are committed while still unsigned, so a session ending does not lose
 them, but an unsigned line is a proposal and never counts toward the signed
-total. SILENCE is not started.
+total.
 
 These are not translations of the English. Each line was written natively and
 then corrected, which is why the wording often diverges. See
@@ -23,12 +24,12 @@ custom_components/greg/lines/TEMPLATE.py for why that matters.
     MEDIUM       50 of 50   50 of 50   complete
     CHAOS        50 of 50   50 of 50   complete
     EXISTENTIAL  50 of 50   50 of 50   complete
-    SILENCE      12 of 50    0 of 50   1-12 awaiting WHISTLER-Arc
+    SILENCE      24 of 50   12 of 50   13-24 awaiting WHISTLER-Arc
 
-    212 of 250 drafted, 200 of 250 signed off
+    224 of 250 drafted, 212 of 250 signed off
 
 Counting NL and PT as separate lines, which is how the 500 figure is reached,
-that is 424 of 500 drafted and 400 of 500 signed off. Only the signed-off
+that is 448 of 500 drafted and 424 of 500 signed off. Only the signed-off
 count is a real number. The other 24 lines are provisional.
 
 ## English corrections, all applied to lines/en.py
@@ -90,8 +91,11 @@ diverges from en.py in two places and assembling by position would misfile it.
     MEDIUM  recovered en 29
     MEDIUM   37-49    off by one, md 37-49 are en 38-50
     CHAOS     1-50    positional throughout
+    EXIST     1-50    positional throughout
+    SILENCE   1-50    positional throughout
 
-Both files now hold exactly 50 entries per language, all distinct.
+Only SOFT and MEDIUM diverge. Every finished pool holds exactly 50 entries per
+language, all distinct, with no collisions across pools either.
 
 Three defects that came out of this check have been fixed in place:
 
