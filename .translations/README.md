@@ -4,8 +4,8 @@ Raw record of the Dutch and Portuguese lines, kept here rather than in a
 temporary directory because a session ending should not cost a day of review.
 
 Most of it is reviewed and signed off by WHISTLER-Arc, who is a native speaker
-of both. SILENCE 25-36 is not, and is marked NOT SIGNED OFF at its batch
-header. There are no open queries. Sign-off is not a formality.
+of both. SILENCE 37-50 is not, and is marked NOT SIGNED OFF at its batch
+header. One query is open on SILENCE 33. Sign-off is not a formality.
 These lines are not translations, the register has to be found natively, and
 a non-native draft can be word-perfect and still not land.
 
@@ -24,18 +24,19 @@ custom_components/greg/lines/TEMPLATE.py for why that matters.
     MEDIUM       50 of 50   50 of 50   complete
     CHAOS        50 of 50   50 of 50   complete
     EXISTENTIAL  50 of 50   50 of 50   complete
-    SILENCE      36 of 50   24 of 50   25-36 awaiting WHISTLER-Arc
+    SILENCE      50 of 50   36 of 50   37-50 awaiting WHISTLER-Arc
 
-    236 of 250 drafted, 224 of 250 signed off
+    250 of 250 drafted, 236 of 250 signed off
 
 Counting NL and PT as separate lines, which is how the 500 figure is reached,
-that is 472 of 500 drafted and 448 of 500 signed off. Only the signed-off
-count is a real number. The other 24 lines are provisional.
+that is 500 of 500 drafted and 472 of 500 signed off. Only the signed-off
+count is a real number. The other 28 lines are provisional. Every line is now
+drafted.
 
 ## English corrections, all applied to lines/en.py
 
-Reviewing the translations turned up nine English lines worth changing. All
-nine have now been applied. Nothing here is outstanding. The list is kept as
+Reviewing the translations turned up eleven English lines worth changing. All
+eleven have now been applied. Nothing here is outstanding. The list is kept as
 the record of what changed and why, not as a task.
 
 Applied in one pass rather than at assembly, so that every English line in
@@ -54,6 +55,8 @@ Indices are en.py list indices, one-based, verified against the file.
     EXIST  idx  4  "happened on top of me" -> "happened around me"
     EXIST  idx 40  "Slower, mostly. Always slower." gains a No, full text below
     EXIST  idx 45  splits into two sentences, full text below
+    SILENCE idx 25  "I'll just say" gains a colon
+    SILENCE idx 32  "like rest instead" gains a comma
 
 CHAOS 32 in full, from the batch 3 review. Note the straight apostrophe in
 "I'm". en.py uses straight apostrophes throughout, fourteen of them and no
