@@ -27,18 +27,24 @@
           "sensitivity": "Sensitivity",
           "suppress_chime": "Attempt to suppress speaker chime",
           "openers": "Occasional openers",
-          "tts_voice": "Voice",
+          "tts_voice": "Voice, fallback",
           "emit_events": "Fire an event for every line",
           "speech_mode": "Who does the talking",
-          "language": "Language"
+          "language": "Language",
+          "tts_voice_en": "Voice for English",
+          "tts_voice_nl": "Voice for Nederlands",
+          "tts_voice_pt": "Voice for Portugues (Portugal)"
         },
         "data_description": {
           "sensitivity": "How readily Greg reacts. 100 counts every sensor event. Lower values make him ignore repeat events for longer, so a twitchy sensor still only registers one disturbance per tap.",
           "openers": "Every so often Greg starts a line with a Right. or an Ah. before he gets going. Roughly one line in three, and the rest of the time there is nothing there at all, which is the part that stops him sounding like he is reading from a list.",
-          "tts_voice": "Optional. The exact voice name to speak with, for example en_GB-alan-medium. Leave it empty and Greg uses whatever your TTS engine defaults to, which also means changing that default to suit Greg changes it for everything else using the same engine. Engines that take no voice option will reject this, so leave it empty unless you know your engine accepts one.",
+          "tts_voice": "Optional. Used for any language with no voice of its own set below. Leave empty and Greg uses whatever the engine defaults to. Engines that take no voice option, Google Translate among them, reject this, so leave it empty unless yours accepts one.",
           "emit_events": "Fires a greg_line event whenever Greg picks something to say, carrying the message, his mood, and the speaker he is set up with. Nothing listens unless you write an automation for it.",
           "speech_mode": "Leave this on Greg and he speaks as usual. Set it to stay quiet and he picks the line and fires the event without saying anything, so your own automation can speak it, or hand it to a local AI first.",
-          "language": "Which language Greg moans in. Leave it on Follow Home Assistant and he uses whatever your system is set to, falling back to English for anything he does not speak yet. His lines are written in each language rather than translated, so a language is only listed once somebody has actually written him one."
+          "language": "Which language Greg moans in. Leave it on Follow Home Assistant and he uses whatever your system is set to, falling back to English for anything he does not speak yet. His lines are written in each language rather than translated, so a language is only listed once somebody has actually written him one.",
+          "tts_voice_en": "Optional. The exact voice name for English lines, for example en_GB-alan-low. Leave empty to use the fallback Voice above, or the engine's own default.",
+          "tts_voice_nl": "Optional. The exact voice name for Dutch lines, for example nl_NL-ronnie-medium. It must be a Dutch voice. An English voice handed Dutch text does not sound Dutch, it sounds like an English voice reading Dutch letters aloud.",
+          "tts_voice_pt": "Optional. The exact voice name for European Portuguese lines, for example pt_PT-tugao-medium. It must be a European Portuguese voice. Brazilian voices are pt_BR and are a different language for Greg's purposes."
         }
       }
     }
@@ -71,18 +77,24 @@
           "sensitivity": "Sensitivity",
           "suppress_chime": "Attempt to suppress speaker chime",
           "openers": "Occasional openers",
-          "tts_voice": "Voice",
+          "tts_voice": "Voice, fallback",
           "emit_events": "Fire an event for every line",
           "speech_mode": "Who does the talking",
-          "language": "Language"
+          "language": "Language",
+          "tts_voice_en": "Voice for English",
+          "tts_voice_nl": "Voice for Nederlands",
+          "tts_voice_pt": "Voice for Portugues (Portugal)"
         },
         "data_description": {
           "sensitivity": "How readily Greg reacts. 100 counts every sensor event. Lower values make him ignore repeat events for longer, so a twitchy sensor still only registers one disturbance per tap.",
           "openers": "Every so often Greg starts a line with a Right. or an Ah. before he gets going. Roughly one line in three, and the rest of the time there is nothing there at all, which is the part that stops him sounding like he is reading from a list.",
-          "tts_voice": "Optional. The exact voice name to speak with, for example en_GB-alan-medium. Leave it empty and Greg uses whatever your TTS engine defaults to, which also means changing that default to suit Greg changes it for everything else using the same engine. Engines that take no voice option will reject this, so leave it empty unless you know your engine accepts one.",
+          "tts_voice": "Optional. Used for any language with no voice of its own set below. Leave empty and Greg uses whatever the engine defaults to. Engines that take no voice option, Google Translate among them, reject this, so leave it empty unless yours accepts one.",
           "emit_events": "Fires a greg_line event whenever Greg picks something to say, carrying the message, his mood, and the speaker he is set up with. Nothing listens unless you write an automation for it.",
           "speech_mode": "Leave this on Greg and he speaks as usual. Set it to stay quiet and he picks the line and fires the event without saying anything, so your own automation can speak it, or hand it to a local AI first.",
-          "language": "Which language Greg moans in. Leave it on Follow Home Assistant and he uses whatever your system is set to, falling back to English for anything he does not speak yet. His lines are written in each language rather than translated, so a language is only listed once somebody has actually written him one."
+          "language": "Which language Greg moans in. Leave it on Follow Home Assistant and he uses whatever your system is set to, falling back to English for anything he does not speak yet. His lines are written in each language rather than translated, so a language is only listed once somebody has actually written him one.",
+          "tts_voice_en": "Optional. The exact voice name for English lines, for example en_GB-alan-low. Leave empty to use the fallback Voice above, or the engine's own default.",
+          "tts_voice_nl": "Optional. The exact voice name for Dutch lines, for example nl_NL-ronnie-medium. It must be a Dutch voice. An English voice handed Dutch text does not sound Dutch, it sounds like an English voice reading Dutch letters aloud.",
+          "tts_voice_pt": "Optional. The exact voice name for European Portuguese lines, for example pt_PT-tugao-medium. It must be a European Portuguese voice. Brazilian voices are pt_BR and are a different language for Greg's purposes."
         }
       }
     }

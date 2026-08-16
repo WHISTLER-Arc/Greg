@@ -30,6 +30,7 @@ from .const import (
     CONF_SPEECH_MODE,
     CONF_OPENERS,
     CONF_TTS_VOICE,
+    tts_voice_key,
     CONF_LANGUAGE,
     DEFAULT_VOLUME,
     DEFAULT_QUIET_START,
@@ -69,6 +70,27 @@ def _language_selector() -> selector.SelectSelector:
     return selector.SelectSelector(
         selector.SelectSelectorConfig(options=options, mode="dropdown")
     )
+
+
+def _voice_fields(current=None) -> dict:
+    """One optional voice box per installed language.
+
+    Generated rather than listed, so a new language file brings its own voice
+    field with it and nothing here has to be told about it.
+
+    A voice belongs to exactly one language. Piper's are named for it,
+    nl_NL-ronnie-medium and pt_PT-tugao-medium, and handing an English voice a
+    Dutch sentence does not give you accented Dutch, it gives you an English
+    voice reading Dutch letters aloud. So the voice has to follow the language
+    rather than sit above it.
+    """
+    get = current if callable(current) else (lambda key, default: default)
+    return {
+        vol.Optional(
+            tts_voice_key(code), default=get(tts_voice_key(code), DEFAULT_TTS_VOICE)
+        ): selector.TextSelector()
+        for code in available_languages()
+    }
 
 
 def _validate_time(value: str) -> str:
@@ -185,6 +207,7 @@ class GregConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             vol.Optional(CONF_SUPPRESS_CHIME, default=DEFAULT_SUPPRESS_CHIME): selector.BooleanSelector(),
             vol.Optional(CONF_OPENERS, default=DEFAULT_OPENERS): selector.BooleanSelector(),
             vol.Optional(CONF_TTS_VOICE, default=DEFAULT_TTS_VOICE): selector.TextSelector(),
+            **_voice_fields(),
             vol.Optional(CONF_LANGUAGE, default=DEFAULT_LANGUAGE): _language_selector(),
             vol.Optional(CONF_EMIT_EVENTS, default=DEFAULT_EMIT_EVENTS): selector.BooleanSelector(),
             vol.Optional(CONF_SPEECH_MODE, default=DEFAULT_SPEECH_MODE): selector.SelectSelector(
@@ -280,6 +303,7 @@ class GregOptionsFlow(config_entries.OptionsFlow):
             vol.Optional(CONF_SUPPRESS_CHIME, default=self._get(CONF_SUPPRESS_CHIME, DEFAULT_SUPPRESS_CHIME)): selector.BooleanSelector(),
             vol.Optional(CONF_OPENERS, default=self._get(CONF_OPENERS, DEFAULT_OPENERS)): selector.BooleanSelector(),
             vol.Optional(CONF_TTS_VOICE, default=self._get(CONF_TTS_VOICE, DEFAULT_TTS_VOICE)): selector.TextSelector(),
+            **_voice_fields(self._get),
             vol.Optional(CONF_LANGUAGE, default=self._get(CONF_LANGUAGE, DEFAULT_LANGUAGE)): _language_selector(),
             vol.Optional(CONF_EMIT_EVENTS, default=self._get(CONF_EMIT_EVENTS, DEFAULT_EMIT_EVENTS)): selector.BooleanSelector(),
             vol.Optional(CONF_SPEECH_MODE, default=self._get(CONF_SPEECH_MODE, DEFAULT_SPEECH_MODE)): selector.SelectSelector(

@@ -13,6 +13,21 @@ versioned.
   speaker of both. None of them are translations of the English, which is the
   whole point and is why the wording often diverges. A translated joke is a
   correct sentence that is not funny, and there are none of those in here.
+- **A voice per language.** One voice cannot pronounce three languages, so
+  there is now a voice box for each language Greg speaks, in advanced settings.
+  Piper names its voices for their language, `nl_NL-ronnie-medium` and
+  `pt_PT-tugão-medium` among them, and the right one has to be picked per
+  language rather than once for everything. The fields are generated from
+  whatever languages are installed, so adding a language file still brings its
+  own voice field with it.
+
+### Fixed
+- **He read the new lines in an English voice.** Greg picked the right line in
+  the right language and then handed it to the TTS engine without saying which
+  language it was, so the engine used whatever it defaults to. With Piper on
+  `en_GB-alan-low` that is an English voice reading Dutch letters aloud, which
+  is not the joke. He now tells the engine the language. The omission was
+  always there and only became audible once the pools stopped being English.
 
 ### Changed
 - Eleven English lines are better than they were. Writing a line twice in two
@@ -21,6 +36,12 @@ versioned.
   `Peak chaos. I have now seen it.`, and ten others like it.
 
 ### Notes
+- The old single Voice setting still works and now applies to English only. It
+  predates Greg speaking anything else, so anyone who set it set an English
+  voice, and letting it carry into Dutch would recreate the bug fixed above.
+  Existing English setups are unchanged.
+- Leave a language's voice empty and the engine picks for itself, which for
+  most engines is the right voice for the language once Greg names it.
 - `pt-BR` still resolves to English rather than European Portuguese, as it has
   since v1.5.0. Brazilian and European Portuguese are different enough that
   the wrong one is worse than none.

@@ -1,8 +1,8 @@
 """Constants for Greg integration."""
 
 DOMAIN = "greg"
-VERSION = "1.5.5b1"
-VERSION_DISPLAY = "v1.5.5b1"
+VERSION = "1.5.5b2"
+VERSION_DISPLAY = "v1.5.5b2"
 
 # Config keys
 CONF_VIBRATION_SENSOR = "vibration_sensor"
@@ -76,7 +76,27 @@ DECK_SEAM_GUARD = 5
 # Passed straight through to the TTS engine as options.voice when set. Left empty
 # Greg uses whatever the engine defaults to, which is fine until you also use that
 # engine for something else and would rather it did not sound like a tired table.
+#
+# This one applies to English only. It predates Greg speaking anything else, so
+# anyone who set it set an English voice, and letting it carry into Dutch would
+# recreate the very bug the per-language voices below exist to fix.
 DEFAULT_TTS_VOICE = ""
+
+# A voice per language, because one voice cannot pronounce three languages. The
+# key is built from the language code, so tts_voice_nl, tts_voice_pt and so on,
+# and the config flow generates a field for whatever languages are installed.
+# Adding a language file still needs nothing else changed.
+#
+# This matters more than it looks. Piper takes a voice name like
+# nl_NL-ronnie-medium, and a voice is tied to one language. Handing it Dutch
+# text while it holds an English voice does not produce accented Dutch, it
+# produces an English speaker reading Dutch letters aloud.
+CONF_TTS_VOICE_PREFIX = "tts_voice_"
+
+
+def tts_voice_key(language: str) -> str:
+    """Config key holding the voice for one language."""
+    return f"{CONF_TTS_VOICE_PREFIX}{language}"
 
 # Mood states
 MOOD_RESTING = "resting"

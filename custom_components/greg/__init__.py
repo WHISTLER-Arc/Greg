@@ -26,6 +26,7 @@ from homeassistant.components.frontend import (
 from homeassistant.components.http import StaticPathConfig
 
 from .lines import (
+    DEFAULT_LANGUAGE as FALLBACK_LANGUAGE,
     available as available_languages,
     openers as openers_for,
     pool as pool_for,
@@ -54,6 +55,7 @@ from .const import (
     CONF_SPEECH_MODE,
     CONF_OPENERS,
     CONF_TTS_VOICE,
+    tts_voice_key,
     CONF_LANGUAGE,
     DEFAULT_SENSITIVITY,
     DEFAULT_VOLUME,
@@ -573,6 +575,9 @@ class GregCoordinator:
         return random.choice(openers_for(self.language))
 
     async def _speak(self, pool_key: str) -> None:
+        # Resolved once and reused, so the line, the event and the TTS call can
+        # never disagree about which language this is.
+        language = self.language
         line = self._next_line(pool_key)
         opener = self._maybe_opener()
         spoken_text = f"{opener} {line}" if opener else line
@@ -599,7 +604,7 @@ class GregCoordinator:
                     "message": spoken_text,
                     "line": line,
                     "category": pool_key,
-                    "language": self.language,
+                    "language": language,
                     "mood": self.mood,
                     "mood_level": self.mood_level,
                     "vibrations_today": self.vibrations_today,
@@ -632,11 +637,27 @@ class GregCoordinator:
                 "entity_id": tts_engine,
                 "media_player_entity_id": player,
                 "message": spoken_text,
+                # Without this the engine speaks whatever language it defaults
+                # to, which is how Dutch lines came out sounding like an English
+                # voice reading Dutch letters aloud. Greg knows which language he
+                # just picked a line in, so he has to say so.
+                "language": language,
             }
             # Only sent when the user has actually named a voice. Engines that
             # take no voice option (Google Translate, for one) reject the key
             # outright, so an empty setting has to mean "say nothing about it".
-            voice = self._config.get(CONF_TTS_VOICE, DEFAULT_TTS_VOICE)
+            #
+            # The per-language voice wins, because a voice belongs to a language.
+            #
+            # The bare tts_voice only applies to English. It predates Greg
+            # speaking anything else, so anyone who set it set an English voice,
+            # and letting it fall through to Dutch would quietly recreate the
+            # exact bug this is fixing. Existing English setups are untouched,
+            # every other language starts from the engine's own default until
+            # given a voice of its own.
+            voice = self._config.get(tts_voice_key(language)) or ""
+            if not voice and language == FALLBACK_LANGUAGE:
+                voice = self._config.get(CONF_TTS_VOICE, DEFAULT_TTS_VOICE)
             if voice:
                 payload["options"] = {"voice": voice}
 
