@@ -91,7 +91,8 @@ NL: Het tempo is versneld. Ik ben niet versneld, want dat kan ik niet.
 PT: O ritmo acelerou. Eu não acelerei nada, porque não consigo.
 
 Batch 4, lines 37-49, covering en.py MEDIUM indices 38-50. MEDIUM COMPLETE,
-50 of 50. One PT query on 47.
+50 of 50, no open queries. A PT query was once noted here against 47. It was
+resolved in review and the line stands as written. Do not re-raise it.
 
 A batch number 50 used to sit at the end of this batch. It was a byte-identical
 copy of batch number 36, both being en.py MEDIUM index 37, so it translated no
