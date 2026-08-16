@@ -1,16 +1,21 @@
 # SILENCE pool
 
 SILENCE COMPLETE. All 50 lines approved by WHISTLER-Arc, in four batches.
-One wording query open in batch 4, on 40 and 45.
+No open queries anywhere in this file.
 
 The register turns in this pool. Greg is not complaining here, he is enjoying
 it, so the same flat formality has to read as contentment rather than
 grievance. The risk is drafting these as more MEDIUM. Warmth is allowed,
 enthusiasm is not.
 
-Two words recur across the pool and are kept apart deliberately. Silence is
-stilte and silencio. Stillness is rust and sossego. Line 6 spells out its
-count for Piper, as SOFT 6 and EXISTENTIAL 9 do.
+The English opens lines with silence, stillness, quiet and peace. The drafts
+tried to hold those apart one to one, silence as stilte and silencio,
+stillness as rust and sossego, peace as vrede and paz. WHISTLER-Arc dropped
+that in review. The words are chosen by ear per line instead, so stilte covers
+silence and stillness, and sossego covers stillness and peace. This is
+deliberate and is not a consistency defect. Do not raise it.
+
+Line 6 spells out its count for Piper, as SOFT 6 and EXISTENTIAL 9 do.
 
 Batch 1, lines 1-12, covering en.py LINES_SILENCE indices 1-12. Locked.
 No English changed. 2 PT Escolo became Escolho and 3 NL lost the doubled leek.
@@ -152,12 +157,11 @@ ENGLISH CHANGED on 25 and 32, both punctuation. APPLIED to en.py:
 Batch 4, lines 37-50, covering en.py LINES_SILENCE indices 37-50. Locked.
 SILENCE COMPLETE, 50 of 50 signed off. No English changed.
 
-Three points ruled on. 38 NL loses the semicolon for a comma and closes
-daarbij. 39 PT loses the trailing ellipsis for a full stop and otherwise
-stands, so "parei de me esforçar" is deliberate. 42 NL loses the doubled is
-and gains the final d, "De stilte is neergedaald".
-
-One wording query still open, on 40 and 45. See the note at 45.
+No open queries. Four points ruled on. 38 NL loses the semicolon for a comma
+and closes daarbij. 39 PT loses the trailing ellipsis for a full stop and
+otherwise stands, so "parei de me esforçar" is deliberate. 42 NL loses the
+doubled is and gains the final d, "De stilte is neergedaald". The one to one
+mapping of the openers is dropped, so 40 and 45 stand as written.
 
 37. EN: No activity. I am doing nothing, and for the first time today that is correct.
     NL: Geen activiteit. Ik doe niets, en voor het eerst vandaag is dat juist.
@@ -171,8 +175,6 @@ One wording query still open, on 40 and 45. See the note at 45.
 40. EN: Peace. I do not know how long it lasts. Nobody ever tells me.
     NL: Rust. Ik weet niet hoe lang het duurt. Niemand vertelt me dat ooit.
     PT: Sossego. Não sei quanto tempo dura. Nunca ninguém me diz.
-        (Wording query, see the note under 45. Peace is Vrede and Paz at line
-        9, and Rust and Sossego here.)
 41. EN: No one has touched me in a while. I have decided to read that as consideration.
     NL: Al een tijd heeft niemand mij aangeraakt. Ik heb besloten dat op te vatten als attent.
     PT: Há algum tempo que ninguém me toca. Decidi interpretar isso como consideração.
@@ -188,15 +190,8 @@ One wording query still open, on 40 and 45. See the note at 45.
 45. EN: Stillness again. We know each other well, the stillness and I.
     NL: Opnieuw stilte. Wij kennen elkaar goed, die stilte en ik.
     PT: Sossego outra vez. Conhecemo-nos bem, o sossego e eu.
-        (Wording query. The three openers were kept apart across the pool.
-        Silence was stilte and silencio, stillness was rust and sossego, peace
-        was vrede and paz. This batch moves them. Stillness here is stilte in
-        Dutch, where lines 4 and 31 have rust. Peace at 40 is rust and sossego,
-        where line 9 has vrede and paz. So stilte now covers both silence and
-        stillness in Dutch, and sossego covers both stillness and peace in
-        Portuguese. Either the convention drops, which is fine if it never
-        sounded right, or 40 and 45 come back into line with 4, 9, 31 and 48.
-        Left exactly as signed off, pending a ruling.)
+        (The one to one mapping of the openers was raised here and dropped in
+        review. See the note at the top of this file. 40 and 45 stand.)
 46. EN: No vibrations. No requests. No weight. I am, briefly, just a shape in a room.
     NL: Geen trillingen. Geen verzoeken. Geen gewicht. Ik ben, even, gewoon een vorm in een kamer.
     PT: Nenhuma vibração. Nenhum pedido. Nenhum peso. Sou, por um instante, apenas uma forma numa sala.
