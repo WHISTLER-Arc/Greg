@@ -3,6 +3,76 @@
 All notable changes to Greg. He would like it noted that he did not ask to be
 versioned.
 
+## [1.5.5]
+
+### Added
+- **Greg actually speaks Dutch and European Portuguese now.** v1.5.0 built the
+  mechanism and left the pools empty. They are full. Two hundred and fifty
+  lines in each language, all five pools, plus his openers.
+- Every line was written natively and then reviewed one by one by a native
+  speaker of both. None of them are translations of the English, which is the
+  whole point and is why the wording often diverges. A translated joke is a
+  correct sentence that is not funny, and there are none of those in here.
+- **A voice per language.** One voice cannot pronounce three languages, so
+  there is now a voice box for each language Greg speaks, in advanced settings.
+  Piper names its voices for their language, `nl_NL-ronnie-medium` and
+  `pt_PT-tugão-medium` among them, and the right one has to be picked per
+  language rather than once for everything. The fields are generated from
+  whatever languages are installed, so adding a language file still brings its
+  own voice field with it.
+
+### Fixed
+- **He read the new lines in an English voice.** Greg picked the right line in
+  the right language and then handed it to the TTS engine without saying which
+  language it was, so the engine used whatever it defaults to. With Piper on
+  `en_GB-alan-low` that is an English voice reading Dutch letters aloud, which
+  is not the joke. He now tells the engine the language. The omission was
+  always there and only became audible once the pools stopped being English.
+- **And then he said nothing at all.** The first attempt at the above sent
+  Greg's own language code straight through. Greg's codes are bare, `nl` and
+  `pt` and `en`. Engines advertise locales, `nl_NL` and `en_GB`, and Home
+  Assistant refuses an unrecognised code rather than falling back, so every
+  line raised `Language 'nl' not supported` and nothing was spoken in any
+  language. Greg now checks what the engine has actually advertised, picks the
+  locale that matches, and leaves the field out entirely when it cannot tell.
+  Worst case he is exactly as he was before any of this, which is the correct
+  worst case. Where a language has several regions he prefers the one matching
+  itself, so Dutch is `nl_NL` rather than `nl_BE` and Portuguese is `pt_PT`
+  rather than `pt_BR`.
+- **A wrong voice name no longer silences him.** Voice names are matched
+  character for character, so `pt_PT-tugao-medium` is not `pt_PT-tugão-medium`
+  and the near miss is refused outright rather than falling back. Greg now
+  checks the name against what the engine offers, drops it if it does not
+  match, and says so in the log with the list of valid names. A table speaking
+  in the wrong voice tells you where to look. A table that has gone quiet tells
+  you nothing.
+- The help text for the Portuguese voice gave the example without its tilde,
+  which is exactly the near miss described above. Fixed, and all three now say
+  to copy the name from the engine's own list.
+
+### Changed
+- Eleven English lines are better than they were. Writing a line twice in two
+  other languages turns out to be an unusually good way of noticing that the
+  original was slightly off. `Peak chaos. I have now seen peak chaos.` became
+  `Peak chaos. I have now seen it.`, and ten others like it.
+
+### Notes
+- The old single Voice setting still works and now applies to English only. It
+  predates Greg speaking anything else, so anyone who set it set an English
+  voice, and letting it carry into Dutch would recreate the bug fixed above.
+  Existing English setups are unchanged.
+- Leave a language's voice empty and the engine picks for itself, which for
+  most engines is the right voice for the language once Greg names it.
+- `pt-BR` still resolves to English rather than European Portuguese, as it has
+  since v1.5.0. Brazilian and European Portuguese are different enough that
+  the wrong one is worse than none.
+- Nothing falls back to English any more for Dutch or Portuguese. Before this
+  release an empty pool quietly served the English one, which was correct
+  behaviour and no longer applies to either language.
+- The reviewed source lives in `.translations/`, with the English line recorded
+  above each pair. `lines/nl.py` and `lines/pt.py` are generated from it by
+  matching on that English text.
+
 ## [1.5.0]
 
 ### Added

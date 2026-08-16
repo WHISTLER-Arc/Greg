@@ -136,16 +136,28 @@ Piper is a fast text-to-speech engine that runs fully local on your own hardware
 
 ### Telling Greg which voice to use
 
-As of v1.4.1 Greg has his own **Voice** field in advanced settings. Put the exact voice name in it, `en_GB-alan-medium` for the full effect, and he'll ask for that voice on every line he speaks.
+Greg has his own voice fields in advanced settings, **one per language he speaks**. Put the exact voice name in each and he asks for that voice on every line in that language.
 
-Do this rather than changing Piper's default. If you already use Piper for a voice assistant, setting the add-on default to Alan means your assistant starts drawling like a depressed table too, which is funny exactly once.
+Do this rather than changing Piper's default. The add-on has a single **Voice** setting that applies to everything on your system, so pointing it at Alan means your voice assistant starts drawling like a depressed table too, which is funny exactly once. It also cannot switch per line, so it is no use at all once Greg speaks more than one language.
 
 1. Open **Settings → Devices & Services → Greg → Configure**
 2. Set **Text-to-speech engine** to your Piper entity
 3. Tick **Show advanced settings**
-4. Put `en_GB-alan-medium` in **Voice**
+4. Fill in the voice for each language you use
 
-Leave the field empty and Greg uses whatever your engine defaults to. Engines that don't take a voice option at all, Google Translate TTS among them, will reject it, so leave it empty for those.
+| Field | For the full effect |
+|---|---|
+| **Voice for English** | `en_GB-alan-medium` |
+| **Voice for Nederlands** | `nl_NL-pim-medium` |
+| **Voice for Português (Portugal)** | `pt_PT-tugão-medium` |
+
+Copy the names from your engine's own voice list. They are matched character for character, accents included, so `pt_PT-tugao-medium` is not `pt_PT-tugão-medium`. Get one wrong and Greg drops it, lets the engine choose, and says so in the log along with the names it does offer.
+
+A voice belongs to one language. An English voice handed a Dutch line does not give you accented Dutch, it gives you an English voice reading Dutch letters aloud, which is why there is a field per language rather than one for all of them.
+
+Leave a field empty and Greg uses whatever the engine defaults to for that language. Engines that don't take a voice option at all, Google Translate TTS among them, will reject it, so leave them empty for those.
+
+The older single **Voice** field is still there and now applies to English only. It predates Greg speaking anything else, so anyone who set it set an English voice.
 
 ### Tuning the delivery
 
@@ -381,8 +393,8 @@ There's also a `greg.uninstall` service if you'd rather script it. It takes an o
 
 ## Where Greg's going
 
-- **v1.4.** Current release. Single room, no Blueprints, works with any protocol, and he brings his own sidebar panel.
-- **v1.5.** Greg is a supercomputer. He should speak multiple languages besides English, starting with Dutch & Portuguese.
+- **v1.4.** Single room, no Blueprints, works with any protocol, and he brings his own sidebar panel.
+- **v1.5.** Current release. Greg is a supercomputer, so he speaks more than one language. English, Dutch and European Portuguese, with every line written natively in each rather than translated into it.
 - **v1.6.** Write your own lines in his panel, and share the good ones with everyone else.
 - **v1.x.** Small improvements as they come. Feedback very welcome.
 - **v2.0.** Multi-room, multiple Gregs, a full mood dashboard. (One Greg might be plenty for some households. I respect that.)
