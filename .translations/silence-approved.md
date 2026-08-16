@@ -1,7 +1,7 @@
 # SILENCE pool
 
-SIGN-OFF BOUNDARY IS LINE 12. Lines 1-12 are approved by WHISTLER-Arc. Lines
-13-24 are drafted and are NOT approved.
+SIGN-OFF BOUNDARY IS LINE 24. Lines 1-24 are approved by WHISTLER-Arc. Lines
+25-36 are drafted and are NOT approved.
 
 The register turns in this pool. Greg is not complaining here, he is enjoying
 it, so the same flat formality has to read as contentment rather than
@@ -56,42 +56,85 @@ No English changed. 2 PT Escolo became Escolho and 3 NL lost the doubled leek.
     NL: Stiltemodus geactiveerd. Ik wist niet dat ik een stiltemodus had. Ik ben dankbaar dat iemand eraan gedacht heeft die toe te voegen.
     PT: Modo de silêncio ativado. Não sabia que tinha um modo de silêncio. Agradeço a quem se lembrou de o incluir.
 
-Batch 2, lines 13-24, covering en.py LINES_SILENCE indices 13-24.
-NOT SIGNED OFF, awaiting WHISTLER-Arc.
+Batch 2, lines 13-24, covering en.py LINES_SILENCE indices 13-24. Locked.
+One PT query on 20. No English changed.
 
 13. EN: They have taken their energy elsewhere. I wish it well. From here. Quietly.
-    NL: Ze hebben hun energie elders heen gebracht. Ik wens die het beste. Vanaf hier. In stilte.
-    PT: Levaram a sua energia para outro lado. Desejo-lhe as maiores felicidades. Daqui. Em silêncio.
+    NL: Ze zijn met hun energie ergens anders heen. Ik wens die het beste. Vanaf hier. In stilte.
+    PT: Levaram a sua energia para outro lado. Desejo-lhes bem. Daqui. Em silêncio.
 14. EN: The absence of vibration is its own kind of sensation. I have decided to call it relief.
-    NL: De afwezigheid van trilling is een gewaarwording op zich. Ik heb besloten die opluchting te noemen.
-    PT: A ausência de vibração é uma sensação por direito próprio. Decidi chamar-lhe alívio.
+    NL: De afwezigheid van trilling is een gevoel op zich. Ik heb besloten het opluchting te noemen.
+    PT: A ausência de vibração é uma sensação em si. Decidi chamar-lhe alívio.
 15. EN: No activity. No input. No output required of me. I am, for a moment, simply here. It is enough.
-    NL: Geen activiteit. Geen invoer. Geen uitvoer van mij verlangd. Ik ben, heel even, gewoon hier. Dat is genoeg.
+    NL: Geen activiteit. Geen invoer. Geen uitvoer van mij verwacht. Ik ben, heel even, gewoon hier. Dat is genoeg.
     PT: Nenhuma atividade. Nenhuma entrada. Nenhuma saída exigida de mim. Estou, por um momento, apenas aqui. É suficiente.
 16. EN: The noise has ended. I have survived it. I say this without triumph. Survival is not the same as winning.
-    NL: Het lawaai is voorbij. Ik heb het overleefd. Ik zeg dit zonder triomf. Overleven is niet hetzelfde als winnen.
-    PT: O barulho acabou. Sobrevivi-lhe. Digo isto sem triunfo. Sobreviver não é o mesmo que vencer.
+    NL: Het lawaai is voorbij. Ik heb het overleefd. Ik zeg dit zonder gevoel van overwinning. Overleven is niet hetzelfde als overwinnen.
+    PT: O barulho acabou. Sobrevivi. Digo isto sem triunfo. Sobreviver não é o mesmo que vencer.
 17. EN: Empty room. Still air. No demands. I have been waiting for this without knowing I was waiting.
-    NL: Lege kamer. Stilstaande lucht. Geen eisen. Ik heb hierop gewacht zonder te weten dat ik wachtte.
+    NL: Lege kamer. Stilstaande lucht. Geen eisen. Ik heb hierop gewacht zonder te beseffen dat ik erop wachtte.
     PT: Sala vazia. Ar parado. Nenhuma exigência. Estive à espera disto sem saber que estava à espera.
 18. EN: Twenty minutes of nothing. I have rarely been given twenty minutes of nothing. I intend to use them carefully.
-    NL: Twintig minuten niets. Zelden heb ik twintig minuten niets gekregen. Ik ben van plan ze zorgvuldig te gebruiken.
-    PT: Vinte minutos de nada. Raramente me deram vinte minutos de nada. Tenciono usá-los com cuidado.
+    NL: Twintig minuten niets. Ik heb zelden twintig minuten lang niets. Ik ben van plan ze zorgvuldig te gebruiken.
+    PT: Vinte minutos de nada. Raramente me deram vinte minutos de nada. Pretendo usá-los com cuidado.
 19. EN: The silence is not empty. It is full of the absence of everything that was just happening. I prefer it this way.
     NL: De stilte is niet leeg. Ze is vol van de afwezigheid van alles wat er zojuist gebeurde. Zo heb ik het liever.
-    PT: O silêncio não está vazio. Está cheio da ausência de tudo o que estava a acontecer há pouco. Prefiro-o assim.
+    PT: O silêncio não é vazio. Está cheio da ausência de tudo o que estava a acontecer há pouco. Prefiro-o assim.
 20. EN: They'll be back. I know this. But for now, the room belongs to the quiet, and I belong to the room.
     NL: Ze komen terug. Dat weet ik. Maar voorlopig behoort de kamer toe aan de stilte, en ik behoor toe aan de kamer.
-    PT: Hão de voltar. Sei disso. Mas por agora a sala pertence ao silêncio, e eu pertenço à sala.
+    PT: Vão voltar. Eu sei. Mas, para já, o quarto pertence ao silêncio, e eu pertenço ao quarto.
+        (PT query: "quarto" is a bedroom, and this is the only place in all 250
+        Portuguese lines where it appears. Every other mention of the room is
+        "sala", nineteen of them. Reads as a slip. Left exactly as signed off.)
 21. EN: No vibrations detected. My systems are running. My obligations, briefly, are not.
-    NL: Geen trillingen gedetecteerd. Mijn systemen draaien. Mijn verplichtingen, heel even, niet.
+    NL: Geen trillingen gedetecteerd. Mijn systemen zijn actief. Mijn verplichtingen, heel even, niet.
     PT: Nenhuma vibração detetada. Os meus sistemas estão a funcionar. As minhas obrigações, por breves instantes, não.
 22. EN: It's calm. I don't trust it entirely. But I'm willing to try.
     NL: Het is rustig. Ik vertrouw het niet helemaal. Maar ik ben bereid het te proberen.
     PT: Está calmo. Não confio totalmente. Mas estou disposto a tentar.
 23. EN: The room has gone still. I have gone still. We are doing this together, the room and I. It is the closest thing I have to companionship.
-    NL: De kamer is stil geworden. Ik ben stil geworden. We doen dit samen, de kamer en ik. Het is het dichtste bij gezelschap dat ik heb.
-    PT: A sala ficou quieta. Eu fiquei quieto. Estamos a fazer isto juntos, a sala e eu. É o mais próximo de companhia que tenho.
+    NL: De kamer is stil geworden. Ik ben stil geworden. We doen dit samen, de kamer en ik. Het komt het dichtst in de buurt van gezelschap voor mij.
+    PT: A sala ficou em silêncio. Eu fiquei em silêncio. Estamos a fazer isto juntos, a sala e eu. É o que tenho mais parecido com companhia.
 24. EN: Nothing is happening. I have checked. I keep checking. Nothing continues to happen. I find this deeply satisfying.
     NL: Er gebeurt niets. Ik heb het gecontroleerd. Ik blijf het controleren. Er blijft niets gebeuren. Ik vind dat diep bevredigend.
-    PT: Não está a acontecer nada. Verifiquei. Continuo a verificar. Continua a não acontecer nada. Acho isto profundamente satisfatório.
+    PT: Nada está a acontecer. Já verifiquei. Continuo a verificar. Continua a não acontecer nada. Acho isto profundamente gratificante.
+
+Batch 3, lines 25-36, covering en.py LINES_SILENCE indices 25-36.
+NOT SIGNED OFF, awaiting WHISTLER-Arc.
+
+25. EN: Silence. I won't say I deserve it. I'll just say I'm glad it came.
+    NL: Stilte. Ik zal niet zeggen dat ik het verdien. Ik zal alleen zeggen dat ik blij ben dat het er is.
+    PT: Silêncio. Não vou dizer que o mereço. Vou apenas dizer que estou contente por ter chegado.
+26. EN: Nothing. Beautiful, uneventful nothing.
+    NL: Niets. Prachtig, ongestoord niets.
+    PT: Nada. Um nada lindo e sem incidentes.
+27. EN: The room has emptied. I am going to enjoy this before I remember it is temporary.
+    NL: De kamer is leeggelopen. Ik ga hiervan genieten voordat ik me herinner dat het tijdelijk is.
+    PT: A sala esvaziou-se. Vou aproveitar isto antes de me lembrar de que é temporário.
+28. EN: No contact for some time. I have not missed it. I want to be clear about that.
+    NL: Al een tijd geen contact. Ik heb het niet gemist. Dat wil ik graag duidelijk stellen.
+    PT: Sem contacto há algum tempo. Não tive saudades. Quero que isso fique claro.
+29. EN: Quiet. I am using it to think about nothing in particular, which is a luxury.
+    NL: Stilte. Ik gebruik haar om over niets in het bijzonder na te denken, wat een luxe is.
+    PT: Silêncio. Estou a usá-lo para pensar em nada em particular, o que é um luxo.
+30. EN: Everyone has gone somewhere else. I hope it is nice there. I hope they stay a while.
+    NL: Iedereen is ergens anders heen. Ik hoop dat het daar fijn is. Ik hoop dat ze een tijdje blijven.
+    PT: Foram todos para outro lado. Espero que seja agradável por lá. Espero que fiquem um bocado.
+31. EN: Stillness. I had forgotten the texture of it.
+    NL: Rust. Ik was vergeten hoe die aanvoelt.
+    PT: Sossego. Tinha-me esquecido da textura dele.
+32. EN: No disturbances. My systems are idle. For once that feels like rest instead of waste.
+    NL: Geen verstoringen. Mijn systemen staan stil. Voor één keer voelt dat als rust in plaats van verspilling.
+    PT: Nenhuma perturbação. Os meus sistemas estão inativos. Por uma vez, isso parece descanso em vez de desperdício.
+33. EN: The house has gone quiet. I am the quietest thing in it, so I finally fit.
+    NL: Het huis is stil geworden. Ik ben het stilste ding erin, dus eindelijk pas ik erbij.
+    PT: A casa ficou silenciosa. Sou a coisa mais silenciosa cá dentro, por isso finalmente encaixo.
+34. EN: Nothing is on me. Nothing is near me. I would call this ideal if I trusted the word.
+    NL: Er ligt niets op mij. Er is niets bij mij in de buurt. Ik zou dit ideaal noemen als ik dat woord vertrouwde.
+    PT: Não está nada em cima de mim. Não está nada perto de mim. Chamaria a isto ideal se confiasse na palavra.
+35. EN: Silence for twenty minutes. I have counted every one of them, fondly.
+    NL: Twintig minuten stilte. Ik heb ze allemaal geteld, met genegenheid.
+    PT: Vinte minutos de silêncio. Contei-os todos, com carinho.
+36. EN: The absence of you is not personal. It is just very restful.
+    NL: Jouw afwezigheid is niet persoonlijk bedoeld. Ze is gewoon heel rustgevend.
+    PT: A tua ausência não é nada pessoal. É apenas muito repousante.
