@@ -32,6 +32,13 @@ versioned.
 - Prefilled GitHub links have a size limit of their own, so a very large batch
   is copied to the clipboard with instructions instead of being silently cut in
   half.
+- **Reload the page after updating.** Greg's panel script is versioned so a new
+  release is never served from cache, but the panel registers its address once
+  when Home Assistant starts, and the frontend holds that address until the page
+  itself is reloaded. So the editor will not appear until you refresh, and a
+  hard refresh if your browser is being stubborn. This has always been true of
+  panel changes; it is simply more obvious when the change is a whole new
+  section rather than a tweak.
 
 ## [1.5.5]
 
