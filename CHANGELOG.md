@@ -3,6 +3,36 @@
 All notable changes to Greg. He would like it noted that he did not ask to be
 versioned.
 
+## [1.6.0]
+
+### Added
+- **Write your own lines, in his panel.** A Lines you wrote section under the
+  card, one tab per category. Type a line, press Add, press Save, and Greg says
+  it. No pull request, no waiting for anyone to approve it. Your table, your
+  jokes.
+- Lines belong to the language you wrote them in, so a Dutch one only comes up
+  while Greg is speaking Dutch.
+- **Use only my lines**, for anyone who wants a different table rather than a
+  slightly expanded one. It never empties a pool: switch it on with nothing
+  written for a category and that category keeps its fifty built-in lines.
+- **Share the good ones.** A button that opens a GitHub issue with your lines
+  already in it, sorted by category and tagged with the language, and a field
+  for how you would like crediting. Read it, press submit, done. No account
+  needed beyond the GitHub one, and nothing is sent anywhere until you press it.
+- A bot sorts each submission into a checklist and marks anything already in
+  the pools, so accepted lines can be picked in about a minute and turn up in a
+  later release with credit.
+- `greg.set_lines` service behind the editor, so the same thing can be scripted.
+
+### Notes
+- Lines live in the config entry, so they survive updates and reinstalls of the
+  integration, and are removed with it.
+- Two hundred lines per category is the cap, and three hundred characters per
+  line. Both are far beyond anything that reads well out loud.
+- Prefilled GitHub links have a size limit of their own, so a very large batch
+  is copied to the clipboard with instructions instead of being silently cut in
+  half.
+
 ## [1.5.5]
 
 ### Added

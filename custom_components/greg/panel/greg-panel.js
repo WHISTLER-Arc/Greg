@@ -94,6 +94,42 @@ class GregPanel extends HTMLElement {
           background:var(--primary-background-color); color:var(--primary-text-color);
           font-family:var(--paper-font-body1_-_font-family, sans-serif); padding:20px 16px 40px; }
         .frame { width:100%; max-width:1180px; margin:0 auto; }
+        .linescard { margin:18px 0 0; padding:18px; background:var(--card-background-color);
+          border:1px solid var(--divider-color); border-radius:16px;
+          box-shadow:var(--ha-card-box-shadow, 0 2px 8px rgba(0,0,0,.2)); }
+        .lineshead { display:flex; align-items:baseline; justify-content:space-between;
+          gap:12px; flex-wrap:wrap; margin-bottom:12px; }
+        .lineshead h3 { margin:0; font-size:15px; letter-spacing:.02em; }
+        .pooltabs { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:10px; }
+        .pooltab { padding:6px 12px; border-radius:20px; cursor:pointer; font-size:13px;
+          background:transparent; color:var(--secondary-text-color);
+          border:1px solid var(--divider-color); }
+        .pooltab.active { background:var(--primary-color); color:var(--text-primary-color, #fff);
+          border-color:var(--primary-color); }
+        .poolnote { font-size:12px; color:var(--secondary-text-color); margin-bottom:10px; }
+        .lineslist { display:flex; flex-direction:column; gap:6px; margin-bottom:10px; }
+        .lineitem { display:flex; align-items:flex-start; gap:10px; padding:8px 10px;
+          border:1px solid var(--divider-color); border-radius:10px; font-size:13px;
+          line-height:1.45; }
+        .lineitem span { flex:1; word-break:break-word; }
+        .lineitem button { background:none; border:none; cursor:pointer; font-size:16px;
+          line-height:1; color:var(--secondary-text-color); padding:0 2px; }
+        .lineitem button:hover { color:var(--error-color, #d33); }
+        .linesempty { font-size:13px; color:var(--secondary-text-color); font-style:italic;
+          padding:10px 0; }
+        .lineadd { display:flex; gap:8px; align-items:flex-start; }
+        .lineadd textarea { flex:1; resize:vertical; padding:8px 10px; border-radius:10px;
+          font:inherit; font-size:13px; color:var(--primary-text-color);
+          background:var(--secondary-background-color); border:1px solid var(--divider-color); }
+        .linesonly { margin-top:14px; }
+        .linesonly .ghint { display:block; }
+        .linesfoot { display:flex; gap:8px; flex-wrap:wrap; margin-top:14px; }
+        .linescard .btn { padding:8px 16px; border-radius:20px; cursor:pointer; font-size:13px;
+          background:transparent; color:var(--primary-text-color);
+          border:1px solid var(--divider-color); }
+        .linescard .btn.primary { background:var(--primary-color);
+          color:var(--text-primary-color, #fff); border-color:var(--primary-color); }
+        .linescard .btn:disabled { opacity:.5; cursor:default; }
         .head { text-align:center; margin:6px 0 20px; }
         .badge { display:inline-flex; align-items:center; gap:10px; padding:10px 22px;
           background:var(--card-background-color); border:1px solid var(--divider-color);
@@ -264,10 +300,57 @@ class GregPanel extends HTMLElement {
             <div class="inlinesettings">${this._settingsHTML()}</div>
           </div>
         </div>
+        ${this._linesHTML()}
       </div>
     `;
     this._wire();
     this._rendered = true;
+  }
+
+  // Full width and below the card, rather than inside the settings block. The
+  // settings block is rendered twice, once in the cog balloon and once in the
+  // right-hand column, so anything with state in it would exist twice and the
+  // two copies would drift apart. This exists once and can use ids.
+  _linesHTML() {
+    return `
+      <div class="linescard" id="linescard">
+        <div class="lineshead">
+          <h3>Lines you wrote</h3>
+          <div class="lineslang">
+            <span class="ghint" id="lines-langnote"></span>
+          </div>
+        </div>
+
+        <div class="pooltabs" id="pooltabs">
+          <button class="pooltab active" data-pool="soft">Soft</button>
+          <button class="pooltab" data-pool="medium">Medium</button>
+          <button class="pooltab" data-pool="chaos">Chaos</button>
+          <button class="pooltab" data-pool="existential">Existential</button>
+          <button class="pooltab" data-pool="silence">Silence</button>
+        </div>
+
+        <div class="poolnote" id="poolnote"></div>
+
+        <div class="lineslist" id="lineslist"></div>
+
+        <div class="lineadd">
+          <textarea id="linenew" rows="2" maxlength="300"
+            placeholder="Write one as Greg would say it, then press Add."></textarea>
+          <button class="btn" id="lineadd-btn">Add</button>
+        </div>
+        <div class="ghint" id="linecount"></div>
+
+        <div class="grow linesonly">
+          <span>Use only my lines<span class="ghint">Built-in lines stay for any pool you have not written for.</span></span>
+          <button class="sw" id="custom-only" role="switch" aria-checked="false"><span></span></button>
+        </div>
+
+        <div class="linesfoot">
+          <button class="btn primary" id="lines-save">Save lines</button>
+          <button class="btn" id="lines-share">Share the good ones</button>
+        </div>
+        <div class="ghint" id="lines-status"></div>
+      </div>`;
   }
 
   // Rendered twice: once in the cog balloon for narrow screens, once inline in
@@ -512,6 +595,218 @@ class GregPanel extends HTMLElement {
     );
   }
 
+  // ---- the lines editor ------------------------------------------------
+  //
+  // Edits are held here and only written on Save. Every write reloads Greg, so
+  // saving per keystroke would reload him per keystroke, which is the same
+  // reason the settings block has an Apply button.
+
+  _linesFor(pool) {
+    const all = this._draftLines || {};
+    return all[pool] ? all[pool].slice() : [];
+  }
+
+  _loadDraft(force) {
+    // Only reload from the entity when the user is not mid-edit, or the panel
+    // would wipe what they are typing every time Greg's state ticks.
+    if (this._linesDirty && !force) return;
+    const s = this._moodState();
+    const stored = (s && s.attributes && s.attributes.custom_lines) || {};
+    const lang = (s && s.attributes && s.attributes.language_effective) || "en";
+    this._draftLang = lang;
+    this._draftLines = { ...((stored && stored[lang]) || {}) };
+    this._linesDirty = false;
+  }
+
+  _renderLines() {
+    const root = this.shadowRoot;
+    if (!root || !root.getElementById("lineslist")) return;
+    const pool = this._activePool || "soft";
+    const lines = this._linesFor(pool);
+    const s = this._moodState();
+    const attrs = (s && s.attributes) || {};
+    const sizes = (attrs.pool_sizes || {})[pool] || {};
+    const langName = (attrs.language_options || {})[this._draftLang] || this._draftLang;
+
+    root.getElementById("lines-langnote").textContent =
+      `Writing in ${langName}. Switch language above to write in another.`;
+
+    root.getElementById("poolnote").textContent = sizes.built_in
+      ? `${sizes.built_in} built in, ${sizes.mine || 0} of yours, ${sizes.in_use} in use.`
+      : "";
+
+    const list = root.getElementById("lineslist");
+    list.innerHTML = lines.length
+      ? lines
+          .map(
+            (l, i) =>
+              `<div class="lineitem"><span></span><button data-del="${i}" title="Remove">&times;</button></div>`
+          )
+          .join("")
+      : `<div class="linesempty">Nothing here yet. Greg is using his own lines for this one.</div>`;
+    // Set as text rather than interpolated, so a line containing markup is
+    // shown rather than rendered.
+    lines.forEach((l, i) => {
+      const cell = list.querySelectorAll(".lineitem span")[i];
+      if (cell) cell.textContent = l;
+    });
+    list.querySelectorAll("[data-del]").forEach((b) => {
+      b.onclick = () => {
+        const next = this._linesFor(pool);
+        next.splice(Number(b.dataset.del), 1);
+        this._draftLines[pool] = next;
+        this._linesDirty = true;
+        this._renderLines();
+      };
+    });
+
+    root.getElementById("linecount").textContent = `${lines.length} of 200 for this category.`;
+    root.getElementById("lines-status").textContent = this._linesDirty
+      ? "Unsaved changes."
+      : "";
+    root.querySelectorAll(".pooltab").forEach((t) =>
+      t.classList.toggle("active", t.dataset.pool === pool)
+    );
+  }
+
+  _addLine() {
+    const root = this.shadowRoot;
+    const box = root.getElementById("linenew");
+    const text = (box.value || "").replace(/\s+/g, " ").trim();
+    if (!text) return;
+    const pool = this._activePool || "soft";
+    const next = this._linesFor(pool);
+    if (next.includes(text)) {
+      root.getElementById("lines-status").textContent = "You have written that one already.";
+      return;
+    }
+    if (next.length >= 200) {
+      root.getElementById("lines-status").textContent = "That is 200 lines. Greg is full.";
+      return;
+    }
+    next.push(text);
+    this._draftLines[pool] = next;
+    this._linesDirty = true;
+    box.value = "";
+    this._renderLines();
+  }
+
+  _saveLines() {
+    if (!this._hass) return;
+    const root = this.shadowRoot;
+    const only =
+      root.getElementById("custom-only").getAttribute("aria-checked") === "true";
+    const pools = ["soft", "medium", "chaos", "existential", "silence"];
+
+    // One call per pool. The service takes a single pool deliberately, so this
+    // is a sequence of small writes rather than one blob that could clobber
+    // another tab's edit to a pool this one never touched.
+    Promise.all(
+      pools.map((pool) =>
+        this._hass.callService("greg", "set_lines", {
+          language: this._draftLang,
+          pool,
+          lines: this._linesFor(pool),
+          custom_only: only,
+        })
+      )
+    ).then(
+      () => {
+        this._linesDirty = false;
+        root.getElementById("lines-status").textContent = "Saved. Greg is reloading.";
+      },
+      () => {
+        root.getElementById("lines-status").textContent =
+          "That did not save. Check the log.";
+      }
+    );
+  }
+
+  // GitHub caps a prefilled issue URL at around 8000 characters. Past that the
+  // link silently truncates or 414s, so anything too big goes to the clipboard
+  // with instructions instead of being quietly cut in half.
+  _shareLines() {
+    const root = this.shadowRoot;
+    const status = root.getElementById("lines-status");
+    const pools = ["soft", "medium", "chaos", "existential", "silence"];
+    const lang = this._draftLang || "en";
+
+    const blocks = pools
+      .map((pool) => {
+        const lines = this._linesFor(pool);
+        if (!lines.length) return "";
+        return `### ${pool}\n\n` + lines.map((l) => `- ${l}`).join("\n");
+      })
+      .filter(Boolean);
+
+    if (!blocks.length) {
+      status.textContent = "Write a line first, then share it.";
+      return;
+    }
+
+    const total = blocks.reduce((n, b) => n + b.split("\n").length - 2, 0);
+    const body =
+      `Language: \`${lang}\`\n\n` +
+      `How I would like to be credited: <!-- your name, handle, or "no credit please" -->\n\n` +
+      blocks.join("\n\n") +
+      `\n\n<!-- ${total} lines, from Greg's panel. -->\n`;
+
+    const url =
+      "https://github.com/WHISTLER-Arc/Greg/issues/new?labels=lines&title=" +
+      encodeURIComponent(`Lines for ${lang}`) +
+      "&body=" +
+      encodeURIComponent(body);
+
+    if (url.length <= 7800) {
+      window.open(url, "_blank", "noopener");
+      status.textContent = `Opened an issue with ${total} lines. Have a read, then submit.`;
+      return;
+    }
+
+    const fallback = `Lines for ${lang}\n\n${body}`;
+    const done = () => {
+      status.textContent =
+        `That is ${total} lines, too many for a prefilled link. Copied instead. ` +
+        `Open a new issue on GitHub and paste.`;
+    };
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(fallback).then(done, done);
+    } else {
+      done();
+    }
+  }
+
+  _wireLines() {
+    const root = this.shadowRoot;
+    if (!root.getElementById("linescard")) return;
+    this._activePool = this._activePool || "soft";
+    this._loadDraft(true);
+
+    root.querySelectorAll(".pooltab").forEach((t) => {
+      t.onclick = () => {
+        this._activePool = t.dataset.pool;
+        this._renderLines();
+      };
+    });
+    root.getElementById("lineadd-btn").onclick = () => this._addLine();
+    root.getElementById("linenew").onkeydown = (e) => {
+      if (e.key === "Enter" && !e.shiftKey) {
+        e.preventDefault();
+        this._addLine();
+      }
+    };
+    root.getElementById("lines-save").onclick = () => this._saveLines();
+    root.getElementById("lines-share").onclick = () => this._shareLines();
+    const only = root.getElementById("custom-only");
+    only.onclick = () => {
+      const on = only.getAttribute("aria-checked") === "true";
+      only.setAttribute("aria-checked", on ? "false" : "true");
+      this._linesDirty = true;
+      this._renderLines();
+    };
+    this._renderLines();
+  }
+
   _wire() {
     const r = this.shadowRoot;
     r.getElementById("poke").onclick = () => this._doPoke();
@@ -541,6 +836,7 @@ class GregPanel extends HTMLElement {
     r.querySelectorAll(".gapply").forEach(
       (el) => (el.onclick = () => this._applySettings(el.closest(".si")))
     );
+    this._wireLines();
     const cog = r.getElementById("cog"), balloon = r.getElementById("balloon");
     cog.onclick = (e) => { e.stopPropagation(); balloon.classList.toggle("open"); };
     document.addEventListener("click", (e) => {
@@ -574,6 +870,27 @@ class GregPanel extends HTMLElement {
     if (!this._rendered) return;
     const r = this.shadowRoot;
     const moodS = this._moodState();
+
+    // The editor writes into whichever language Greg is currently speaking, so
+    // switching language has to swap the list under it. Unsaved edits win: they
+    // belong to the language they were typed in, and silently rebasing them
+    // onto another one would file somebody's English joke as Dutch.
+    const nowLang =
+      (moodS && moodS.attributes && moodS.attributes.language_effective) || "en";
+    if (r.getElementById("linescard") && nowLang !== this._draftLang) {
+      if (this._linesDirty) {
+        const note = r.getElementById("lines-status");
+        if (note) note.textContent =
+          "Unsaved lines are still for " + this._draftLang + ". Save or discard them first.";
+      } else {
+        this._loadDraft(true);
+        this._renderLines();
+      }
+    }
+    if (r.getElementById("custom-only") && !this._linesDirty) {
+      const on = !!(moodS && moodS.attributes && moodS.attributes.custom_only);
+      r.getElementById("custom-only").setAttribute("aria-checked", on ? "true" : "false");
+    }
     const mood = moodS ? moodS.state : "resting";
     const meta = MOODS[mood] || MOODS.resting;
     const level = this._levelState() ? Number(this._levelState().state) : 0;

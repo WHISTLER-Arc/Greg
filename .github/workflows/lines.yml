@@ -1,0 +1,35 @@
+name: Line submissions
+
+# Reformats a lines submission into a checklist as soon as it arrives, so
+# reviewing is ticking boxes rather than reading a wall of bullets. Runs on the
+# issue rather than on a fork's code, so there is nothing here a submitter can
+# influence beyond the text of their own issue.
+
+on:
+  issues:
+    types: [opened, edited]
+
+permissions:
+  issues: write
+  contents: read
+
+jobs:
+  sort:
+    if: contains(github.event.issue.labels.*.name, 'lines')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Write the issue body to a file
+        env:
+          BODY: ${{ github.event.issue.body }}
+        run: printf '%s' "$BODY" > issue-body.md
+
+      - name: Sort the lines into a checklist
+        run: python3 .github/scripts/line_submission.py --body-file issue-body.md --out comment.md
+
+      - name: Post it
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NUMBER: ${{ github.event.issue.number }}
+        run: gh issue comment "$NUMBER" --body-file comment.md --repo "$GITHUB_REPOSITORY"
