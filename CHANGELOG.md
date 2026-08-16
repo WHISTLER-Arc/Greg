@@ -3,6 +3,34 @@
 All notable changes to Greg. He would like it noted that he did not ask to be
 versioned.
 
+## [1.6.0]
+
+### Added
+- **Greg actually speaks Dutch and European Portuguese now.** v1.5.0 built the
+  mechanism and left the pools empty. They are full. Two hundred and fifty
+  lines in each language, all five pools, plus his openers.
+- Every line was written natively and then reviewed one by one by a native
+  speaker of both. None of them are translations of the English, which is the
+  whole point and is why the wording often diverges. A translated joke is a
+  correct sentence that is not funny, and there are none of those in here.
+
+### Changed
+- Eleven English lines are better than they were. Writing a line twice in two
+  other languages turns out to be an unusually good way of noticing that the
+  original was slightly off. `Peak chaos. I have now seen peak chaos.` became
+  `Peak chaos. I have now seen it.`, and ten others like it.
+
+### Notes
+- `pt-BR` still resolves to English rather than European Portuguese, as it has
+  since v1.5.0. Brazilian and European Portuguese are different enough that
+  the wrong one is worse than none.
+- Nothing falls back to English any more for Dutch or Portuguese. Before this
+  release an empty pool quietly served the English one, which was correct
+  behaviour and no longer applies to either language.
+- The reviewed source lives in `.translations/`, with the English line recorded
+  above each pair. `lines/nl.py` and `lines/pt.py` are generated from it by
+  matching on that English text.
+
 ## [1.5.0]
 
 ### Added
