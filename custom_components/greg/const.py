@@ -98,6 +98,32 @@ def tts_voice_key(language: str) -> str:
     """Config key holding the voice for one language."""
     return f"{CONF_TTS_VOICE_PREFIX}{language}"
 
+# Lines written by the person who owns the table, kept in the config entry
+# rather than in a file, so they survive updates and need no filesystem access.
+#
+# Shape mirrors the lines package, {language: {pool: [line, ...]}}, because a
+# line belongs to a language as much as a translation does. Somebody's Dutch
+# joke should not turn up while Greg is speaking English.
+CONF_CUSTOM_LINES = "custom_lines"
+
+# Off, custom lines join the built-in ones and Greg draws from both. On, he uses
+# only what you wrote, for anyone who wants a different table rather than a
+# slightly expanded one.
+#
+# It never empties a pool. Switch it on with nothing written for a pool and that
+# pool falls back to the built-in lines, because a silent Greg is a broken Greg
+# and this setting is not worth breaking him over.
+CONF_CUSTOM_ONLY = "custom_only"
+DEFAULT_CUSTOM_ONLY = False
+
+# One line has to be speakable and not accidentally enormous. Long enough for
+# the longest built-in line with room to spare, short enough that a paste
+# accident does not become Greg's new personality.
+CUSTOM_LINE_MAX = 300
+CUSTOM_LINES_MAX_PER_POOL = 200
+
+SERVICE_SET_LINES = "set_lines"
+
 # Mood states
 MOOD_RESTING = "resting"
 MOOD_ANNOYED = "annoyed"

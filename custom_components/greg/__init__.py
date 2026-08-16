@@ -27,6 +27,7 @@ from homeassistant.components.http import StaticPathConfig
 
 from .lines import (
     DEFAULT_LANGUAGE as FALLBACK_LANGUAGE,
+    POOL_KEYS,
     available as available_languages,
     openers as openers_for,
     pool as pool_for,
@@ -80,7 +81,13 @@ from .const import (
     SERVICE_POKE,
     SERVICE_UNINSTALL,
     SERVICE_SET_OPTIONS,
+    SERVICE_SET_LINES,
     BASIC_OPTION_KEYS,
+    CONF_CUSTOM_LINES,
+    CONF_CUSTOM_ONLY,
+    DEFAULT_CUSTOM_ONLY,
+    CUSTOM_LINE_MAX,
+    CUSTOM_LINES_MAX_PER_POOL,
     WWW_ASSET_DIR,
     PANEL_URL_PATH,
     PANEL_TITLE,
@@ -172,7 +179,12 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         if panel_state and panel_state["registered"]:
             async_remove_panel(hass, PANEL_URL_PATH)
             panel_state["registered"] = False
-        for service in (SERVICE_POKE, SERVICE_UNINSTALL, SERVICE_SET_OPTIONS):
+        for service in (
+            SERVICE_POKE,
+            SERVICE_UNINSTALL,
+            SERVICE_SET_OPTIONS,
+            SERVICE_SET_LINES,
+        ):
             if hass.services.has_service(DOMAIN, service):
                 hass.services.async_remove(DOMAIN, service)
 
@@ -267,7 +279,72 @@ def _async_register_services(hass: HomeAssistant) -> None:
             if merged != dict(entry.options):
                 hass.config_entries.async_update_entry(entry, options=merged)
 
+    async def _handle_set_lines(call) -> None:
+        """Write the owner's own lines back from Greg's panel.
+
+        Takes one language and one pool at a time. The panel edits one list in
+        front of you, and sending the whole nested blob every keystroke would
+        make a lost race between two open tabs far too easy.
+
+        Cleaning happens here rather than in the panel because the service is
+        also the scripting interface, and anything reachable by an automation
+        has to defend itself. Blank lines go, duplicates go, whitespace is
+        trimmed, and the count and length are capped.
+        """
+        language = call.data[CONF_LANGUAGE]
+        pool_key = call.data["pool"]
+
+        seen: set[str] = set()
+        cleaned: list[str] = []
+        for raw in call.data.get("lines", []):
+            line = " ".join(str(raw).split())[:CUSTOM_LINE_MAX].strip()
+            if not line or line in seen:
+                continue
+            seen.add(line)
+            cleaned.append(line)
+            if len(cleaned) >= CUSTOM_LINES_MAX_PER_POOL:
+                break
+
+        for entry_id, coordinator in list(hass.data.get(DOMAIN, {}).items()):
+            if not isinstance(coordinator, GregCoordinator):
+                continue
+            entry = hass.config_entries.async_get_entry(entry_id)
+            if entry is None:
+                continue
+
+            existing = entry.options.get(CONF_CUSTOM_LINES) or {}
+            stored = {k: dict(v) for k, v in existing.items() if isinstance(v, dict)}
+            per_language = stored.setdefault(language, {})
+
+            if cleaned:
+                per_language[pool_key] = cleaned
+            else:
+                # An empty list is how the panel says "I deleted them all", so
+                # drop the key rather than storing an empty list forever.
+                per_language.pop(pool_key, None)
+                if not per_language:
+                    stored.pop(language, None)
+
+            merged = {**entry.options, CONF_CUSTOM_LINES: stored}
+            if CONF_CUSTOM_ONLY in call.data:
+                merged[CONF_CUSTOM_ONLY] = call.data[CONF_CUSTOM_ONLY]
+            if merged != dict(entry.options):
+                hass.config_entries.async_update_entry(entry, options=merged)
+
     hass.services.async_register(DOMAIN, SERVICE_POKE, _handle_poke)
+    hass.services.async_register(
+        DOMAIN,
+        SERVICE_SET_LINES,
+        _handle_set_lines,
+        schema=vol.Schema(
+            {
+                vol.Required(CONF_LANGUAGE): vol.In(list(available_languages().keys())),
+                vol.Required("pool"): vol.In(list(POOL_KEYS)),
+                vol.Required("lines"): [cv.string],
+                vol.Optional(CONF_CUSTOM_ONLY): cv.boolean,
+            }
+        ),
+    )
     hass.services.async_register(
         DOMAIN,
         SERVICE_SET_OPTIONS,
@@ -365,7 +442,34 @@ class GregCoordinator:
         self._last_accepted = None
 
     async def async_reload(self, hass: HomeAssistant, entry: ConfigEntry) -> None:
+        # A deck is a shuffled copy of a pool, so a pool that just changed has a
+        # deck that no longer matches it. Without this, a line you have only just
+        # written is not heard until the current deck runs out, which for a
+        # fifty line pool can be most of an evening, and it looks like the panel
+        # simply did not save.
+        #
+        # Only the decks that actually changed are dropped. Reload fires on every
+        # settings change, including a nudge of the volume slider, and clearing
+        # all of them would restart every cycle and cause the repetition the
+        # deck exists to prevent.
+        previous = self.custom_lines()
+        previously_only = self._config.get(CONF_CUSTOM_ONLY, DEFAULT_CUSTOM_ONLY)
+
         self._config = {**entry.data, **entry.options}
+
+        current = self.custom_lines()
+        if previously_only != self._config.get(CONF_CUSTOM_ONLY, DEFAULT_CUSTOM_ONLY):
+            self._decks.clear()
+            self._deck_pos.clear()
+        else:
+            for lang in set(previous) | set(current):
+                before = previous.get(lang) or {}
+                after = current.get(lang) or {}
+                for pool_key in set(before) | set(after):
+                    if before.get(pool_key) != after.get(pool_key):
+                        self._decks.pop((lang, pool_key), None)
+                        self._deck_pos.pop((lang, pool_key), None)
+
         await self.async_unload()
         await self.async_setup()
         # The entities survive a reload, so nothing makes them re-read their
@@ -529,7 +633,7 @@ class GregCoordinator:
         deck are pushed out of the first few of the incoming one.
         """
         language = self.language
-        pool = pool_for(language, pool_key)
+        pool = self.lines_for(language, pool_key)
         deck_key = (language, pool_key)
 
         deck = self._decks.get(deck_key, [])
@@ -561,6 +665,69 @@ class GregCoordinator:
 
         self._deck_pos[deck_key] = pos + 1
         return deck[pos]
+
+    def custom_lines(self, language: str | None = None, pool_key: str | None = None):
+        """Whatever the owner has written, for a language, or a pool, or all.
+
+        Stored as {language: {pool: [line]}}. Read defensively because this
+        comes out of a config entry a user can edit by hand, and a malformed
+        blob should cost you your custom lines rather than the integration.
+        """
+        raw = self._config.get(CONF_CUSTOM_LINES) or {}
+        if not isinstance(raw, dict):
+            return {} if language is None else ([] if pool_key else {})
+
+        if language is None:
+            return raw
+        per_language = raw.get(language) or {}
+        if not isinstance(per_language, dict):
+            return [] if pool_key else {}
+        if pool_key is None:
+            return per_language
+        lines = per_language.get(pool_key) or []
+        return [str(l) for l in lines if str(l).strip()] if isinstance(lines, list) else []
+
+    def lines_for(self, language: str, pool_key: str) -> list[str]:
+        """The pool Greg actually draws from, built-ins plus anything written.
+
+        Custom lines are appended rather than merged in place, so the deck
+        shuffle treats them exactly like the rest and a new line is no more or
+        less likely to come up than a built-in one.
+
+        With custom_only on, the built-ins are dropped, but only when there is
+        something to drop them for. A pool nobody has written for keeps its
+        built-in lines regardless, because the alternative is Greg silently
+        having nothing to say, and every bug in this release has been some
+        version of that.
+        """
+        built_in = list(pool_for(language, pool_key))
+        mine = [l for l in self.custom_lines(language, pool_key) if l not in built_in]
+        if not mine:
+            return built_in
+        if self._config.get(CONF_CUSTOM_ONLY, DEFAULT_CUSTOM_ONLY):
+            return mine
+        return built_in + mine
+
+    @property
+    def custom_only(self) -> bool:
+        return bool(self._config.get(CONF_CUSTOM_ONLY, DEFAULT_CUSTOM_ONLY))
+
+    @property
+    def pool_sizes(self) -> dict:
+        """Counts per pool for the current language, for the panel's editor.
+
+        Counts rather than the lines themselves, because the built-in pools are
+        250 lines the browser already cannot change and has no reason to hold.
+        """
+        language = self.language
+        return {
+            key: {
+                "built_in": len(pool_for(language, key)),
+                "mine": len(self.custom_lines(language, key)),
+                "in_use": len(self.lines_for(language, key)),
+            }
+            for key in POOL_KEYS
+        }
 
     def _maybe_opener(self) -> str:
         """Return an opener, or an empty string most of the time.
