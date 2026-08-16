@@ -132,12 +132,14 @@ ENGLISH CHANGED on 25 and 32, both punctuation. APPLIED to en.py:
 33. EN: The house has gone quiet. I am the quietest thing in it, so I finally fit.
     NL: Het is stil geworden in huis. Ik ben het stilste ding hier, dus ik ben eindelijk op mijn plek.
     PT: A casa ficou silenciosa. Sou a coisa mais silenciosa cá dentro, por isso finalmente conduzo.
-        (PT query, second pass. The intended sense was confirmed in review as
-        the verb meaning to match, as colours or styles match. That verb is
-        condizer, and its first person is condigo. Conduzo is the first person
-        of conduzir, to drive. So if the line wants "so I finally match", the
-        word is condigo rather than conduzo. Left exactly as signed off,
-        pending a ruling on which of the two was meant.)
+        (PT query, third pass. The intended sense is the verb meaning to match,
+        as colours or styles match. Conduzo is from conduzir, to drive, so it
+        is not that. Condizer is that verb, but it lives almost entirely in the
+        third person, as in "as cores condizem", and WHISTLER-Arc judged the
+        first person condigo to sound wrong. Combinar carries the same sense
+        and is natural in the first person, so "por isso finalmente combino"
+        is the standing proposal. Alternatives are encaixo, me enquadro, or
+        faco sentido. Left exactly as signed off, pending a ruling.)
 34. EN: Nothing is on me. Nothing is near me. I would call this ideal if I trusted the word.
     NL: Er ligt niets op mij. Er is niets bij mij in de buurt. Ik zou dit ideaal noemen als ik dat woord vertrouwde.
     PT: Não está nada em cima de mim. Não há nada perto de mim. Chamaria isso ideal se confiasse na palavra.
