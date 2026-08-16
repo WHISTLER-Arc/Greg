@@ -99,7 +99,8 @@ esta in both clauses, and 23 PT stands with the NL reworded.
     PT: Nada está a acontecer. Já verifiquei. Continuo a verificar. Continua a não acontecer nada. Acho isto profundamente gratificante.
 
 Batch 3, lines 25-36, covering en.py LINES_SILENCE indices 25-36. Locked.
-One PT query on 33.
+One PT query still open on 33. 32 NL "Dat voelt eens als rust" and 34 PT
+"Chamaria isso ideal" were both raised and ruled to stand. Do not re-raise.
 ENGLISH CHANGED on 25 and 32, both punctuation. APPLIED to en.py:
   25 EN: I'll just say: I'm glad it came. (gains the colon)
   32 EN: like rest, instead of waste. (gains the comma)
@@ -131,9 +132,12 @@ ENGLISH CHANGED on 25 and 32, both punctuation. APPLIED to en.py:
 33. EN: The house has gone quiet. I am the quietest thing in it, so I finally fit.
     NL: Het is stil geworden in huis. Ik ben het stilste ding hier, dus ik ben eindelijk op mijn plek.
     PT: A casa ficou silenciosa. Sou a coisa mais silenciosa cá dentro, por isso finalmente conduzo.
-        (PT query: "conduzo" is from conduzir, to drive. The line needs "so I
-        finally fit", which the draft had as "encaixo". Reads as a slip. Left
-        exactly as signed off, pending a ruling.)
+        (PT query, second pass. The intended sense was confirmed in review as
+        the verb meaning to match, as colours or styles match. That verb is
+        condizer, and its first person is condigo. Conduzo is the first person
+        of conduzir, to drive. So if the line wants "so I finally match", the
+        word is condigo rather than conduzo. Left exactly as signed off,
+        pending a ruling on which of the two was meant.)
 34. EN: Nothing is on me. Nothing is near me. I would call this ideal if I trusted the word.
     NL: Er ligt niets op mij. Er is niets bij mij in de buurt. Ik zou dit ideaal noemen als ik dat woord vertrouwde.
     PT: Não está nada em cima de mim. Não há nada perto de mim. Chamaria isso ideal se confiasse na palavra.
