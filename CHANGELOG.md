@@ -3,7 +3,7 @@
 All notable changes to Greg. He would like it noted that he did not ask to be
 versioned.
 
-## [1.6.0]
+## [1.5.5]
 
 ### Added
 - **Greg actually speaks Dutch and European Portuguese now.** v1.5.0 built the
