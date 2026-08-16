@@ -80,3 +80,54 @@ set_options:
       example: "08:00"
       selector:
         text:
+
+set_lines:
+  name: Set custom lines
+  description: >
+    Replace Greg's own lines for one category in one language. Sends the whole
+    list for that category, so include the ones you are keeping. An empty list
+    removes them all and hands the category back to the built-in lines.
+  fields:
+    language:
+      name: Language
+      description: Which language these are written in.
+      required: true
+      example: en
+      selector:
+        select:
+          options:
+            - en
+            - nl
+            - pt
+    pool:
+      name: Category
+      description: Which of Greg's five moods these belong to.
+      required: true
+      example: chaos
+      selector:
+        select:
+          options:
+            - soft
+            - medium
+            - chaos
+            - existential
+            - silence
+    lines:
+      name: Lines
+      description: >
+        The complete list for this category. Blanks and duplicates are dropped,
+        each line is capped at 300 characters, and 200 lines per category is the
+        limit.
+      required: true
+      example: '["I have opinions about this table."]'
+      selector:
+        object:
+    custom_only:
+      name: Use only my lines
+      description: >
+        On, Greg uses only what you wrote. Categories you have written nothing
+        for keep their built-in lines regardless, so this cannot leave him with
+        nothing to say.
+      required: false
+      selector:
+        boolean:
