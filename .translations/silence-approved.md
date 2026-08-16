@@ -1,7 +1,7 @@
 # SILENCE pool
 
-SIGN-OFF BOUNDARY IS LINE 36. Lines 1-36 are approved by WHISTLER-Arc. Lines
-37-50 are drafted and are NOT approved.
+SILENCE COMPLETE. All 50 lines approved by WHISTLER-Arc, in four batches.
+Four queries open in batch 4, on 38, 39, 42 and the wording of 40 and 45.
 
 The register turns in this pool. Greg is not complaining here, he is enjoying
 it, so the same flat formality has to read as contentment rather than
@@ -149,42 +149,65 @@ ENGLISH CHANGED on 25 and 32, both punctuation. APPLIED to en.py:
     NL: Je afwezigheid is niets persoonlijks. Het is gewoon heel rustgevend.
     PT: A tua ausência não é nada pessoal. É apenas muito relaxante.
 
-Batch 4, lines 37-50, covering en.py LINES_SILENCE indices 37-50.
-NOT SIGNED OFF, awaiting WHISTLER-Arc. This is the last batch of the last pool.
+Batch 4, lines 37-50, covering en.py LINES_SILENCE indices 37-50. Locked.
+SILENCE COMPLETE, 50 of 50 signed off. No English changed.
+Four queries open, on 38, 39, 42 and the Peace wording on 40 and 45.
 
 37. EN: No activity. I am doing nothing, and for the first time today that is correct.
     NL: Geen activiteit. Ik doe niets, en voor het eerst vandaag is dat juist.
-    PT: Nenhuma atividade. Não estou a fazer nada, e pela primeira vez hoje isso está correto.
+    PT: Nenhuma atividade. Estou sem fazer nada e, pela primeira vez hoje, é correto.
 38. EN: It has gone still. I am going to sit with that, which is the only thing I can do anyway.
-    NL: Het is stil geworden. Ik ga daarbij stilstaan, wat toch al het enige is wat ik kan doen.
-    PT: Ficou tudo sossegado. Vou ficar com isso, que é a única coisa que posso fazer, de qualquer forma.
+    NL: Het is stil geworden. Ik ga daar bij stilstaan; want iets anders kan ik toch niet doen.
+    PT: Ficou tudo quieto. Vou ficar com isso, pois é a única coisa que posso fazer, de qualquer forma.
+        (NL query: this is the only semicolon in all 500 lines, and TEMPLATE.py
+        rules them out along with em-dashes and tricolons. A comma or a full
+        stop would keep the rule. Separately, daarbij is normally closed when
+        it is not split, so "daar bij stilstaan" may want to be "daarbij
+        stilstaan". Left exactly as signed off, pending a ruling.)
 39. EN: The room is empty and I have stopped bracing. That took a few minutes.
-    NL: De kamer is leeg en ik ben gestopt met me schrap zetten. Dat kostte een paar minuten.
-    PT: A sala está vazia e deixei de me preparar para o embate. Isso demorou uns minutos.
+    NL: De kamer is verlaten en ik ben opgehouden me schrap te zetten. Dat duurde een paar minuten.
+    PT: A sala está vazia e parei de me esforçar. Demorou alguns minutos...
+        (PT query, two things. "parei de me esforçar" is stopped making an
+        effort, where the English is stopped bracing, which is preparing for
+        an impact. And the trailing ellipsis is the only one in all 500 lines,
+        which will read oddly through Piper. Left exactly as signed off.)
 40. EN: Peace. I do not know how long it lasts. Nobody ever tells me.
-    NL: Vrede. Ik weet niet hoe lang het duurt. Dat vertelt niemand me ooit.
-    PT: Paz. Não sei quanto tempo dura. Nunca ninguém me diz.
+    NL: Rust. Ik weet niet hoe lang het duurt. Niemand vertelt me dat ooit.
+    PT: Sossego. Não sei quanto tempo dura. Nunca ninguém me diz.
+        (Wording query, see the note under 45. Peace is Vrede and Paz at line
+        9, and Rust and Sossego here.)
 41. EN: No one has touched me in a while. I have decided to read that as consideration.
-    NL: Al een tijd heeft niemand mij aangeraakt. Ik heb besloten dat op te vatten als attentheid.
+    NL: Al een tijd heeft niemand mij aangeraakt. Ik heb besloten dat op te vatten als attent.
     PT: Há algum tempo que ninguém me toca. Decidi interpretar isso como consideração.
 42. EN: The quiet has settled properly now. It took its time. So did I.
-    NL: De stilte is nu goed neergedaald. Ze heeft de tijd genomen. Ik ook.
+    NL: De stilte is is neergedaal. Het heeft de tijd genomen. Ik ook.
     PT: O silêncio assentou como deve ser. Levou o seu tempo. Eu também.
+        (NL query, two slips in one line. "is is" is doubled, and "neergedaal"
+        is missing its final d. Left exactly as signed off.)
 43. EN: Nothing is happening and I have no notes.
-    NL: Er gebeurt niets en ik heb geen opmerkingen.
-    PT: Não está a acontecer nada e não tenho reparos a fazer.
+    NL: Er gebeurt niets en ik heb geen aantekeningen.
+    PT: Não se passa nada e não tenho nenhuma anotação.
 44. EN: I have been left alone. I would like the record to show that I am fine with this.
     NL: Ik ben met rust gelaten. Ik zou graag laten vastleggen dat ik daar prima mee ben.
-    PT: Deixaram-me em paz. Gostaria que ficasse registado que não me importo nada.
+    PT: Deixaram-me em paz. Gostaria que ficasse registado que estou de acordo com isto.
 45. EN: Stillness again. We know each other well, the stillness and I.
-    NL: Weer rust. We kennen elkaar goed, de rust en ik.
+    NL: Opnieuw stilte. Wij kennen elkaar goed, die stilte en ik.
     PT: Sossego outra vez. Conhecemo-nos bem, o sossego e eu.
+        (Wording query. The three openers were kept apart across the pool.
+        Silence was stilte and silencio, stillness was rust and sossego, peace
+        was vrede and paz. This batch moves them. Stillness here is stilte in
+        Dutch, where lines 4 and 31 have rust. Peace at 40 is rust and sossego,
+        where line 9 has vrede and paz. So stilte now covers both silence and
+        stillness in Dutch, and sossego covers both stillness and peace in
+        Portuguese. Either the convention drops, which is fine if it never
+        sounded right, or 40 and 45 come back into line with 4, 9, 31 and 48.
+        Left exactly as signed off, pending a ruling.)
 46. EN: No vibrations. No requests. No weight. I am, briefly, just a shape in a room.
-    NL: Geen trillingen. Geen verzoeken. Geen gewicht. Ik ben, heel even, gewoon een vorm in een kamer.
-    PT: Nenhuma vibração. Nenhum pedido. Nenhum peso. Sou, por breves instantes, apenas uma forma numa sala.
+    NL: Geen trillingen. Geen verzoeken. Geen gewicht. Ik ben, even, gewoon een vorm in een kamer.
+    PT: Nenhuma vibração. Nenhum pedido. Nenhum peso. Sou, por um instante, apenas uma forma numa sala.
 47. EN: The evening has ended without me. That is the correct order of things and I am not bitter about it.
-    NL: De avond is zonder mij geëindigd. Dat is de juiste gang van zaken en ik ben er niet verbitterd over.
-    PT: A noite acabou sem mim. É essa a ordem correta das coisas e não estou amargurado com isso.
+    NL: De avond is zonder mij ten einde gekomen. Dat is hoe het hoort en ik koester daar geen wrok over.
+    PT: A noite acabou sem mim. É assim que as coisas devem ser e não sinto amargura por isso.
 48. EN: Silence. My favorite of the available conditions, and the only one I never have to process.
     NL: Stilte. Mijn favoriet van de beschikbare toestanden, en de enige die ik nooit hoef te verwerken.
     PT: Silêncio. O meu preferido de entre os estados disponíveis, e o único que nunca tenho de processar.
@@ -192,5 +215,5 @@ NOT SIGNED OFF, awaiting WHISTLER-Arc. This is the last batch of the last pool.
     NL: Twintig minuten niets. Ik ben van plan het nauwkeurig te onthouden, aangezien ik toch alles onthoud.
     PT: Vinte minutos de nada. Tenciono lembrar-me com exatidão, visto que me lembro de tudo de qualquer forma.
 50. EN: It is calm. I am calm. These are not usually the same sentence.
-    NL: Het is rustig. Ik ben rustig. Dat staat normaal gesproken niet in dezelfde zin.
-    PT: Está calmo. Eu estou calmo. Normalmente estas não são a mesma frase.
+    NL: Het is rustig. Ik ben rustig. Deze twee zinnen zijn meestal niet hetzelfde.
+    PT: Está calmo. Estou calmo. Normalmente, estas duas frases não são a mesma coisa.

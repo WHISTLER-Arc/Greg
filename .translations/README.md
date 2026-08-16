@@ -4,8 +4,8 @@ Raw record of the Dutch and Portuguese lines, kept here rather than in a
 temporary directory because a session ending should not cost a day of review.
 
 Most of it is reviewed and signed off by WHISTLER-Arc, who is a native speaker
-of both. SILENCE 37-50 is not, and is marked NOT SIGNED OFF at its batch
-header. There are no open queries. Sign-off is not a formality.
+of both, and that now covers all 250 lines. Four queries remain open in
+SILENCE batch 4. Sign-off is not a formality.
 These lines are not translations, the register has to be found natively, and
 a non-native draft can be word-perfect and still not land.
 
@@ -24,14 +24,14 @@ custom_components/greg/lines/TEMPLATE.py for why that matters.
     MEDIUM       50 of 50   50 of 50   complete
     CHAOS        50 of 50   50 of 50   complete
     EXISTENTIAL  50 of 50   50 of 50   complete
-    SILENCE      50 of 50   36 of 50   37-50 awaiting WHISTLER-Arc
+    SILENCE      50 of 50   50 of 50   complete
 
-    250 of 250 drafted, 236 of 250 signed off
+    250 of 250 drafted and signed off
 
 Counting NL and PT as separate lines, which is how the 500 figure is reached,
-that is 500 of 500 drafted and 472 of 500 signed off. Only the signed-off
-count is a real number. The other 28 lines are provisional. Every line is now
-drafted.
+that is 500 of 500. Every pool is drafted and signed off. Four queries are
+still open in SILENCE batch 4, noted at their lines, and three of them are
+things a check would catch rather than matters of taste.
 
 ## English corrections, all applied to lines/en.py
 
@@ -117,9 +117,9 @@ Three defects that came out of this check have been fixed in place:
 
 ## Next
 
-Draft SILENCE in batches of twelve, each batch reviewed and signed off before
-the next is drafted. Then fold everything into lines/nl.py and lines/pt.py,
-and only then cut a beta. The English corrections are already applied.
+Close the four open SILENCE queries, then fold everything into lines/nl.py
+and lines/pt.py, and only then cut a beta. The English corrections are already
+applied. All 250 lines are written and signed.
 
 Nothing unsigned goes into nl.py or pt.py. Once a line is in the pool it ships,
 and there is no review step after that. The filenames still say approved, which
