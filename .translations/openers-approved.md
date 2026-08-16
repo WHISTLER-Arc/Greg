@@ -20,7 +20,7 @@ the line it is supposed to introduce.
 Same rule as the lines. Not translations. The English is listed to show which
 slot each one fills, and the Dutch and Portuguese are not renderings of it.
 
-Batch 1, all six. NOT SIGNED OFF, awaiting WHISTLER-Arc.
+Batch 1, all six. Locked, no open queries.
 
 1. EN: Right.
    NL: Natuurlijk.
@@ -30,30 +30,28 @@ Batch 1, all six. NOT SIGNED OFF, awaiting WHISTLER-Arc.
    PT: Enfim.
 3. EN: Ah.
    NL: Ach.
-   PT: Ai.
+   PT: Ah.
 4. EN: I see.
    NL: Fijn.
    PT: Ótimo.
 5. EN: So.
-   NL: Alweer.
-   PT: Outra vez.
+   NL: Dus.
+   PT: Então.
 6. EN: Very well.
-   NL: Vooruit.
-   PT: Adiante.
+   NL: Goed.
+   PT: Bom.
 
-What each one is doing, since none of them mean what they say.
+Three carry the character and three stay flat, which is where review landed
+and is better than either extreme. 1, 2 and 4 do the work.
 
   1  Of course. Sarcastic agreement with a situation nobody agreed to.
   2  Tja is the most Greg word in Dutch, flat resigned acceptance with no
      English equivalent. Enfim is its Portuguese cousin, oh well, anyway.
-  3  A sigh with a full stop after it.
   4  Great. Said about something that is not great. The flattest sarcasm
      available in either language.
-  5  Again. Weary recognition that this has all happened before.
-  6  Onward, grudgingly. The sound of proceeding without consent.
 
-One thing to settle. These now diverge from the English openers, which are
-still the flat originals. So Greg is drier in Dutch and Portuguese than he is
-in his own language, which is a strange way round. Either en.py OPENERS gets
-the same treatment, or the divergence is accepted as the two written languages
-simply having a better set.
+  3, 5 and 6 are plain on purpose. Six sarcastic openers in rotation would
+  stop being throat-clearing and start being a bit.
+
+The English openers stay as they are. The divergence that leaves is small,
+since three of the six now sit close to them anyway.

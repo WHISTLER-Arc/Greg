@@ -26,6 +26,7 @@ custom_components/greg/lines/TEMPLATE.py for why that matters.
     SILENCE      50 of 50   50 of 50   complete
 
     250 of 250 drafted and signed off
+    plus 6 openers per language, signed off, in openers-approved.md
 
 Counting NL and PT as separate lines, which is how the 500 figure is reached,
 that is 500 of 500. Every pool is drafted and signed off, and there are no
@@ -125,9 +126,9 @@ Three defects that came out of this check have been fixed in place:
 
 ## Next
 
-Fold everything into lines/nl.py and lines/pt.py, then cut a beta. The English
-corrections are already applied. All 250 lines are written and signed, with no
-open queries.
+Done. The lines and the openers are folded into lines/nl.py and lines/pt.py,
+both report complete, and the CI line check passes. The English corrections
+are applied. What is left is cutting a beta.
 
 Nothing unsigned goes into nl.py or pt.py. Once a line is in the pool it ships,
 and there is no review step after that. The filenames still say approved, which

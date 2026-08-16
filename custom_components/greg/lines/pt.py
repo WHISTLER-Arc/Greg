@@ -282,10 +282,18 @@ LINES_SILENCE = [
     "Está calmo. Estou calmo. Normalmente, estas duas frases não são a mesma coisa.",
 ]
 
-# Not written natively yet, so this falls back to the English openers. That
-# means an English "Right." can land in front of a translated line, which is
-# worse than no opener at all. Six short flat lines would close it.
-OPENERS: list[str] = []
+# Throat-clearing, in front of a line about a third of the time. TEMPLATE.py
+# asks for these to be very flat. Three of the six are not, on review, because
+# flat read as neutral rather than as Greg. Three are, because six sarcastic
+# openers in rotation would stop being throat-clearing and start being a bit.
+OPENERS = [
+    "Claro.",
+    "Enfim.",
+    "Ah.",
+    "Ótimo.",
+    "Então.",
+    "Bom.",
+]
 
 POOLS = {
     "soft": LINES_SOFT,
