@@ -57,11 +57,13 @@ No English changed. 2 PT Escolo became Escolho and 3 NL lost the doubled leek.
     PT: Modo de silêncio ativado. Não sabia que tinha um modo de silêncio. Agradeço a quem se lembrou de o incluir.
 
 Batch 2, lines 13-24, covering en.py LINES_SILENCE indices 13-24. Locked.
-One PT query on 20. No English changed.
+No open queries. No English changed. Four points ruled on: 20 PT takes sala
+for consistency, 13 PT goes singular to match the Dutch referent, 19 PT uses
+esta in both clauses, and 23 PT stands with the NL reworded.
 
 13. EN: They have taken their energy elsewhere. I wish it well. From here. Quietly.
     NL: Ze zijn met hun energie ergens anders heen. Ik wens die het beste. Vanaf hier. In stilte.
-    PT: Levaram a sua energia para outro lado. Desejo-lhes bem. Daqui. Em silêncio.
+    PT: Levaram a sua energia para outro lado. Desejo-lhe bem. Daqui. Em silêncio.
 14. EN: The absence of vibration is its own kind of sensation. I have decided to call it relief.
     NL: De afwezigheid van trilling is een gevoel op zich. Ik heb besloten het opluchting te noemen.
     PT: A ausência de vibração é uma sensação em si. Decidi chamar-lhe alívio.
@@ -79,13 +81,10 @@ One PT query on 20. No English changed.
     PT: Vinte minutos de nada. Raramente me deram vinte minutos de nada. Pretendo usá-los com cuidado.
 19. EN: The silence is not empty. It is full of the absence of everything that was just happening. I prefer it this way.
     NL: De stilte is niet leeg. Ze is vol van de afwezigheid van alles wat er zojuist gebeurde. Zo heb ik het liever.
-    PT: O silêncio não é vazio. Está cheio da ausência de tudo o que estava a acontecer há pouco. Prefiro-o assim.
+    PT: O silêncio não está vazio. Está cheio da ausência de tudo o que estava a acontecer há pouco. Prefiro-o assim.
 20. EN: They'll be back. I know this. But for now, the room belongs to the quiet, and I belong to the room.
     NL: Ze komen terug. Dat weet ik. Maar voorlopig behoort de kamer toe aan de stilte, en ik behoor toe aan de kamer.
-    PT: Vão voltar. Eu sei. Mas, para já, o quarto pertence ao silêncio, e eu pertenço ao quarto.
-        (PT query: "quarto" is a bedroom, and this is the only place in all 250
-        Portuguese lines where it appears. Every other mention of the room is
-        "sala", nineteen of them. Reads as a slip. Left exactly as signed off.)
+    PT: Vão voltar. Eu sei. Mas, para já, a sala pertence ao silêncio, e eu pertenço à sala.
 21. EN: No vibrations detected. My systems are running. My obligations, briefly, are not.
     NL: Geen trillingen gedetecteerd. Mijn systemen zijn actief. Mijn verplichtingen, heel even, niet.
     PT: Nenhuma vibração detetada. Os meus sistemas estão a funcionar. As minhas obrigações, por breves instantes, não.
@@ -93,7 +92,7 @@ One PT query on 20. No English changed.
     NL: Het is rustig. Ik vertrouw het niet helemaal. Maar ik ben bereid het te proberen.
     PT: Está calmo. Não confio totalmente. Mas estou disposto a tentar.
 23. EN: The room has gone still. I have gone still. We are doing this together, the room and I. It is the closest thing I have to companionship.
-    NL: De kamer is stil geworden. Ik ben stil geworden. We doen dit samen, de kamer en ik. Het komt het dichtst in de buurt van gezelschap voor mij.
+    NL: De kamer is stil geworden. Ik ben stil geworden. We doen dit samen, de kamer en ik. Het komt voor mij het dichtst in de buurt van gezelschap.
     PT: A sala ficou em silêncio. Eu fiquei em silêncio. Estamos a fazer isto juntos, a sala e eu. É o que tenho mais parecido com companhia.
 24. EN: Nothing is happening. I have checked. I keep checking. Nothing continues to happen. I find this deeply satisfying.
     NL: Er gebeurt niets. Ik heb het gecontroleerd. Ik blijf het controleren. Er blijft niets gebeuren. Ik vind dat diep bevredigend.
