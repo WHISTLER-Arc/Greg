@@ -98,9 +98,16 @@ esta in both clauses, and 23 PT stands with the NL reworded.
     NL: Er gebeurt niets. Ik heb het gecontroleerd. Ik blijf het controleren. Er blijft niets gebeuren. Ik vind dat diep bevredigend.
     PT: Nada está a acontecer. Já verifiquei. Continuo a verificar. Continua a não acontecer nada. Acho isto profundamente gratificante.
 
-Batch 3, lines 25-36, covering en.py LINES_SILENCE indices 25-36. Locked.
-One PT query still open on 33. 32 NL "Dat voelt eens als rust" and 34 PT
-"Chamaria isso ideal" were both raised and ruled to stand. Do not re-raise.
+Batch 3, lines 25-36, covering en.py LINES_SILENCE indices 25-36. Locked,
+no open queries.
+
+33 PT took three passes. The sense wanted is matching, as colours match.
+Conduzo is from conduzir, to drive, so not that. Condizer is the right verb
+but sits in the third person, "as cores condizem", and condigo sounds wrong.
+Combinar carries the sense naturally in the first person, so the line ends
+"por isso finalmente combino". 32 NL "Dat voelt eens als rust" and 34 PT
+"Chamaria isso ideal" were raised and ruled to stand. Do not re-raise any of
+these three.
 ENGLISH CHANGED on 25 and 32, both punctuation. APPLIED to en.py:
   25 EN: I'll just say: I'm glad it came. (gains the colon)
   32 EN: like rest, instead of waste. (gains the comma)
@@ -131,15 +138,7 @@ ENGLISH CHANGED on 25 and 32, both punctuation. APPLIED to en.py:
     PT: Nenhuma perturbação. Os meus sistemas estão inativos. Por uma vez, parece descanso em vez de desperdício.
 33. EN: The house has gone quiet. I am the quietest thing in it, so I finally fit.
     NL: Het is stil geworden in huis. Ik ben het stilste ding hier, dus ik ben eindelijk op mijn plek.
-    PT: A casa ficou silenciosa. Sou a coisa mais silenciosa cá dentro, por isso finalmente conduzo.
-        (PT query, third pass. The intended sense is the verb meaning to match,
-        as colours or styles match. Conduzo is from conduzir, to drive, so it
-        is not that. Condizer is that verb, but it lives almost entirely in the
-        third person, as in "as cores condizem", and WHISTLER-Arc judged the
-        first person condigo to sound wrong. Combinar carries the same sense
-        and is natural in the first person, so "por isso finalmente combino"
-        is the standing proposal. Alternatives are encaixo, me enquadro, or
-        faco sentido. Left exactly as signed off, pending a ruling.)
+    PT: A casa ficou silenciosa. Sou a coisa mais silenciosa cá dentro, por isso finalmente combino.
 34. EN: Nothing is on me. Nothing is near me. I would call this ideal if I trusted the word.
     NL: Er ligt niets op mij. Er is niets bij mij in de buurt. Ik zou dit ideaal noemen als ik dat woord vertrouwde.
     PT: Não está nada em cima de mim. Não há nada perto de mim. Chamaria isso ideal se confiasse na palavra.
