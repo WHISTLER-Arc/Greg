@@ -574,6 +574,42 @@ class GregCoordinator:
             return ""
         return random.choice(openers_for(self.language))
 
+    def _engine_language(self, tts_engine: str, language: str) -> str | None:
+        """A language code this engine has actually advertised, or None.
+
+        Greg's codes are bare, en and nl and pt. Engines advertise locales,
+        en_GB and nl_NL among them, and Home Assistant does not reconcile the
+        two. Hand it a code the engine has not advertised and it raises
+        "Language 'nl' not supported" rather than falling back, which silences
+        Greg completely. That is worse than the accent this was meant to fix,
+        so anything that cannot be confirmed is left out and the engine is
+        allowed to pick for itself, exactly as it did before.
+
+        Region preference matters. Sorting nl alphabetically gives nl_BE, and
+        Greg's Dutch is written for nl_NL, so a locale whose region matches its
+        language wins before falling back to alphabetical order.
+        """
+        try:
+            component = self.hass.data.get("tts")
+            entity = component.get_entity(tts_engine) if component else None
+            supported = [str(c) for c in (getattr(entity, "supported_languages", None) or ())]
+        except Exception:  # noqa: BLE001 - never let this stop him speaking
+            return None
+
+        if not supported:
+            return None
+        if language in supported:
+            return language
+
+        candidates = [c for c in supported if c.lower().split("_")[0] == language.lower()]
+        if not candidates:
+            return None
+        preferred = f"{language}_{language}".lower()
+        for code in candidates:
+            if code.lower() == preferred:
+                return code
+        return sorted(candidates)[0]
+
     async def _speak(self, pool_key: str) -> None:
         # Resolved once and reused, so the line, the event and the TTS call can
         # never disagree about which language this is.
@@ -637,12 +673,15 @@ class GregCoordinator:
                 "entity_id": tts_engine,
                 "media_player_entity_id": player,
                 "message": spoken_text,
-                # Without this the engine speaks whatever language it defaults
-                # to, which is how Dutch lines came out sounding like an English
-                # voice reading Dutch letters aloud. Greg knows which language he
-                # just picked a line in, so he has to say so.
-                "language": language,
             }
+            # Without this the engine speaks whatever language it defaults to,
+            # which is how Dutch lines came out sounding like an English voice
+            # reading Dutch letters aloud. Only sent when the engine has said it
+            # understands it, because an unrecognised code is refused outright
+            # and Greg says nothing at all.
+            engine_language = self._engine_language(tts_engine, language)
+            if engine_language:
+                payload["language"] = engine_language
             # Only sent when the user has actually named a voice. Engines that
             # take no voice option (Google Translate, for one) reject the key
             # outright, so an empty setting has to mean "say nothing about it".

@@ -28,6 +28,17 @@ versioned.
   `en_GB-alan-low` that is an English voice reading Dutch letters aloud, which
   is not the joke. He now tells the engine the language. The omission was
   always there and only became audible once the pools stopped being English.
+- **And then he said nothing at all.** The first attempt at the above sent
+  Greg's own language code straight through. Greg's codes are bare, `nl` and
+  `pt` and `en`. Engines advertise locales, `nl_NL` and `en_GB`, and Home
+  Assistant refuses an unrecognised code rather than falling back, so every
+  line raised `Language 'nl' not supported` and nothing was spoken in any
+  language. Greg now checks what the engine has actually advertised, picks the
+  locale that matches, and leaves the field out entirely when it cannot tell.
+  Worst case he is exactly as he was before any of this, which is the correct
+  worst case. Where a language has several regions he prefers the one matching
+  itself, so Dutch is `nl_NL` rather than `nl_BE` and Portuguese is `pt_PT`
+  rather than `pt_BR`.
 
 ### Changed
 - Eleven English lines are better than they were. Writing a line twice in two
