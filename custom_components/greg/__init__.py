@@ -610,6 +610,43 @@ class GregCoordinator:
                 return code
         return sorted(candidates)[0]
 
+    def _engine_voice(self, tts_engine: str, engine_language: str | None, voice: str) -> str | None:
+        """The configured voice, if the engine will accept it.
+
+        Voice names are matched character for character. pt_PT-tugão-medium is
+        not pt_PT-tugao-medium, and a near miss is refused outright, which
+        silences Greg entirely rather than falling back to a default. That is
+        the same trap the language field set, so it gets the same treatment.
+
+        An unusable voice is dropped and said so in the log, because a table
+        that has gone quiet gives you nothing to go on, while a table speaking
+        in the wrong voice at least tells you where to look.
+        """
+        if not voice:
+            return None
+        try:
+            component = self.hass.data.get("tts")
+            entity = component.get_entity(tts_engine) if component else None
+            getter = getattr(entity, "async_get_supported_voices", None)
+            available = getter(engine_language) if (getter and engine_language) else None
+            names = [str(getattr(v, "voice_id", v)) for v in (available or ())]
+        except Exception:  # noqa: BLE001 - never let this stop him speaking
+            return voice
+
+        # Nothing advertised means nothing to check against, so trust the user.
+        if not names or voice in names:
+            return voice
+
+        _LOGGER.warning(
+            "Greg's voice for %s, %r, is not one this engine offers, so he is "
+            "letting it choose instead. It must match exactly, accents included. "
+            "Available: %s",
+            engine_language,
+            voice,
+            ", ".join(sorted(names)[:8]) or "none",
+        )
+        return None
+
     async def _speak(self, pool_key: str) -> None:
         # Resolved once and reused, so the line, the event and the TTS call can
         # never disagree about which language this is.
@@ -697,6 +734,7 @@ class GregCoordinator:
             voice = self._config.get(tts_voice_key(language)) or ""
             if not voice and language == FALLBACK_LANGUAGE:
                 voice = self._config.get(CONF_TTS_VOICE, DEFAULT_TTS_VOICE)
+            voice = self._engine_voice(tts_engine, engine_language, voice)
             if voice:
                 payload["options"] = {"voice": voice}
 

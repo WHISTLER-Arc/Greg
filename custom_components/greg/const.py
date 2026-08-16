@@ -1,8 +1,8 @@
 """Constants for Greg integration."""
 
 DOMAIN = "greg"
-VERSION = "1.5.5b3"
-VERSION_DISPLAY = "v1.5.5b3"
+VERSION = "1.5.5b4"
+VERSION_DISPLAY = "v1.5.5b4"
 
 # Config keys
 CONF_VIBRATION_SENSOR = "vibration_sensor"

@@ -79,7 +79,7 @@ def _voice_fields(current=None) -> dict:
     field with it and nothing here has to be told about it.
 
     A voice belongs to exactly one language. Piper's are named for it,
-    nl_NL-ronnie-medium and pt_PT-tugao-medium, and handing an English voice a
+    nl_NL-ronnie-medium and pt_PT-tugão-medium, and handing an English voice a
     Dutch sentence does not give you accented Dutch, it gives you an English
     voice reading Dutch letters aloud. So the voice has to follow the language
     rather than sit above it.

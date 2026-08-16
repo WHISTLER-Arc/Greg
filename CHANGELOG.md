@@ -39,6 +39,16 @@ versioned.
   worst case. Where a language has several regions he prefers the one matching
   itself, so Dutch is `nl_NL` rather than `nl_BE` and Portuguese is `pt_PT`
   rather than `pt_BR`.
+- **A wrong voice name no longer silences him.** Voice names are matched
+  character for character, so `pt_PT-tugao-medium` is not `pt_PT-tugão-medium`
+  and the near miss is refused outright rather than falling back. Greg now
+  checks the name against what the engine offers, drops it if it does not
+  match, and says so in the log with the list of valid names. A table speaking
+  in the wrong voice tells you where to look. A table that has gone quiet tells
+  you nothing.
+- The help text for the Portuguese voice gave the example without its tilde,
+  which is exactly the near miss described above. Fixed, and all three now say
+  to copy the name from the engine's own list.
 
 ### Changed
 - Eleven English lines are better than they were. Writing a line twice in two
