@@ -4,51 +4,56 @@ NOTHING HERE IS SIGNED OFF YET. Drafted and awaiting WHISTLER-Arc.
 
 Not a pool. These are the short throat-clearings that land in front of a line
 about a third of the time, so they sit alongside every pool rather than inside
-one. Six per language, matching en.py OPENERS.
+one. Six per language, matching the six slots in en.py OPENERS.
 
-TEMPLATE.py is blunt about the brief. Very short and very flat. The value is
-in the two thirds where there is nothing at all, so anything with personality
-in it is already wrong. These carry no joke. They buy Greg a beat.
+BRIEF OVERRIDDEN, DELIBERATELY. TEMPLATE.py says to keep these very short and
+very flat, and the first draft followed that literally, giving the Dutch and
+Portuguese equivalents of Right, Well, Ah, I see, So and Very well.
+WHISTLER-Arc rejected that as too neutral and asked for Greg proper, cynical
+and miserable. So these carry character where the template says they should
+not. That is a decision, not a drift. Do not flatten them back.
 
-Same rule as the lines. Not translations. The English is listed to show the
-register and the slot, not to be rendered.
+Short is still enforced. The longest is eleven characters, shorter than the
+longest in the flat draft, because an opener that outstays its welcome eats
+the line it is supposed to introduce.
 
-This gap only exists because OPENERS was never part of the 250. Leaving the
-lists empty makes lines/__init__.py fall back to the English openers, so a
-Dutch line would open with "Right." That is worse than no opener at all, which
-is why these are being written rather than left.
+Same rule as the lines. Not translations. The English is listed to show which
+slot each one fills, and the Dutch and Portuguese are not renderings of it.
 
 Batch 1, all six. NOT SIGNED OFF, awaiting WHISTLER-Arc.
 
 1. EN: Right.
-   NL: Juist.
-   PT: Certo.
+   NL: Natuurlijk.
+   PT: Claro.
 2. EN: Well.
-   NL: Nou.
-   PT: Bom.
+   NL: Tja.
+   PT: Enfim.
 3. EN: Ah.
-   NL: Ah.
-   PT: Ah.
+   NL: Ach.
+   PT: Ai.
 4. EN: I see.
-   NL: Ik begrijp het.
-   PT: Estou a ver.
+   NL: Fijn.
+   PT: Ótimo.
 5. EN: So.
-   NL: Zo.
-   PT: Então.
+   NL: Alweer.
+   PT: Outra vez.
 6. EN: Very well.
-   NL: Goed dan.
-   PT: Muito bem.
+   NL: Vooruit.
+   PT: Adiante.
 
-Alternatives worth considering, noted rather than chosen.
+What each one is doing, since none of them mean what they say.
 
-  NL "Tja." is the most Greg word in the language, a flat resigned acceptance
-  with no real English equivalent. It would replace 2 or 6. Left out only
-  because it carries more character than the brief asks for, and the brief
-  says these should carry none.
+  1  Of course. Sarcastic agreement with a situation nobody agreed to.
+  2  Tja is the most Greg word in Dutch, flat resigned acceptance with no
+     English equivalent. Enfim is its Portuguese cousin, oh well, anyway.
+  3  A sigh with a full stop after it.
+  4  Great. Said about something that is not great. The flattest sarcasm
+     available in either language.
+  5  Again. Weary recognition that this has all happened before.
+  6  Onward, grudgingly. The sound of proceeding without consent.
 
-  PT "Pronto." is the everyday European Portuguese beat-filler and is flatter
-  than "Muito bem." It would replace 6. "Enfim." is the resigned one and would
-  replace 2.
-
-  NL 4 is the longest of the six. "Aha." is shorter and flatter but sits very
-  close to 3. "Juist ja." is natural but echoes 1.
+One thing to settle. These now diverge from the English openers, which are
+still the flat originals. So Greg is drier in Dutch and Portuguese than he is
+in his own language, which is a strange way round. Either en.py OPENERS gets
+the same treatment, or the divergence is accepted as the two written languages
+simply having a better set.
