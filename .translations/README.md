@@ -4,7 +4,7 @@ Raw record of the Dutch and Portuguese lines, kept here rather than in a
 temporary directory because a session ending should not cost a day of review.
 
 Most of it is reviewed and signed off by WHISTLER-Arc, who is a native speaker
-of both, and that now covers all 250 lines. Four queries remain open in
+of both, and that now covers all 250 lines. One wording query remains open in
 SILENCE batch 4. Sign-off is not a formality.
 These lines are not translations, the register has to be found natively, and
 a non-native draft can be word-perfect and still not land.
@@ -29,9 +29,8 @@ custom_components/greg/lines/TEMPLATE.py for why that matters.
     250 of 250 drafted and signed off
 
 Counting NL and PT as separate lines, which is how the 500 figure is reached,
-that is 500 of 500. Every pool is drafted and signed off. Four queries are
-still open in SILENCE batch 4, noted at their lines, and three of them are
-things a check would catch rather than matters of taste.
+that is 500 of 500. Every pool is drafted and signed off. One wording query
+is still open in SILENCE, on 40 and 45, noted at line 45.
 
 ## English corrections, all applied to lines/en.py
 
@@ -117,7 +116,7 @@ Three defects that came out of this check have been fixed in place:
 
 ## Next
 
-Close the four open SILENCE queries, then fold everything into lines/nl.py
+Close the last SILENCE wording query, then fold everything into lines/nl.py
 and lines/pt.py, and only then cut a beta. The English corrections are already
 applied. All 250 lines are written and signed.
 

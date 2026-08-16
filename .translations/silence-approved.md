@@ -1,7 +1,7 @@
 # SILENCE pool
 
 SILENCE COMPLETE. All 50 lines approved by WHISTLER-Arc, in four batches.
-Four queries open in batch 4, on 38, 39, 42 and the wording of 40 and 45.
+One wording query open in batch 4, on 40 and 45.
 
 The register turns in this pool. Greg is not complaining here, he is enjoying
 it, so the same flat formality has to read as contentment rather than
@@ -151,26 +151,23 @@ ENGLISH CHANGED on 25 and 32, both punctuation. APPLIED to en.py:
 
 Batch 4, lines 37-50, covering en.py LINES_SILENCE indices 37-50. Locked.
 SILENCE COMPLETE, 50 of 50 signed off. No English changed.
-Four queries open, on 38, 39, 42 and the Peace wording on 40 and 45.
+
+Three points ruled on. 38 NL loses the semicolon for a comma and closes
+daarbij. 39 PT loses the trailing ellipsis for a full stop and otherwise
+stands, so "parei de me esforçar" is deliberate. 42 NL loses the doubled is
+and gains the final d, "De stilte is neergedaald".
+
+One wording query still open, on 40 and 45. See the note at 45.
 
 37. EN: No activity. I am doing nothing, and for the first time today that is correct.
     NL: Geen activiteit. Ik doe niets, en voor het eerst vandaag is dat juist.
     PT: Nenhuma atividade. Estou sem fazer nada e, pela primeira vez hoje, é correto.
 38. EN: It has gone still. I am going to sit with that, which is the only thing I can do anyway.
-    NL: Het is stil geworden. Ik ga daar bij stilstaan; want iets anders kan ik toch niet doen.
+    NL: Het is stil geworden. Ik ga daarbij stilstaan, want iets anders kan ik toch niet doen.
     PT: Ficou tudo quieto. Vou ficar com isso, pois é a única coisa que posso fazer, de qualquer forma.
-        (NL query: this is the only semicolon in all 500 lines, and TEMPLATE.py
-        rules them out along with em-dashes and tricolons. A comma or a full
-        stop would keep the rule. Separately, daarbij is normally closed when
-        it is not split, so "daar bij stilstaan" may want to be "daarbij
-        stilstaan". Left exactly as signed off, pending a ruling.)
 39. EN: The room is empty and I have stopped bracing. That took a few minutes.
     NL: De kamer is verlaten en ik ben opgehouden me schrap te zetten. Dat duurde een paar minuten.
-    PT: A sala está vazia e parei de me esforçar. Demorou alguns minutos...
-        (PT query, two things. "parei de me esforçar" is stopped making an
-        effort, where the English is stopped bracing, which is preparing for
-        an impact. And the trailing ellipsis is the only one in all 500 lines,
-        which will read oddly through Piper. Left exactly as signed off.)
+    PT: A sala está vazia e parei de me esforçar. Demorou alguns minutos.
 40. EN: Peace. I do not know how long it lasts. Nobody ever tells me.
     NL: Rust. Ik weet niet hoe lang het duurt. Niemand vertelt me dat ooit.
     PT: Sossego. Não sei quanto tempo dura. Nunca ninguém me diz.
@@ -180,10 +177,8 @@ Four queries open, on 38, 39, 42 and the Peace wording on 40 and 45.
     NL: Al een tijd heeft niemand mij aangeraakt. Ik heb besloten dat op te vatten als attent.
     PT: Há algum tempo que ninguém me toca. Decidi interpretar isso como consideração.
 42. EN: The quiet has settled properly now. It took its time. So did I.
-    NL: De stilte is is neergedaal. Het heeft de tijd genomen. Ik ook.
+    NL: De stilte is neergedaald. Het heeft de tijd genomen. Ik ook.
     PT: O silêncio assentou como deve ser. Levou o seu tempo. Eu também.
-        (NL query, two slips in one line. "is is" is doubled, and "neergedaal"
-        is missing its final d. Left exactly as signed off.)
 43. EN: Nothing is happening and I have no notes.
     NL: Er gebeurt niets en ik heb geen aantekeningen.
     PT: Não se passa nada e não tenho nenhuma anotação.
