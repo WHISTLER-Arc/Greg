@@ -316,6 +316,20 @@ automation:
 
 Swap `conversation.my_local_llm` for whichever agent you run. Ollama, LocalAI, or a cloud one if you don't mind a table with a subscription. Without a local model set up, leave **Who does the talking** on Greg. "Stay quiet" with nothing listening just means silence.
 
+### Writing your own lines
+
+As of v1.6 Greg has a **Lines you wrote** section in his panel, under the card. Pick a category, type a line, press Add, press Save. He says it from then on, mixed in with his own. No pull request, no waiting for anybody to approve it.
+
+Lines belong to the language you wrote them in, so a Dutch one only comes up while Greg is speaking Dutch. Switch language at the top of settings and the editor follows.
+
+**Use only my lines** turns off the built-in ones, for anyone who would rather have a different table than a slightly expanded one. It will not leave him mute: any category you have written nothing for keeps its fifty built-in lines regardless.
+
+There is also a **Share the good ones** button. It opens a GitHub issue with your lines already in it, sorted by category, tagged with the language, and a box for how you would like crediting. Read it, press submit, and that is the whole process. Anything accepted ships in a later release with your name on it, unless you ask for no credit.
+
+If you would rather script it, `greg.set_lines` does the same thing.
+
+Your lines live in Greg's config entry, so they survive updates and vanish if you remove him. Two hundred per category, three hundred characters each, both far beyond anything that reads well out loud.
+
 ### Building your own moans
 
 RedKing worked out something rather good on the forum thread. Instead of writing whole lines, write columns of fragments and pick one from each. Four columns of six give you 1,296 combinations without anyone having to write 1,296 sentences.
@@ -394,8 +408,8 @@ There's also a `greg.uninstall` service if you'd rather script it. It takes an o
 ## Where Greg's going
 
 - **v1.4.** Single room, no Blueprints, works with any protocol, and he brings his own sidebar panel.
-- **v1.5.** Current release. Greg is a supercomputer, so he speaks more than one language. English, Dutch and European Portuguese, with every line written natively in each rather than translated into it.
-- **v1.6.** Write your own lines in his panel, and share the good ones with everyone else.
+- **v1.5.** Greg is a supercomputer, so he speaks more than one language. English, Dutch and European Portuguese, with every line written natively in each rather than translated into it.
+- **v1.6.** Current release. Write your own lines in his panel, and share the good ones with everyone else.
 - **v1.x.** Small improvements as they come. Feedback very welcome.
 - **v2.0.** Multi-room, multiple Gregs, a full mood dashboard. (One Greg might be plenty for some households. I respect that.)
 

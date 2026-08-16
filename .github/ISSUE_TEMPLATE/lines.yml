@@ -1,0 +1,57 @@
+name: Lines for Greg
+description: Lines you wrote that Greg should say. Usually opened for you by his panel.
+title: "Lines for "
+labels: ["lines"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Greg's panel fills this in for you. **Settings → Greg → Lines you wrote → Share the good ones.**
+
+        Writing it by hand is fine too. One line per bullet, grouped under the
+        category it belongs to.
+
+  - type: input
+    id: language
+    attributes:
+      label: Language
+      description: The language code these are written in. `en`, `nl` or `pt`.
+      placeholder: en
+    validations:
+      required: true
+
+  - type: input
+    id: credit
+    attributes:
+      label: How would you like to be credited
+      description: >
+        Name, handle, a link, whatever you want in the release notes.
+        Say "no credit please" and there will be none.
+      placeholder: your name or handle
+    validations:
+      required: false
+
+  - type: textarea
+    id: lines
+    attributes:
+      label: The lines
+      description: >
+        Grouped under `### soft`, `### medium`, `### chaos`, `### existential`
+        or `### silence`, one per bullet. The panel does this for you.
+      value: |
+        ### chaos
+
+        -
+      render: markdown
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Before you submit
+      options:
+        - label: These are my own words, not lifted from Douglas Adams or anyone else.
+          required: true
+        - label: I am happy for them to ship in Greg under the repository's MIT licence.
+          required: true

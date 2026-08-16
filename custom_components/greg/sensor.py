@@ -85,6 +85,15 @@ class GregMoodSensor(_GregBase):
             # What an empty language setting actually resolves to, so the
             # panel can say which language Follow Home Assistant landed on.
             "language_effective": self.coordinator.language,
+            # The owner's own lines, for the panel's editor. Same reason as
+            # config above: the panel can read states and call services and has
+            # no other way to see what is stored.
+            "custom_lines": self.coordinator.custom_lines(),
+            "custom_only": self.coordinator.custom_only,
+            # How many lines Greg is actually drawing from right now, per pool,
+            # so the editor can say "50 built in, 3 of yours" without having to
+            # ship all 250 built-in lines out to the browser to count them.
+            "pool_sizes": self.coordinator.pool_sizes,
         }
 
 
