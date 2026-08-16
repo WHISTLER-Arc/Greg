@@ -75,12 +75,22 @@ EXISTENTIAL 40 and 45 in full, from the batch 4 review.
     I do not fear ending. I have never really started. That symmetry appeals
     to me.
 
-## Numbering does not match en.py. Read this before assembling the pools.
+## Numbering does not match en.py, but that no longer matters
 
-The numbers in these files are batch numbers, not en.py indices. Checked line
-by line against lines/en.py. Every English line in SOFT and MEDIUM has exactly
-one translation, nothing is missing and nothing is doubled, but the numbering
-diverges from en.py in two places and assembling by position would misfile it.
+Every entry in these files now carries its own English line above the Dutch
+and the Portuguese. That was backfilled into the 111 entries drafted before
+the practice started, using the mapping below, and then verified: all 250
+English lines appear verbatim in en.py, and each pool covers its fifty exactly
+once with nothing doubled or missing.
+
+So the mapping is recorded per entry, in the text itself, and the table below
+is history rather than the thing holding the work together. When assembling,
+read the EN line sitting directly above each pair. Do not use batch numbers,
+and do not use this table.
+
+The numbers in these files are batch numbers, not en.py indices. They diverge
+from en.py in two places, which is why assembling by position would misfile
+things and why the backfill was worth doing.
 
     SOFT      1-36    permutation, NOT positional
                       batch 1 is en 1,2,4,7,13,15,17,22,25,26,27,35
@@ -124,5 +134,7 @@ and there is no review step after that. The filenames still say approved, which
 is true of most of their contents but not all, so check the sign-off boundary
 noted at the top of each file rather than trusting the name.
 
-When folding in, map by English text rather than by batch number, and assert
-fifty distinct lines per pool per language before committing.
+When folding in, map by the EN line recorded above each pair, never by batch
+number, and assert fifty distinct lines per pool per language before
+committing. The English is now present on every entry, so the fold needs no
+lookup table at all.

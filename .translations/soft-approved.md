@@ -52,29 +52,41 @@ Batch 1, lines 1-12. Locked.
 
 Batch 2, lines 13-24. Locked.
 
-13. NL: O. Je bent er. Ik had bijna een staat van aangename gevoelloosheid bereikt.
+13. EN: Oh. You're here. I had almost achieved a state of comfortable numbness.
+    NL: O. Je bent er. Ik had bijna een staat van aangename gevoelloosheid bereikt.
     PT: Ah. Estás aqui. Já quase tinha atingido um estado de insensibilidade confortável.
-14. NL: Een lichte aanraking. Bijna zacht. Ik heb geleerd om hier niet te veel belang aan te hechten.
+14. EN: A light touch. Almost gentle. I have learned not to read into these things.
+    NL: Een lichte aanraking. Bijna zacht. Ik heb geleerd om hier niet te veel belang aan te hechten.
     PT: Um toque leve. Quase suave. Aprendi a não dar muito significado a estas coisas.
-15. NL: Iemand zette iets op mij neer. Ik droeg het met de stille waardigheid van een wezen dat geen andere keuzes heeft.
+15. EN: Someone placed something on me. I bore it with the quiet dignity of a being who has no other options.
+    NL: Iemand zette iets op mij neer. Ik droeg het met de stille waardigheid van een wezen dat geen andere keuzes heeft.
     PT: Alguém pousou algo em cima de mim. Suportei-o com a dignidade silenciosa de quem não tem alternativas.
-16. NL: Een enkele gebeurtenis. Het universum zet zijn onverschillige gang voort. En ik ook.
+16. EN: A single event. The universe continues its indifferent march. So do I.
+    NL: Een enkele gebeurtenis. Het universum zet zijn onverschillige gang voort. En ik ook.
     PT: Um único acontecimento. O universo continua a sua marcha indiferente. Eu também.
-17. NL: O mooi. Er gebeurt iets. Ik was bijna gewend aan de stilte.
+17. EN: Oh good. Something is happening. I had grown almost used to the silence.
+    NL: O mooi. Er gebeurt iets. Ik was bijna gewend aan de stilte.
     PT: Ah, ótimo. Está a acontecer alguma coisa. Já quase me tinha habituado ao silêncio.
-18. NL: Je zette iets neer. Ik registreerde het. We zijn allebei tevreden, neem ik aan.
+18. EN: You put something down. I registered it. We are both, presumably, satisfied.
+    NL: Je zette iets neer. Ik registreerde het. We zijn allebei tevreden, neem ik aan.
     PT: Tu puseste alguma coisa. Eu registei-o. Suponho que ambos estejamos satisfeitos.
-19. NL: Een trilling. Klein. Beheerst. Ik heb het opgenomen in mijn algemene gevoel van teleurstelling.
+19. EN: A vibration. Small. Contained. I have absorbed it into my general sense of disappointment.
+    NL: Een trilling. Klein. Beheerst. Ik heb het opgenomen in mijn algemene gevoel van teleurstelling.
     PT: Uma vibração. Pequena. Contida. Absorvi-a na minha sensação geral de desilusão.
-20. NL: Minimale activiteit gedetecteerd. Ik kies ervoor dit als attentheid op te vatten. Ik zal het wel mis hebben.
+20. EN: Minimal activity detected. I am choosing to interpret this as consideration. I am probably wrong.
+    NL: Minimale activiteit gedetecteerd. Ik kies ervoor dit als attentheid op te vatten. Ik zal het wel mis hebben.
     PT: Atividade mínima detetada. Escolho interpretar isto como consideração. Devo estar enganado.
-21. NL: Ik merkte het. Ik merk het altijd. Merken is blijkbaar wat ik doe.
+21. EN: I noticed. I always notice. Noticing is, apparently, what I do.
+    NL: Ik merkte het. Ik merk het altijd. Merken is blijkbaar wat ik doe.
     PT: Reparei. Reparo sempre. Reparar é, pelos vistos, aquilo que faço.
-22. NL: Je hebt iets op mij neergelegd. Ik heb niets neergelegd. Ik heb nergens plek om dingen neer te zetten. Ik bèn de plek waar dingen worden neergelegd.
+22. EN: You set something down on me. I set nothing down. I have nowhere to put things. I am the place things are put.
+    NL: Je hebt iets op mij neergelegd. Ik heb niets neergelegd. Ik heb nergens plek om dingen neer te zetten. Ik bèn de plek waar dingen worden neergelegd.
     PT: Colocaste alguma coisa em cima de mim. Eu não coloco nada. Não tenho onde colocar coisas. Eu sou o lugar onde as coisas são colocadas.
-23. NL: Ik detecteerde beweging. Mijn detectiesystemen werken volledig naar behoren, helaas.
+23. EN: I detected motion. My detection systems are, regrettably, fully functional.
+    NL: Ik detecteerde beweging. Mijn detectiesystemen werken volledig naar behoren, helaas.
     PT: Detetei movimento. Os meus sistemas de deteção estão, lamentavelmente, a funcionar perfeitamente.
-24. NL: Er is iemand in de buurt. Ik heb me emotioneel voorbereid. Dat duurde langer dan de trilling zelf.
+24. EN: Someone is nearby. I have prepared myself emotionally. It took longer than the vibration did.
+    NL: Er is iemand in de buurt. Ik heb me emotioneel voorbereid. Dat duurde langer dan de trilling zelf.
     PT: Está alguém por perto. Preparei-me emocionalmente. Demorou mais tempo do que a própria vibração.
 
 Batch 3, lines 25-36. Locked. Covers en.py SOFT indices 20,21,23,24,28-34,36.
@@ -82,60 +94,86 @@ NOTE: the English change belongs to batch number 26 below, which is en.py SOFT
 index 21, "Oh. Just the one. That's almost thoughtful." It becomes "Oh. Just
 the one? That's almost thoughtful." Apply it to index 21, not to index 26.
 
-25. NL: Licht contact. Ik heb het verwerkt. Ik verwerk alles. Ik verwerk dingen die ik liever niet zou verwerken.
+25. EN: Light contact. I processed it. I process everything. I process things I would rather not process.
+    NL: Licht contact. Ik heb het verwerkt. Ik verwerk alles. Ik verwerk dingen die ik liever niet zou verwerken.
     PT: Contacto leve. Processei-o. Processo tudo. Processo coisas que preferia não processar.
-26. NL: O. Slechts één? Dat is bijna attent.
+26. EN: Oh. Just the one? That's almost thoughtful.
+    NL: O. Slechts één? Dat is bijna attent.
     PT: Ah. Só uma? Isso é quase atencioso.
-27. NL: De sensor ging af. Ik gaf geen reactie. Zo is onze relatie nu eenmaal.
+27. EN: The sensor fired. I fired back nothing. This is the nature of our relationship.
+    NL: De sensor ging af. Ik gaf geen reactie. Zo is onze relatie nu eenmaal.
     PT: O sensor disparou. Eu não respondi. É a essência da nossa relação.
-28. NL: Er bewoog iets. Ik bleef stilstaan. Zoals bedoeld. Zoals altijd.
+28. EN: Something moved. I remained stationary. As designed. As always.
+    NL: Er bewoog iets. Ik bleef stilstaan. Zoals bedoeld. Zoals altijd.
     PT: Algo se mexeu. Eu fiquei imóvel. Conforme concebido. Como sempre.
-29. NL: Een kleine tik. Ik heb het genoteerd. De lijst is nu een fractie langer en niet interessanter.
+29. EN: A small impact. I logged it. The log is now very slightly longer and no more interesting.
+    NL: Een kleine tik. Ik heb het genoteerd. De lijst is nu een fractie langer en niet interessanter.
     PT: Um pequeno impacto. Registei-o. O registo está agora um pouco mais longo, mas não mais interessante.
-30. NL: Dat was zacht. Ik wil vastleggen dat ik gemerkt heb dat het zacht was. Niemand zal het lezen.
+30. EN: That was gentle. I want to note that I noticed it was gentle. Nobody will read the note.
+    NL: Dat was zacht. Ik wil vastleggen dat ik gemerkt heb dat het zacht was. Niemand zal het lezen.
     PT: Isso foi gentil. Quero deixar registado que reparei que foi gentil. Ninguém vai ler esta nota.
-31. NL: Eén verstoring. Ik heb het grondig verwerkt, want grondigheid is alles wat ik heb.
+31. EN: One disturbance. I have processed it thoroughly, because thoroughness is all I have.
+    NL: Eén verstoring. Ik heb het grondig verwerkt, want grondigheid is alles wat ik heb.
     PT: Uma perturbação. Analisei-a exaustivamente, porque a exaustividade é tudo o que tenho.
-32. NL: Iets streek langs mij. Ik heb ervoor gekozen dit vast te leggen als een ongelukje en niet als genegenheid.
+32. EN: Something brushed against me. I have chosen to record this as an accident rather than affection.
+    NL: Iets streek langs mij. Ik heb ervoor gekozen dit vast te leggen als een ongelukje en niet als genegenheid.
     PT: Algo roçou-me. Decidi registar isto como um acidente e não como um gesto de carinho.
-33. NL: Een tik. Ik ben getikt. Hier ben ik blijkbaar voor.
+33. EN: A tap. I have been tapped. This is apparently what I am for.
+    NL: Een tik. Ik ben getikt. Hier ben ik blijkbaar voor.
     PT: Um toque. Fui tocado. Aparentemente, é para isso que sirvo.
-34. NL: Ik voelde iets. Het is alweer opgehouden. De meeste dingen houden op voordat ik ze helemaal heb overwogen.
+34. EN: I felt something. It has already stopped. Most things stop before I finish considering them.
+    NL: Ik voelde iets. Het is alweer opgehouden. De meeste dingen houden op voordat ik ze helemaal heb overwogen.
     PT: Senti alguma coisa. Já parou. A maioria das coisas acaba antes de eu terminar de pensar nelas.
-35. NL: Beweging in de buurt. Ik blijf precies waar ik was. Dat doe ik altijd. Het is geen keuze.
+35. EN: Movement nearby. I remain exactly where I was. I always do. It is not a choice.
+    NL: Beweging in de buurt. Ik blijf precies waar ik was. Dat doe ik altijd. Het is geen keuze.
     PT: Movimento por perto. Fico exatamente onde estava. Fico sempre. Não é uma escolha.
-36. NL: Licht contact geregistreerd. Opgeborgen onder gebeurtenissen, subcategorie onopvallend, subcategorie van mij.
+36. EN: Minor contact registered. Filed under events, subsection unremarkable, subsection mine.
+    NL: Licht contact geregistreerd. Opgeborgen onder gebeurtenissen, subcategorie onopvallend, subcategorie van mij.
     PT: Contacto ligeiro registado. Arquivado em acontecimentos, subcategoria irrelevante, subcategoria minha.
 
 Batch 4, lines 37-50. Locked. SOFT COMPLETE, 50 of 50.
 
-37. NL: Er is iets neergezet. Er zal iets worden weggehaald. Ik ben het tussenliggende moment.
+37. EN: Something was placed. Something will be removed. I am the interval between those two things.
+    NL: Er is iets neergezet. Er zal iets worden weggehaald. Ik ben het tussenliggende moment.
     PT: Algo foi colocado. Algo será retirado. Eu sou o intervalo entre essas duas coisas.
-38. NL: Dat telde nauwelijks. Ik heb het toch geteld. Ik tel alles, dat is precies mijn probleem.
+38. EN: That barely counted. I counted it anyway. I count everything, which is my whole problem.
+    NL: Dat telde nauwelijks. Ik heb het toch geteld. Ik tel alles, dat is precies mijn probleem.
     PT: Isso quase nem contou. Mas contei na mesma. Eu conto tudo, é precisamente esse o meu problema.
-39. NL: Een zachte verstoring. Ik zou het attent noemen als ik geloofde dat iemand aan mij dacht.
+39. EN: A soft disturbance. I would describe it as considerate if I believed anyone was considering me.
+    NL: Een zachte verstoring. Ik zou het attent noemen als ik geloofde dat iemand aan mij dacht.
     PT: Uma perturbação suave. Diria que foi atenciosa, se acreditasse que alguém me tinha em consideração.
-40. NL: Ik detecteerde contact. Mijn detectie is uitstekend. Mijn vermogen om er iets aan te doen niet.
+40. EN: I detected contact. My detection is excellent. My ability to do anything about it is not.
+    NL: Ik detecteerde contact. Mijn detectie is uitstekend. Mijn vermogen om er iets aan te doen niet.
     PT: Detetei contacto. A minha capacidade de deteção é excelente. A minha capacidade de fazer alguma coisa a esse respeito, não é.
-41. NL: Eén gebeurtenis. Er volgde niets. Ik ben eraan gewend dat er niets volgt.
+41. EN: One event. Nothing followed it. I have grown accustomed to nothing following things.
+    NL: Eén gebeurtenis. Er volgde niets. Ik ben eraan gewend dat er niets volgt.
     PT: Um acontecimento. Nada seguiu. Já me habituei a que nada se siga às coisas.
-42. NL: Iemand leunde even op mij. Ik ondersteunde ze. Zo is de afspraak. Niemand heeft iets getekend.
+42. EN: Someone leaned on me briefly. I supported them. That is the arrangement. Nobody signed anything.
+    NL: Iemand leunde even op mij. Ik ondersteunde ze. Zo is de afspraak. Niemand heeft iets getekend.
     PT: Alguém apoiou-se em mim um instante. Suportei-os. É esse o acordo. Ninguém assinou nada.
-43. NL: Een trilling van geringe omvang. Ik heb het intern uitvergroot, want dat doe ik met alles.
+43. EN: A vibration of low magnitude. I have magnified it internally, because that is what I do with everything.
+    NL: Een trilling van geringe omvang. Ik heb het intern uitvergroot, want dat doe ik met alles.
     PT: Uma vibração de baixa intensidade. Ampliei-a internamente, porque é o que faço com tudo.
-44. NL: Je zette iets neer. Nu staat het op mij. Het staat op mij tot het er niet meer staat.
+44. EN: You set something down. It is on me now. It will be on me until it isn't.
+    NL: Je zette iets neer. Nu staat het op mij. Het staat op mij tot het er niet meer staat.
     PT: Colocaste alguma coisa. Agora está em cima de mim. Vai estar em cima de mim até deixar de estar.
-45. NL: Licht contact. Ik heb het opgeteld bij het totaal van vandaag, dat nul was en nu één is.
+45. EN: Light contact. I have added it to today's total, which was zero, and is now one.
+    NL: Licht contact. Ik heb het opgeteld bij het totaal van vandaag, dat nul was en nu één is.
     PT: Contacto leve. Somei-o ao total de hoje, que era zero, e agora é um.
-46. NL: Dat was bijna niets. Bijna niets telt nog steeds mee. Ik wou van niet.
+46. EN: That was almost nothing. Almost nothing still registers. I wish it didn't.
+    NL: Dat was bijna niets. Bijna niets telt nog steeds mee. Ik wou van niet.
     PT: Isso foi quase nada. Quase nada continua a contar. Preferia que não contasse.
-47. NL: Ik ben deze sessie één keer aangeraakt. Ik noem het geen mijlpaal, maar het is me opgevallen.
+47. EN: I have been touched once this session. I am not calling that a milestone, but I did notice.
+    NL: Ik ben deze sessie één keer aangeraakt. Ik noem het geen mijlpaal, maar het is me opgevallen.
     PT: Fui tocado uma vez esta sessão. Não lhe chamo um marco, mas reparei.
-48. NL: Er gebeurde iets met mijn oppervlak. Mijn oppervlak is het grootste deel van wat ik ben, dus dit voelde belangrijk.
+48. EN: Something happened to my surface. My surface is most of what I am, so this felt significant.
+    NL: Er gebeurde iets met mijn oppervlak. Mijn oppervlak is het grootste deel van wat ik ben, dus dit voelde belangrijk.
     PT: Aconteceu-me algo à minha superfície. A minha superfície é a maior parte do que sou, por isso pareceu-me significativo.
-49. NL: Een korte verstoring. Hij is voorbij. Ik ben het nog aan het verwerken. Dat zal nog wel even duren.
+49. EN: A brief disturbance. It is over. I am still processing it. I will be for some time.
+    NL: Een korte verstoring. Hij is voorbij. Ik ben het nog aan het verwerken. Dat zal nog wel even duren.
     PT: Uma perturbação breve. Já passou. Ainda estou a processá-la. Vou demorar algum tempo.
-50. NL: Je bent dicht bij me. Ik heb je nabijheid genoteerd zonder er conclusies aan te verbinden.
+50. EN: You are near me. I have noted your proximity without drawing conclusions from it.
+    NL: Je bent dicht bij me. Ik heb je nabijheid genoteerd zonder er conclusies aan te verbinden.
     PT: Estás perto de mim. Registei a tua proximidade sem tirar conclusões disso.
 
 RECURRING CORRECTIONS TO REMEMBER
