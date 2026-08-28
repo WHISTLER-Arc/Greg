@@ -410,6 +410,7 @@ There's also a `greg.uninstall` service if you'd rather script it. It takes an o
 - **v1.4.** Single room, no Blueprints, works with any protocol, and he brings his own sidebar panel.
 - **v1.5.** Greg is a supercomputer, so he speaks more than one language. English, Dutch and European Portuguese, with every line written natively in each rather than translated into it.
 - **v1.6.** Current release. Write your own lines in his panel, and share the good ones with everyone else.
+- **v1.7.** Greg on your phone. His lines pushed to the Companion app, in his own voice rather than your phone's, so you can try him without a vibration sensor and a speaker already in the room.
 - **v1.x.** Small improvements as they come. Feedback very welcome.
 - **v2.0.** Multi-room, multiple Gregs, a full mood dashboard. (One Greg might be plenty for some households. I respect that.)
 
