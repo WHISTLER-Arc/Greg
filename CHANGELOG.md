@@ -24,6 +24,12 @@ versioned.
   scripted.
 
 ### Changed
+- **Quiet hours and conditions have their own card**, "When Greg keeps quiet",
+  below the mood card. They answer the same question and now live in the same
+  place, with room for as many conditions as you want and its own Save. The
+  settings block carries a summary and a link down to it.
+- The card says what is actually holding him, so a poke that does nothing has
+  a visible reason.
 - **The panel's settings are one block again.** They were rendered twice, once
   in the cog popover and once in the right-hand column, and kept in step by
   hand. Now it is a single block that CSS moves: the popover below 1000px, the

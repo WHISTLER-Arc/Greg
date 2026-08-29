@@ -261,7 +261,7 @@ Greg respects quiet hours (you set them during setup), and you can flip quiet mo
 
 A clock is a poor model of an evening. Guests arrive, somebody works late, the house is empty.
 
-If you already keep a few core conditions that the rest of your automations consult, Greg can consult them too. Open the cog in his panel and add rows under **Conditions**: an entity, `is` or `is not`, and a state.
+If you already keep a few core conditions that the rest of your automations consult, Greg can consult them too. In his panel, under **When Greg keeps quiet**, add rows: an entity, `is` or `is not`, and a state. Quiet hours live in the same card, because they answer the same question.
 
 ```
 switch.home_occupancy      is      on
