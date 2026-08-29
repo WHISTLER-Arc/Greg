@@ -23,7 +23,28 @@ versioned.
 - `greg.set_options` takes a `conditions` list, so the same thing can be
   scripted.
 
+### Changed
+- **The panel's settings are one block again.** They were rendered twice, once
+  in the cog popover and once in the right-hand column, and kept in step by
+  hand. Now it is a single block that CSS moves: the popover below 1000px, the
+  column above.
+- Settings are grouped into what he listens to, how he speaks, and when he
+  keeps quiet, rather than twelve fields in a row.
+- Wide screens are two columns rather than three. Greg and his last line stack
+  together; settings gets a column of its own.
+- One breakpoint fewer. Between 720 and 1000 pixels you now get the phone
+  layout at a wider size instead of a two-column arrangement nobody asked for.
+- Uninstall is a card-level action rather than the last thing in a popover you
+  could not reach the bottom of.
+
 ### Fixed
+- **The settings closed on every touch below 1000px.** The click-outside
+  handler asked whether the click was inside the panel using `contains`, which
+  cannot see into a shadow DOM: every click looked like it was outside, so the
+  settings shut the moment you touched one. Reported by WHISTLER-Arc. (#5)
+- **The settings could not be scrolled**, so on a short screen the bottom of
+  them was unreachable. They now have their own scroll and stay inside it. (#5)
+- The panel leaked one document listener per teardown.
 - **Greg's options no longer eat his settings.** Pressing Submit in Greg's
   options replaced the whole stored options rather than merging into them, so
   it deleted any lines you had written and any conditions you had set, and

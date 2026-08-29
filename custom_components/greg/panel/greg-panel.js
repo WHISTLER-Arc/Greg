@@ -60,6 +60,10 @@ class GregPanel extends HTMLElement {
   disconnectedCallback() {
     if (this._countdownTimer) clearInterval(this._countdownTimer);
     if (this._pokeTimer) clearTimeout(this._pokeTimer);
+    if (this._onDocClick) {
+      document.removeEventListener("click", this._onDocClick);
+      this._onDocClick = null;
+    }
     // The wizard is deliberately left alone here. Removing Greg tears this panel
     // down mid-flow, and the overlay still has steps to show.
   }
@@ -166,7 +170,8 @@ class GregPanel extends HTMLElement {
           border-radius:6px; margin:12px 0 4px; overflow:hidden; }
         .bar > span { display:block; height:100%; border-radius:6px; transition:width .5s, background .5s; }
         .taphint { font-size:11px; color:var(--secondary-text-color); margin-top:8px; opacity:.75; }
-        .detail { display:flex; flex-direction:column; justify-content:center; }
+        .detail { display:flex; flex-direction:column; justify-content:center;
+          border-top:1px solid var(--divider-color); }
         .quote { margin:16px 18px; padding:16px 20px; font-style:italic; font-size:15px; line-height:1.55;
           border-left:3px solid var(--success-color, #7cc36e); background:var(--secondary-background-color);
           border-radius:0 10px 10px 0; transition:opacity .4s; color:var(--primary-text-color); }
@@ -204,9 +209,10 @@ class GregPanel extends HTMLElement {
         .si .full { width:100%; margin-top:12px; background:var(--secondary-background-color);
           color:var(--secondary-text-color); border:1px solid var(--divider-color); border-radius:9px;
           padding:9px; font-size:12px; cursor:pointer; text-align:center; }
-        .si { display:flex; flex-direction:column; gap:13px; }
         .si h3 { font-size:12px; letter-spacing:.09em; text-transform:uppercase;
-          color:var(--secondary-text-color); margin:0; font-weight:600; }
+          color:var(--secondary-text-color); margin:0; font-weight:600;
+          display:flex; align-items:center; gap:8px; }
+        .si h3::after { content:""; flex:1; height:1px; background:var(--divider-color); }
         .gfield { display:flex; flex-direction:column; gap:5px; }
         .gfield > label { font-size:12px; color:var(--secondary-text-color);
           display:flex; justify-content:space-between; align-items:baseline; gap:8px; }
@@ -259,35 +265,55 @@ class GregPanel extends HTMLElement {
           border-radius:11px; padding:11px; font-size:13px; font-weight:700;
           font-family:inherit; cursor:pointer; transition:opacity .2s; }
         .gapply[disabled] { opacity:.32; cursor:default; }
-        .guninstall { border-top:1px solid var(--divider-color); padding-top:14px; margin-top:2px; }
-        .guninstall h4 { margin:0 0 5px; font-size:13px; font-weight:600;
-          color:var(--error-color, #c0504c); }
-        .guninstall p { margin:0 0 10px; font-size:11px; line-height:1.5;
-          color:var(--secondary-text-color); }
         .si :focus-visible { outline:2px solid var(--success-color, #7cc36e); outline-offset:2px; }
-        .balloon { position:absolute; top:58px; right:14px; z-index:10; width:min(300px, calc(100vw - 44px));
-          background:var(--card-background-color); border:1px solid var(--divider-color); border-radius:14px;
-          box-shadow:0 14px 34px rgba(0,0,0,.4); padding:15px; opacity:0; transform:translateY(-8px) scale(.97);
-          pointer-events:none; transition:all .2s; }
-        .balloon.open { opacity:1; transform:translateY(0) scale(1); pointer-events:auto; }
-        .inlinesettings { display:none; border-left:1px solid var(--divider-color); padding:22px 18px;
-          flex-direction:column; justify-content:center; }
-        /* uninstall, its own section, deliberately visible, not behind the gear */
+        /* One settings block, moved by CSS rather than rendered twice. Below
+           1000px it is the popover behind the cog; at 1000px and up it is the
+           right-hand column. Same node either way, so nothing has to be kept
+           in sync with a second copy and anything stateful inside it can use
+           ids, the way the lines card already does. */
+        .si { position:absolute; top:58px; right:14px; z-index:10; box-sizing:border-box;
+          width:min(300px, calc(100vw - 44px));
+          /* The block is tall and pinned near the top of the card, so without
+             these the bottom of it runs off a short screen with no way to
+             reach it. contain stops a scroll that runs out here from carrying
+             on into the page underneath, which is what makes it feel broken
+             on a touchscreen. */
+          max-height:calc(100vh - 120px); overflow-y:auto; overscroll-behavior:contain;
+          background:var(--card-background-color); border:1px solid var(--divider-color);
+          border-radius:14px; box-shadow:0 14px 34px rgba(0,0,0,.4); padding:15px;
+          display:flex; flex-direction:column; gap:13px;
+          opacity:0; transform:translateY(-8px) scale(.97);
+          pointer-events:none; transition:opacity .2s, transform .2s; }
+        .si.open { opacity:1; transform:translateY(0) scale(1); pointer-events:auto; }
+        /* Greg and what he just said, stacked, so settings gets a column of
+           its own rather than being the squeezed third of three. */
+        .col { display:flex; flex-direction:column; min-width:0; }
+        .cardfoot { border-top:1px solid var(--divider-color); padding:14px 18px;
+          display:flex; align-items:center; gap:12px; flex-wrap:wrap; }
+        .cardfoot p { margin:0; flex:1; min-width:220px; font-size:12px;
+          line-height:1.5; color:var(--secondary-text-color); }
+        /* uninstall, a card-level action rather than the last thing in a
+           settings popover you cannot reach the bottom of */
         .uninstall-btn { background:transparent; color:var(--error-color, #c0504c);
           border:1px solid var(--error-color, #c0504c); border-radius:10px; padding:10px 18px;
           font-size:14px; font-weight:600; font-family:inherit; cursor:pointer; transition:all .18s; }
         .uninstall-btn:hover { background:var(--error-color, #c0504c); color:#fff; }
-        @media (min-width:720px) {
-          .body { grid-template-columns:minmax(0,1.05fr) minmax(0,1fr); }
-          .hero { padding:38px 26px; justify-content:center; }
-          .herostack { max-width:340px; }
-          .detail { border-left:1px solid var(--divider-color); }
-        }
+        /* One breakpoint. Below 1000px is the phone layout at whatever width
+           it is given: one column, settings behind the cog. The old 720px
+           two-column step existed only to fill space next to a card that had
+           three columns to distribute, and it is a whole breakpoint's worth
+           of CSS for a layout nobody asked for. */
         @media (min-width:1000px) {
-          .body { grid-template-columns:minmax(0,1.1fr) minmax(0,1fr) minmax(240px,.8fr); }
-          .inlinesettings { display:flex; }
-          .cog, .balloon { display:none !important; }
+          .body { grid-template-columns:minmax(0,1fr) minmax(300px,.62fr); }
+          .hero { padding:38px 26px 20px; }
           .herostack { max-width:380px; }
+          .cog { display:none; }
+          /* The same node, sitting in the grid instead of floating over the
+             card. Everything the popover needs is undone here. */
+          .si { position:static; width:auto; max-height:none; overflow:visible;
+            border:0; border-left:1px solid var(--divider-color); border-radius:0;
+            box-shadow:none; padding:22px 18px;
+            opacity:1; transform:none; pointer-events:auto; }
         }
       </style>
       <div class="frame">
@@ -296,9 +322,9 @@ class GregPanel extends HTMLElement {
           <div class="cog" id="cog" title="Settings">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
           </div>
-          <div class="balloon" id="balloon">${this._settingsHTML()}</div>
           <datalist id="allents"></datalist>
           <div class="body">
+            <div class="col">
             <div class="hero">
               <div class="herostack" id="herostack">
                 <img id="img-resting" alt=""><img id="img-annoyed" alt="">
@@ -321,7 +347,13 @@ class GregPanel extends HTMLElement {
               </div>
               <div class="firmware" id="firmware">Greg OS · sentience: regrettably stable · warranty void since manufacture</div>
             </div>
-            <div class="inlinesettings">${this._settingsHTML()}</div>
+            </div>
+            <div class="si" id="settings">${this._settingsHTML()}</div>
+          </div>
+          <div class="cardfoot">
+            <p>Uninstall is safe and complete, with cache clearing. Your automations,
+               sensors and helpers are left alone.</p>
+            <button class="uninstall-btn">Uninstall Greg</button>
           </div>
         </div>
         ${this._linesHTML()}
@@ -331,10 +363,10 @@ class GregPanel extends HTMLElement {
     this._rendered = true;
   }
 
-  // Full width and below the card, rather than inside the settings block. The
-  // settings block is rendered twice, once in the cog balloon and once in the
-  // right-hand column, so anything with state in it would exist twice and the
-  // two copies would drift apart. This exists once and can use ids.
+  // Full width and below the card. Written when the settings block was
+  // rendered twice and anything stateful in it would have drifted between the
+  // copies; the settings block is one node now, so this is a layout choice
+  // rather than a forced one. It stays because the editor wants the width.
   _linesHTML() {
     return `
       <div class="linescard" id="linescard">
@@ -377,18 +409,28 @@ class GregPanel extends HTMLElement {
       </div>`;
   }
 
-  // Rendered twice: once in the cog balloon for narrow screens, once inline in
-  // the right-hand column for wide ones. Only one is ever visible, but both are
-  // in the DOM, so everything here is addressed by class and kept in sync. No
-  // ids, or they would collide.
+  // One instance, so this is free to use ids. It is addressed by class and
+  // data-key anyway, which costs nothing and keeps the plumbing below the same
+  // shape it has always had.
+  //
+  // Grouped into the three questions somebody actually arrives with, rather
+  // than twelve fields in a row.
   _settingsHTML() {
-    return `<div class="si">
-      <h3>Setup</h3>
+    return `
+      <h3>What he listens to</h3>
 
       <div class="gfield">
         <label>Vibration sensor</label>
         <div class="gselwrap"><select class="gctl" data-key="vibration_sensor" data-domain="binary_sensor"></select></div>
       </div>
+
+      <div class="gfield">
+        <label>Sensitivity <span class="gval" data-out="sensitivity"></span></label>
+        <input class="gctl" type="range" data-key="sensitivity" min="1" max="100" step="1">
+        <span class="ghint">Lower ignores repeat taps for longer.</span>
+      </div>
+
+      <h3>How he speaks</h3>
 
       <div class="gfield">
         <label>Speaker</label>
@@ -411,11 +453,7 @@ class GregPanel extends HTMLElement {
         <input class="gctl" type="range" data-key="volume" min="0" max="100" step="5">
       </div>
 
-      <div class="gfield">
-        <label>Sensitivity <span class="gval" data-out="sensitivity"></span></label>
-        <input class="gctl" type="range" data-key="sensitivity" min="1" max="100" step="1">
-        <span class="ghint">Lower ignores repeat taps for longer.</span>
-      </div>
+      <h3>When he keeps quiet</h3>
 
       <div class="grow">
         <span>Quiet hours</span>
@@ -443,14 +481,7 @@ class GregPanel extends HTMLElement {
       <button class="gapply" disabled>No changes</button>
       <button class="full" data-full>Advanced settings →</button>
       <p class="ghint">Thresholds, openers and his voice live in advanced.</p>
-
-      <div class="guninstall">
-        <h4>Uninstall Greg</h4>
-        <p>Safe, complete removal with cache clearing. Your automations, sensors
-           and helpers are left alone.</p>
-        <button class="uninstall-btn">Uninstall Greg</button>
-      </div>
-    </div>`;
+  `;
   }
 
   // ---- settings plumbing ----------------------------------------------
@@ -499,8 +530,9 @@ class GregPanel extends HTMLElement {
     });
   }
 
-  _readForm(scope) {
-    const g = (k) => scope.querySelector(`.gctl[data-key="${k}"]`);
+  _readForm() {
+    const g = (k) =>
+      this.shadowRoot.querySelector(`.gctl[data-key="${k}"]`);
     return {
       vibration_sensor: g("vibration_sensor").value,
       media_player: g("media_player").value,
@@ -520,8 +552,9 @@ class GregPanel extends HTMLElement {
     };
   }
 
-  _writeForm(scope, cfg) {
-    const g = (k) => scope.querySelector(`.gctl[data-key="${k}"]`);
+  _writeForm(cfg) {
+    const g = (k) =>
+      this.shadowRoot.querySelector(`.gctl[data-key="${k}"]`);
     if (cfg.vibration_sensor) g("vibration_sensor").value = cfg.vibration_sensor;
     if (cfg.media_player) g("media_player").value = cfg.media_player;
     if (cfg.tts_engine) g("tts_engine").value = cfg.tts_engine;
@@ -540,7 +573,7 @@ class GregPanel extends HTMLElement {
     // back over it and the row you just added disappears as you look at it.
     if (cfg.conditions && !this._condInProgress())
       this._condDraft = cfg.conditions.map((c) => ({ ...c }));
-    this._renderConditions(scope);
+    this._renderConditions();
   }
 
   _sameConfig(a, b) {
@@ -571,37 +604,34 @@ class GregPanel extends HTMLElement {
     if (!saved) return;
     this._fillSelects();
 
-    r.querySelectorAll(".si").forEach((scope) => {
-      // Don't stamp saved values over an edit in progress, or over settings
-      // that have been sent but not yet published back.
-      if (force || !(this._dirty || this._awaitingSave(saved))) {
-        this._writeForm(scope, saved);
-      }
+    // Don't stamp saved values over an edit in progress, or over settings
+    // that have been sent but not yet published back.
+    if (force || !(this._dirty || this._awaitingSave(saved))) {
+      this._writeForm(saved);
+    }
 
-      const cur = this._readForm(scope);
-      const dirty = !this._sameConfig(cur, saved);
-      const apply = scope.querySelector(".gapply");
-      apply.disabled = !dirty;
-      apply.textContent = dirty ? "Apply" : "No changes";
+    const dirty = !this._sameConfig(this._readForm(), saved);
+    const apply = r.querySelector(".gapply");
+    apply.disabled = !dirty;
+    apply.textContent = dirty ? "Apply" : "No changes";
 
-      const quiet =
-        scope.querySelector('.gctl[data-key="quiet_hours_enabled"]')
-             .getAttribute("aria-checked") === "true";
-      scope.querySelector(".gtimes").classList.toggle("hidden", !quiet);
+    const quiet =
+      r.querySelector('.gctl[data-key="quiet_hours_enabled"]')
+       .getAttribute("aria-checked") === "true";
+    r.querySelector(".gtimes").classList.toggle("hidden", !quiet);
 
-      const note = scope.querySelector('[data-out="langnote"]');
-      if (note) {
-        const chosen = scope.querySelector('.gctl[data-key="language"]').value;
-        const s = this._moodState();
-        const effective = (s && s.attributes && s.attributes.language_effective) || "";
-        const names = (s && s.attributes && s.attributes.language_options) || {};
-        note.textContent = chosen
-          ? ""
-          : effective
-          ? `Currently ${names[effective] || effective}.`
-          : "";
-      }
-    });
+    const note = r.querySelector('[data-out="langnote"]');
+    if (note) {
+      const chosen = r.querySelector('.gctl[data-key="language"]').value;
+      const st = this._moodState();
+      const effective = (st && st.attributes && st.attributes.language_effective) || "";
+      const names = (st && st.attributes && st.attributes.language_options) || {};
+      note.textContent = chosen
+        ? ""
+        : effective
+        ? `Currently ${names[effective] || effective}.`
+        : "";
+    }
   }
 
   // True while a save is in flight: sent to the service, not yet visible in the
@@ -623,20 +653,14 @@ class GregPanel extends HTMLElement {
     return true;
   }
 
-  _onSettingInput(el) {
-    const scope = el.closest(".si");
-    // Mirror into the other copy so the two never disagree.
-    const state = this._readForm(scope);
-    this.shadowRoot.querySelectorAll(".si").forEach((s) => {
-      if (s !== scope) this._writeForm(s, state);
-    });
-    this._dirty = !this._sameConfig(state, this._savedConfig());
+  _onSettingInput() {
+    this._dirty = !this._sameConfig(this._readForm(), this._savedConfig());
     this._refreshSettings(false);
   }
 
-  _applySettings(scope) {
+  _applySettings() {
     if (!this._hass) return;
-    const cfg = this._readForm(scope);
+    const cfg = this._readForm();
     // An empty select means that domain has no entities. Sending "" fails
     // validation on the service side, so leave the field out entirely.
     ["vibration_sensor", "media_player", "tts_engine"].forEach((k) => {
@@ -645,7 +669,7 @@ class GregPanel extends HTMLElement {
     // Half-filled rows go here as well as on Greg's side, so what is pending
     // matches what comes back and the form settles.
     cfg.conditions = this._cleanConditions(cfg.conditions);
-    const apply = scope.querySelector(".gapply");
+    const apply = this.shadowRoot.querySelector(".gapply");
     apply.disabled = true;
     apply.textContent = "Applying…";
     this._pending = cfg;
@@ -749,8 +773,9 @@ class GregPanel extends HTMLElement {
 
   // Structure only. Values go on afterwards as properties rather than into the
   // markup, so an entity id or a state can never be read as HTML.
-  _renderConditions(scope) {
-    const list = scope.querySelector(".gcondlist");
+  _renderConditions() {
+    const r = this.shadowRoot;
+    const list = r.querySelector(".gcondlist");
     if (!list) return;
     const rows = this._conditions();
     if (list.children.length !== rows.length) {
@@ -776,17 +801,17 @@ class GregPanel extends HTMLElement {
         )
         .join("");
     }
-    this._paintConditions(scope);
-    const add = scope.querySelector(".gcondadd");
+    this._paintConditions();
+    const add = r.querySelector(".gcondadd");
     if (add) add.disabled = rows.length >= CONDITIONS_MAX;
   }
 
   // Values and notes, without touching the structure, so this is safe to run
   // on every keystroke and on every state tick.
-  _paintConditions(scope) {
+  _paintConditions() {
     const rows = this._conditions();
     const focused = this.shadowRoot.activeElement;
-    scope.querySelectorAll(".gcond").forEach((el, i) => {
+    this.shadowRoot.querySelectorAll(".gcond").forEach((el, i) => {
       const row = rows[i];
       if (!row) return;
       const ent = el.querySelector(".gcondent");
@@ -808,12 +833,10 @@ class GregPanel extends HTMLElement {
   // rerender is for adding and removing rows, which changes how many there
   // are. Typing only needs repainting.
   _condChanged(rerender) {
-    const scopes = this.shadowRoot.querySelectorAll(".si");
-    if (!scopes.length) return;
-    this._dirty = !this._sameConfig(this._readForm(scopes[0]), this._savedConfig());
-    scopes.forEach((sc) =>
-      rerender ? this._renderConditions(sc) : this._paintConditions(sc)
-    );
+    if (!this.shadowRoot.querySelector(".gcondlist")) return;
+    this._dirty = !this._sameConfig(this._readForm(), this._savedConfig());
+    if (rerender) this._renderConditions();
+    else this._paintConditions();
     this._refreshSettings(false);
   }
 
@@ -1063,15 +1086,15 @@ class GregPanel extends HTMLElement {
         el.onclick = () => {
           const on = el.getAttribute("aria-checked") === "true";
           el.setAttribute("aria-checked", on ? "false" : "true");
-          this._onSettingInput(el);
+          this._onSettingInput();
         };
       } else {
-        el.oninput = () => this._onSettingInput(el);
-        el.onchange = () => this._onSettingInput(el);
+        el.oninput = () => this._onSettingInput();
+        el.onchange = () => this._onSettingInput();
       }
     });
     r.querySelectorAll(".gapply").forEach(
-      (el) => (el.onclick = () => this._applySettings(el.closest(".si")))
+      (el) => (el.onclick = () => this._applySettings())
     );
 
     // Condition rows are added and removed, so the handlers live on the list
@@ -1096,11 +1119,23 @@ class GregPanel extends HTMLElement {
       };
     });
     this._wireLines();
-    const cog = r.getElementById("cog"), balloon = r.getElementById("balloon");
-    cog.onclick = (e) => { e.stopPropagation(); balloon.classList.toggle("open"); };
-    document.addEventListener("click", (e) => {
-      if (!this.contains(e.target)) balloon.classList.remove("open");
-    });
+    const cog = r.getElementById("cog"), panel = r.getElementById("settings");
+    cog.onclick = (e) => { e.stopPropagation(); panel.classList.toggle("open"); };
+
+    // A listener on document sees event.target retargeted to the outermost
+    // shadow host, never to anything of ours, so contains() reported every
+    // click as being outside and the settings shut the instant you touched
+    // one. composedPath crosses shadow boundaries and gives the nodes actually
+    // clicked. Kept on `this` so disconnectedCallback can take it off again;
+    // it closes over this instance, so without that every teardown left one
+    // behind holding a detached element.
+    this._onDocClick = (e) => {
+      const path = e.composedPath();
+      if (!path.includes(panel) && !path.includes(cog)) {
+        panel.classList.remove("open");
+      }
+    };
+    document.addEventListener("click", this._onDocClick);
   }
 
   _doPoke() {
