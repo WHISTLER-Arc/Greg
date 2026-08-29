@@ -8,6 +8,11 @@ const MOODS = {
   existential: { label: "Existential", color: "var(--error-color, #c0504c)" },
 };
 
+// Matches CONDITIONS_MAX in const.py. The cap is there so a malformed
+// automation cannot write thousands of rows into the config entry, not
+// because a house has twenty core conditions.
+const CONDITIONS_MAX = 20;
+
 const POKE_LABELS = [
   "Disturb Greg", "Disturb again?", "Please stop",
   "I felt that one too", "We are past disturbing now",
@@ -208,7 +213,7 @@ class GregPanel extends HTMLElement {
         .gval { color:var(--primary-text-color); font-weight:600; font-size:12px;
           font-variant-numeric:tabular-nums; }
         .ghint { font-size:11px; color:var(--secondary-text-color); opacity:.8; margin:0; }
-        .si select, .si input[type="time"] { width:100%; box-sizing:border-box;
+        .si select, .si input[type="time"], .si input[type="text"] { width:100%; box-sizing:border-box;
           background:var(--secondary-background-color); color:var(--primary-text-color);
           border:1px solid var(--divider-color); border-radius:9px; padding:9px 10px;
           font-size:13px; font-family:inherit; appearance:none; }
@@ -232,6 +237,24 @@ class GregPanel extends HTMLElement {
         .grow .sw { border:0; padding:0; }
         .gtimes { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
         .gtimes.hidden { display:none; }
+        .gcondhead { display:flex; align-items:center; justify-content:space-between; gap:8px; }
+        .gcondhead > span { font-size:12px; color:var(--secondary-text-color); }
+        .gcondadd { background:var(--secondary-background-color); color:var(--primary-text-color);
+          border:1px solid var(--divider-color); border-radius:9px; padding:5px 10px;
+          font-size:12px; font-family:inherit; cursor:pointer; }
+        .gcondadd[disabled] { opacity:.32; cursor:default; }
+        .gcondlist { display:flex; flex-direction:column; gap:8px; }
+        .gcondlist:empty { display:none; }
+        .gcond { background:var(--secondary-background-color); border-radius:11px;
+          padding:9px 10px; display:flex; flex-direction:column; gap:6px; }
+        .gcondrow { display:flex; gap:6px; align-items:center; }
+        .gcondrow > input { flex:1; min-width:0; }
+        .gcondrow > select { flex:0 0 84px; width:84px; }
+        .gcondx { flex:0 0 auto; background:none; border:0; color:var(--secondary-text-color);
+          font-size:17px; line-height:1; padding:2px 4px; font-family:inherit; cursor:pointer; }
+        .gcondx:hover { color:var(--error-color, #db4437); }
+        .gcondnote { font-size:11px; color:var(--secondary-text-color); opacity:.8; }
+        .gcondnote.warn { color:var(--warning-color, #e5a50a); opacity:1; }
         .gapply { background:var(--success-color, #7cc36e); color:#14301a; border:0;
           border-radius:11px; padding:11px; font-size:13px; font-weight:700;
           font-family:inherit; cursor:pointer; transition:opacity .2s; }
@@ -274,6 +297,7 @@ class GregPanel extends HTMLElement {
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
           </div>
           <div class="balloon" id="balloon">${this._settingsHTML()}</div>
+          <datalist id="allents"></datalist>
           <div class="body">
             <div class="hero">
               <div class="herostack" id="herostack">
@@ -406,6 +430,16 @@ class GregPanel extends HTMLElement {
           <input class="gctl" type="time" data-key="quiet_end"></div>
       </div>
 
+      <div class="gconds">
+        <div class="gcondhead">
+          <span>Conditions</span>
+          <button class="gcondadd" type="button">+ Add</button>
+        </div>
+        <div class="gcondlist"></div>
+        <span class="ghint">Every one has to be true or Greg stays quiet. This is on
+          top of quiet hours, not instead of it. An entity he cannot read never blocks him.</span>
+      </div>
+
       <button class="gapply" disabled>No changes</button>
       <button class="full" data-full>Advanced settings →</button>
       <p class="ghint">Thresholds, openers and his voice live in advanced.</p>
@@ -449,6 +483,7 @@ class GregPanel extends HTMLElement {
 
   _fillSelects() {
     const r = this.shadowRoot;
+    this._fillEntityList();
     r.querySelectorAll("select.gctl").forEach((sel) => {
       const opts = sel.dataset.optkey
         ? this._listOptions(sel.dataset.optkey)
@@ -477,6 +512,11 @@ class GregPanel extends HTMLElement {
       quiet_start: g("quiet_start").value,
       quiet_end: g("quiet_end").value,
       language: g("language").value,
+      // Rows are held on the component rather than read back out of the DOM.
+      // The settings block exists twice and rows are added and removed, so
+      // keeping one array and rendering it into both copies is far less
+      // fragile than trying to keep two lists of live inputs agreeing.
+      conditions: this._conditions().map((c) => ({ ...c })),
     };
   }
 
@@ -495,6 +535,12 @@ class GregPanel extends HTMLElement {
     // Empty means follow Home Assistant, which is a valid choice rather than
     // an absent one, so this is set unconditionally.
     g("language").value = cfg.language ?? "";
+    // Not while a row is still being filled in. A blank row cleans away to
+    // nothing, so the form reads as unchanged, so saved values get stamped
+    // back over it and the row you just added disappears as you look at it.
+    if (cfg.conditions && !this._condInProgress())
+      this._condDraft = cfg.conditions.map((c) => ({ ...c }));
+    this._renderConditions(scope);
   }
 
   _sameConfig(a, b) {
@@ -502,7 +548,21 @@ class GregPanel extends HTMLElement {
     return ["vibration_sensor", "media_player", "tts_engine", "sensitivity",
             "quiet_hours_enabled", "quiet_start", "quiet_end", "language"]
       .every((k) => a[k] === b[k])
-      && Math.abs((a.volume ?? 0) - (b.volume ?? 0)) < 0.001;
+      && Math.abs((a.volume ?? 0) - (b.volume ?? 0)) < 0.001
+      && this._sameConditions(this._cleanConditions(a.conditions),
+                               this._cleanConditions(b.conditions));
+  }
+
+  // Rows compare by value and in order. Order is not meaningful to Greg, who
+  // needs all of them, but it is meaningful to whoever arranged them, so a
+  // reorder counts as a change worth applying.
+  _sameConditions(a, b) {
+    const x = a || [], y = b || [];
+    if (x.length !== y.length) return false;
+    return x.every((row, i) =>
+      row.entity_id === y[i].entity_id &&
+      row.op === y[i].op &&
+      row.state === y[i].state);
   }
 
   _refreshSettings(force) {
@@ -549,11 +609,13 @@ class GregPanel extends HTMLElement {
   // service call can return before the new values come back round.
   _awaitingSave(saved) {
     if (!this._pending) return false;
-    const settled = Object.keys(this._pending).every((k) =>
-      k === "volume"
-        ? Math.abs((saved[k] ?? 0) - this._pending[k]) < 0.001
-        : saved[k] === this._pending[k]
-    );
+    const settled = Object.keys(this._pending).every((k) => {
+      if (k === "volume")
+        return Math.abs((saved[k] ?? 0) - this._pending[k]) < 0.001;
+      if (k === "conditions")
+        return this._sameConditions(saved[k], this._pending[k]);
+      return saved[k] === this._pending[k];
+    });
     if (settled || Date.now() - this._pendingAt > 10000) {
       this._pending = null;
       return false;
@@ -580,6 +642,9 @@ class GregPanel extends HTMLElement {
     ["vibration_sensor", "media_player", "tts_engine"].forEach((k) => {
       if (!cfg[k]) delete cfg[k];
     });
+    // Half-filled rows go here as well as on Greg's side, so what is pending
+    // matches what comes back and the form settles.
+    cfg.conditions = this._cleanConditions(cfg.conditions);
     const apply = scope.querySelector(".gapply");
     apply.disabled = true;
     apply.textContent = "Applying…";
@@ -593,6 +658,178 @@ class GregPanel extends HTMLElement {
         this._pending = null;
       }
     );
+  }
+
+  // ---- conditions ------------------------------------------------------
+  //
+  // Rows of entity / is | is not / state, all of which have to hold or Greg
+  // stays quiet. Deliberately smaller than Home Assistant's own condition
+  // syntax: this covers the core-conditions pattern it was asked for, and
+  // anything wanting or, templates or numeric ranges points a row at a
+  // template binary_sensor, which is one row here either way.
+
+  _conditions() {
+    if (!this._condDraft) this._condDraft = [];
+    return this._condDraft;
+  }
+
+  // True while any row is half filled in, which is the normal state of the
+  // form between pressing + Add and typing a state into it.
+  _condInProgress() {
+    const rows = this._conditions();
+    return this._cleanConditions(rows).length !== rows.length;
+  }
+
+  // Mirrors _clean_conditions in __init__.py, deliberately kept in step. The
+  // panel needs to know what Greg will actually store to tell whether the form
+  // is dirty and whether a save has landed.
+  _cleanConditions(rows) {
+    const out = [];
+    for (const r of rows || []) {
+      if (!r) continue;
+      const entity_id = String(r.entity_id || "").trim();
+      const state = String(r.state || "").trim().replace(/\s+/g, " ");
+      if (!entity_id || !entity_id.includes(".") || !state) continue;
+      out.push({ entity_id, op: r.op === "is_not" ? "is_not" : "is", state });
+      if (out.length >= CONDITIONS_MAX) break;
+    }
+    return out;
+  }
+
+  // What the row is doing right now, in words. The warning cases are the ones
+  // that can never be true, which would otherwise silence Greg for good with
+  // nothing on screen to say why. The request that started this asked for
+  // "boolean.quite_hours = false", and an input_boolean is never "false".
+  _conditionNote(row) {
+    if (!row.entity_id)
+      return { text: "Pick an entity. Unfinished rows are ignored." };
+    const st = this._hass && this._hass.states[row.entity_id];
+    if (!st)
+      return { text: "Not here right now. Greg never blocks on an entity he cannot read." };
+
+    const cur = st.state;
+    if (cur === "unavailable" || cur === "unknown")
+      return { text: `Currently ${cur}, so it is not blocking him.` };
+    if (!row.state) return { text: `Currently ${cur}. Type the state to match.` };
+
+    const typed = row.state.toLowerCase();
+    const opts = (st.attributes && st.attributes.options) || null;
+    if (opts && opts.length && !opts.some((o) => String(o).toLowerCase() === typed))
+      return {
+        warn: true,
+        text: `Currently ${cur}. This one is only ever ${opts.join(", ")}, so that never matches.`,
+      };
+    if ((cur === "on" || cur === "off") && typed !== "on" && typed !== "off")
+      return {
+        warn: true,
+        text: `Currently ${cur}. This one is on or off, never ${row.state}, so that never matches.`,
+      };
+    return { text: `Currently ${cur}.` };
+  }
+
+  // Every entity in the house, for the row inputs to suggest from. One list at
+  // the root of the shadow tree, shared by both copies of the settings block.
+  // Rebuilt only when the entity list actually changes, because it is a few
+  // thousand options and Greg's own state ticks constantly.
+  _fillEntityList() {
+    const dl = this.shadowRoot.getElementById("allents");
+    if (!dl || !this._hass) return;
+    const ids = Object.keys(this._hass.states).sort();
+    const sig = `${ids.length}|${ids[0]}|${ids[ids.length - 1]}`;
+    if (dl.dataset.sig === sig) return;
+    dl.dataset.sig = sig;
+    dl.replaceChildren(
+      ...ids.map((id) => {
+        const o = document.createElement("option");
+        o.value = id;
+        return o;
+      })
+    );
+  }
+
+  // Structure only. Values go on afterwards as properties rather than into the
+  // markup, so an entity id or a state can never be read as HTML.
+  _renderConditions(scope) {
+    const list = scope.querySelector(".gcondlist");
+    if (!list) return;
+    const rows = this._conditions();
+    if (list.children.length !== rows.length) {
+      list.innerHTML = rows
+        .map(
+          () => `
+        <div class="gcond">
+          <div class="gcondrow">
+            <input type="text" class="gcondent" list="allents" placeholder="entity id"
+                   autocomplete="off" spellcheck="false" aria-label="Entity">
+            <button class="gcondx" type="button" aria-label="Remove condition">&times;</button>
+          </div>
+          <div class="gcondrow">
+            <select class="gcondop" aria-label="Comparison">
+              <option value="is">is</option>
+              <option value="is_not">is not</option>
+            </select>
+            <input type="text" class="gcondval" placeholder="state"
+                   autocomplete="off" spellcheck="false" aria-label="State">
+          </div>
+          <span class="gcondnote"></span>
+        </div>`
+        )
+        .join("");
+    }
+    this._paintConditions(scope);
+    const add = scope.querySelector(".gcondadd");
+    if (add) add.disabled = rows.length >= CONDITIONS_MAX;
+  }
+
+  // Values and notes, without touching the structure, so this is safe to run
+  // on every keystroke and on every state tick.
+  _paintConditions(scope) {
+    const rows = this._conditions();
+    const focused = this.shadowRoot.activeElement;
+    scope.querySelectorAll(".gcond").forEach((el, i) => {
+      const row = rows[i];
+      if (!row) return;
+      const ent = el.querySelector(".gcondent");
+      const op = el.querySelector(".gcondop");
+      const val = el.querySelector(".gcondval");
+      // Never write over the field somebody is typing in, or the caret jumps
+      // to the end on every character.
+      if (ent !== focused && ent.value !== row.entity_id) ent.value = row.entity_id;
+      if (op !== focused && op.value !== row.op) op.value = row.op;
+      if (val !== focused && val.value !== row.state) val.value = row.state;
+
+      const note = this._conditionNote(row);
+      const noteEl = el.querySelector(".gcondnote");
+      noteEl.textContent = note.text;
+      noteEl.classList.toggle("warn", !!note.warn);
+    });
+  }
+
+  // rerender is for adding and removing rows, which changes how many there
+  // are. Typing only needs repainting.
+  _condChanged(rerender) {
+    const scopes = this.shadowRoot.querySelectorAll(".si");
+    if (!scopes.length) return;
+    this._dirty = !this._sameConfig(this._readForm(scopes[0]), this._savedConfig());
+    scopes.forEach((sc) =>
+      rerender ? this._renderConditions(sc) : this._paintConditions(sc)
+    );
+    this._refreshSettings(false);
+  }
+
+  _onCondEdit(e) {
+    const el = e.target;
+    const wrap = el.closest && el.closest(".gcond");
+    if (!wrap) return;
+    const i = Array.prototype.indexOf.call(wrap.parentElement.children, wrap);
+    const row = this._conditions()[i];
+    if (!row) return;
+
+    if (el.classList.contains("gcondent")) row.entity_id = el.value.trim();
+    else if (el.classList.contains("gcondop")) row.op = el.value;
+    else if (el.classList.contains("gcondval")) row.state = el.value;
+    else return;
+    this._condChanged(false);
   }
 
   // ---- the lines editor ------------------------------------------------
@@ -836,6 +1073,28 @@ class GregPanel extends HTMLElement {
     r.querySelectorAll(".gapply").forEach(
       (el) => (el.onclick = () => this._applySettings(el.closest(".si")))
     );
+
+    // Condition rows are added and removed, so the handlers live on the list
+    // rather than on the inputs, which do not exist yet when this runs.
+    r.querySelectorAll(".gcondlist").forEach((list) => {
+      list.addEventListener("input", (e) => this._onCondEdit(e));
+      list.addEventListener("change", (e) => this._onCondEdit(e));
+      list.addEventListener("click", (e) => {
+        const x = e.target.closest && e.target.closest(".gcondx");
+        if (!x) return;
+        const wrap = x.closest(".gcond");
+        const i = Array.prototype.indexOf.call(wrap.parentElement.children, wrap);
+        this._conditions().splice(i, 1);
+        this._condChanged(true);
+      });
+    });
+    r.querySelectorAll(".gcondadd").forEach((el) => {
+      el.onclick = () => {
+        if (this._conditions().length >= CONDITIONS_MAX) return;
+        this._conditions().push({ entity_id: "", op: "is", state: "" });
+        this._condChanged(true);
+      };
+    });
     this._wireLines();
     const cog = r.getElementById("cog"), balloon = r.getElementById("balloon");
     cog.onclick = (e) => { e.stopPropagation(); balloon.classList.toggle("open"); };
@@ -896,8 +1155,13 @@ class GregPanel extends HTMLElement {
     const level = this._levelState() ? Number(this._levelState().state) : 0;
     const swS = this._switchState();
     const enabled = swS ? swS.state === "on" : true;
-    const quiet = moodS && moodS.attributes ? moodS.attributes.quiet_hours : false;
-    const asleep = !enabled || quiet;
+    const attrs = (moodS && moodS.attributes) || {};
+    const quiet = attrs.quiet_hours || false;
+    // blocked covers quiet hours and conditions together. Falls back to quiet
+    // so the panel still reads correctly against a Greg that predates it.
+    const blocked = attrs.blocked === undefined ? quiet : attrs.blocked;
+    const blockedBy = attrs.blocked_by || "";
+    const asleep = !enabled || blocked;
 
     // hero images (served from integration static path, via mood attribute)
     ["resting", "annoyed", "judging", "existential"].forEach((m) => {
@@ -932,7 +1196,13 @@ class GregPanel extends HTMLElement {
     r.getElementById("card").classList.toggle("asleep", asleep);
     r.getElementById("sleepcap").textContent = !enabled
       ? "Greg is switched off. He notices nothing. He is grateful."
-      : (quiet ? "Greg is asleep. Quiet hours are in effect." : "");
+      : quiet
+      ? "Greg is asleep. Quiet hours are in effect."
+      : blocked
+      // Named rather than hinted at, so nobody has to work out which of their
+      // own conditions is holding him.
+      ? `Greg is holding his tongue. ${blockedBy} does not meet a condition you set.`
+      : "";
 
     // firmware gag bound to actual installed version (device sw_version)
     const fw = r.getElementById("firmware");

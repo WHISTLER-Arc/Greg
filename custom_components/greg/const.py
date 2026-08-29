@@ -12,6 +12,7 @@ CONF_VOLUME = "volume"
 CONF_QUIET_HOURS_ENABLED = "quiet_hours_enabled"
 CONF_QUIET_START = "quiet_start"
 CONF_QUIET_END = "quiet_end"
+CONF_CONDITIONS = "conditions"
 
 # Advanced config keys
 CONF_SOFT_THRESHOLD = "soft_threshold"
@@ -122,6 +123,35 @@ DEFAULT_CUSTOM_ONLY = False
 CUSTOM_LINE_MAX = 300
 CUSTOM_LINES_MAX_PER_POOL = 200
 
+# Conditions Greg consults before reacting, alongside quiet hours rather than
+# instead of it. Each row is {entity_id, op, state} and every row must pass, so
+# a row that fails keeps him quiet the same way a quiet hour does.
+#
+# Deliberately smaller than Home Assistant's own condition syntax. Rows cover
+# the "core conditions" pattern this was asked for, and anything wanting or,
+# templates or numeric ranges points a row at a template binary_sensor. That
+# logic then belongs to the house rather than to Greg, and it is one row here
+# either way.
+#
+# It also keeps the gate synchronous. Rows are a states lookup and a string
+# compare, so _is_blocked() stays callable from the two @callback paths and
+# from the property the mood sensor publishes.
+CONDITION_IS = "is"
+CONDITION_IS_NOT = "is_not"
+CONDITION_OPS = (CONDITION_IS, CONDITION_IS_NOT)
+
+# Enough for the handful of core conditions a house actually has. The cap
+# exists so a malformed automation cannot write ten thousand rows into the
+# config entry, not because anyone will reach it.
+CONDITIONS_MAX = 20
+
+# An entity that is missing, unavailable or unknown does NOT block. Treating it
+# as a failed condition means one renamed entity silences Greg permanently with
+# nothing in the log to say why, which is the worse failure by a distance: a
+# Greg who talks when he should not is a nuisance, a Greg who has gone silent
+# for good looks broken.
+CONDITION_SKIP_STATES = ("unavailable", "unknown")
+
 SERVICE_SET_LINES = "set_lines"
 
 # Mood states
@@ -160,6 +190,7 @@ BASIC_OPTION_KEYS = (
     CONF_QUIET_HOURS_ENABLED,
     CONF_QUIET_START,
     CONF_QUIET_END,
+    CONF_CONDITIONS,
     CONF_LANGUAGE,
 )
 

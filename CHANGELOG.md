@@ -3,6 +3,41 @@
 All notable changes to Greg. He would like it noted that he did not ask to be
 versioned.
 
+## [1.7.0]
+
+### Added
+- **Conditions.** Greg can now consult the same core conditions the rest of
+  your automations use, rather than only his own clock. Rows of entity /
+  `is` or `is not` / state in his panel, all of which have to hold or he keeps
+  quiet. Requested by
+  [euf0ria](https://community.home-assistant.io/u/euf0ria) on the forum thread.
+- Conditions sit alongside quiet hours rather than replacing them, so anyone
+  who has not written any notices no change at all.
+- Each row shows the entity's current state, and warns when what you have typed
+  can never match it. `input_boolean.x is false` never fires, because an
+  `input_boolean` is `on` or `off`.
+- The panel says which condition is keeping him quiet, rather than leaving you
+  to work out why a poke did nothing.
+- `blocked` and `blocked_by` attributes on the mood sensor. `quiet_hours` still
+  means only the clock, so automations reading it are unaffected.
+- `greg.set_options` takes a `conditions` list, so the same thing can be
+  scripted.
+
+### Fixed
+- **Greg's options no longer eat his settings.** Pressing Submit in Greg's
+  options replaced the whole stored options rather than merging into them, so
+  it deleted any lines you had written and any conditions you had set, and
+  reverted advanced settings changed since install. Present since custom lines
+  shipped in 1.6.0.
+
+### Notes
+- An entity that is missing, unavailable or unknown does not block Greg. A
+  renamed entity leaving him permanently silent is the worse failure by a
+  distance.
+- Twenty conditions is the cap, which is there to stop a malformed automation
+  writing thousands of rows into the config entry rather than because a house
+  has twenty core conditions.
+
 ## [1.6.0]
 
 ### Added

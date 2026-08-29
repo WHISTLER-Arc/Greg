@@ -257,6 +257,28 @@ His four faces:
 
 Greg respects quiet hours (you set them during setup), and you can flip quiet mode on or off straight from the dashboard card without digging into HA settings. Even a depressed table needs to sleep.
 
+### Conditions
+
+A clock is a poor model of an evening. Guests arrive, somebody works late, the house is empty.
+
+If you already keep a few core conditions that the rest of your automations consult, Greg can consult them too. Open the cog in his panel and add rows under **Conditions**: an entity, `is` or `is not`, and a state.
+
+```
+switch.home_occupancy      is      on
+input_boolean.focus_mode   is not  on
+input_select.home_mode     is      day
+```
+
+All of them have to be true or he keeps quiet. They sit on top of quiet hours rather than replacing them, so if you have not written any, nothing about Greg changes. A blocked Greg reacts to nothing at all: no line, no tally, no mood movement, exactly as quiet hours has always behaved.
+
+Each row shows the entity's current state underneath it, and warns you when what you have typed can never match. `input_boolean.something is false` looks reasonable and never fires, because an `input_boolean` is `on` or `off`.
+
+**An entity Greg cannot read never blocks him.** Rename one, unplug one, and he carries on rather than going silent for good with nothing to say why. The panel says which condition is holding him when one is.
+
+One row, one entity, all ANDed. For anything needing `or`, a template or a numeric range, point a row at a template `binary_sensor` you write yourself. That logic then belongs to your house rather than to a coffee table, and it is one row here either way.
+
+> Conditions were requested by **[euf0ria](https://community.home-assistant.io/u/euf0ria)** on the forum thread.
+
 ---
 
 ## Hooking Greg up to your own stuff

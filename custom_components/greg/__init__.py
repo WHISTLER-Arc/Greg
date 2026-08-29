@@ -44,6 +44,7 @@ from .const import (
     CONF_QUIET_HOURS_ENABLED,
     CONF_QUIET_START,
     CONF_QUIET_END,
+    CONF_CONDITIONS,
     CONF_SOFT_THRESHOLD,
     CONF_MEDIUM_THRESHOLD,
     CONF_CHAOS_THRESHOLD,
@@ -83,6 +84,11 @@ from .const import (
     SERVICE_SET_OPTIONS,
     SERVICE_SET_LINES,
     BASIC_OPTION_KEYS,
+    CONDITION_IS,
+    CONDITION_IS_NOT,
+    CONDITION_OPS,
+    CONDITIONS_MAX,
+    CONDITION_SKIP_STATES,
     CONF_CUSTOM_LINES,
     CONF_CUSTOM_ONLY,
     DEFAULT_CUSTOM_ONLY,
@@ -99,6 +105,34 @@ from .const import (
 )
 
 _LOGGER = logging.getLogger(__name__)
+
+
+def _clean_conditions(raw) -> list[dict]:
+    """Normalise condition rows, dropping anything unusable.
+
+    A row missing its entity or its state is dropped rather than failed. The
+    panel adds a row the moment you press +, so a half-filled row is the normal
+    state of the form while you are still typing in it, and treating those as
+    unmet would silence Greg mid-edit.
+    """
+    if not isinstance(raw, list):
+        return []
+
+    rows: list[dict] = []
+    for item in raw:
+        if not isinstance(item, dict):
+            continue
+        entity_id = str(item.get("entity_id") or "").strip()
+        state = " ".join(str(item.get("state") or "").split())
+        op = item.get("op") or CONDITION_IS
+        if not entity_id or "." not in entity_id or not state:
+            continue
+        if op not in CONDITION_OPS:
+            op = CONDITION_IS
+        rows.append({"entity_id": entity_id, "op": op, "state": state})
+        if len(rows) >= CONDITIONS_MAX:
+            break
+    return rows
 
 # Dispatcher signals so entities update the instant coordinator state changes.
 SIGNAL_STATE_UPDATED = f"{DOMAIN}_state_updated"
@@ -266,6 +300,8 @@ def _async_register_services(hass: HomeAssistant) -> None:
         per control. That is also why the panel has an Apply button.
         """
         fields = {key: call.data[key] for key in BASIC_OPTION_KEYS if key in call.data}
+        if CONF_CONDITIONS in fields:
+            fields[CONF_CONDITIONS] = _clean_conditions(fields[CONF_CONDITIONS])
         if not fields:
             return
 
@@ -363,6 +399,10 @@ def _async_register_services(hass: HomeAssistant) -> None:
                 vol.Optional(CONF_QUIET_HOURS_ENABLED): cv.boolean,
                 vol.Optional(CONF_QUIET_START): cv.matches_regex(r"^\d{2}:\d{2}$"),
                 vol.Optional(CONF_QUIET_END): cv.matches_regex(r"^\d{2}:\d{2}$"),
+                # Deliberately only shape-checked here. Rows are cleaned in
+                # the handler, where a half-filled row is dropped rather than
+                # failing the whole call and making Apply look broken.
+                vol.Optional(CONF_CONDITIONS): vol.All(cv.ensure_list, [dict]),
                 # Empty is valid and means follow Home Assistant.
                 vol.Optional(CONF_LANGUAGE): vol.In(
                     ["", *available_languages().keys()]
@@ -529,7 +569,7 @@ class GregCoordinator:
         new_state = event.data.get("new_state")
         if new_state is None or new_state.state not in ("on", "vibrating", "detected"):
             return
-        if not self.enabled or self._is_quiet_time():
+        if not self.enabled or self._is_blocked():
             return
         # Filtered before anything is counted, so a bouncy sensor does not
         # inflate the daily tally either.
@@ -554,7 +594,7 @@ class GregCoordinator:
 
     async def async_poke(self) -> None:
         """Force a reaction regardless of sensor (greg.poke service / panel button)."""
-        if not self.enabled or self._is_quiet_time():
+        if not self.enabled or self._is_blocked():
             return
         self._counter += 1
         self.vibrations_today += 1
@@ -583,13 +623,13 @@ class GregCoordinator:
         )
 
     async def _handle_silence(self) -> None:
-        if not self.enabled or self._is_quiet_time():
+        if not self.enabled or self._is_blocked():
             return
         await self._speak("silence")
 
     @callback
     def _handle_existential(self, now=None) -> None:
-        if self._counter > 0 and self.enabled and not self._is_quiet_time():
+        if self._counter > 0 and self.enabled and not self._is_blocked():
             self.hass.async_create_task(
                 self._speak("existential")
             )
@@ -911,7 +951,7 @@ class GregCoordinator:
         except Exception as err:
             _LOGGER.error("Greg failed to speak: %s", err)
 
-    # ---- quiet hours -----------------------------------------------------
+    # ---- the gate --------------------------------------------------------
 
     def _is_quiet_time(self) -> bool:
         if not self._config.get(CONF_QUIET_HOURS_ENABLED):
@@ -927,6 +967,56 @@ class GregCoordinator:
             return start <= now < end
         except Exception:
             return False
+
+    def _conditions(self) -> list[dict]:
+        """The stored condition rows, cleaned.
+
+        Read defensively rather than trusted: these come from a config entry an
+        older version wrote, that an automation can write through
+        greg.set_options, and that somebody can edit by hand.
+        """
+        return _clean_conditions(self._config.get(CONF_CONDITIONS))
+
+    def _failing_condition(self) -> str | None:
+        """The first condition row not currently met, described for a human.
+
+        None means every row passes, which is also what an empty list gives, so
+        anyone who has written no conditions is unaffected.
+        """
+        for row in self._conditions():
+            entity_id = row["entity_id"]
+            state_obj = self.hass.states.get(entity_id)
+
+            # Missing, unavailable or unknown never blocks. See
+            # CONDITION_SKIP_STATES for why this is the safe direction.
+            if state_obj is None:
+                _LOGGER.debug(
+                    "Greg condition skipped, %s does not exist", entity_id
+                )
+                continue
+            actual = state_obj.state
+            if actual in CONDITION_SKIP_STATES:
+                _LOGGER.debug(
+                    "Greg condition skipped, %s is %s", entity_id, actual
+                )
+                continue
+
+            matches = actual.casefold() == row["state"].casefold()
+            if row["op"] == CONDITION_IS_NOT:
+                matches = not matches
+            if not matches:
+                return f"{entity_id} is {actual}"
+        return None
+
+    def _is_blocked(self) -> bool:
+        """The single gate in front of everything Greg does.
+
+        Quiet hours and conditions block independently, so anyone who has set
+        neither is never blocked and anyone who has set both gets the union.
+        A blocked Greg reacts to nothing at all: no line, no tally, no mood
+        movement, exactly as quiet hours has always behaved.
+        """
+        return self._is_quiet_time() or self._failing_condition() is not None
 
     @property
     def language_options(self) -> dict:
@@ -949,7 +1039,28 @@ class GregCoordinator:
 
     @property
     def is_quiet_now(self) -> bool:
+        """Quiet hours specifically, not the gate as a whole.
+
+        Kept meaning what it has always meant. The mood sensor publishes it as
+        the quiet_hours attribute and people have automations reading that, so
+        widening it to include conditions would quietly change what those see.
+        """
         return self._is_quiet_time()
+
+    @property
+    def blocked_by(self) -> str | None:
+        """Why Greg is staying quiet, or None when he is not.
+
+        Published so the panel can say which condition is holding him rather
+        than leaving someone to work out why a poke did nothing.
+        """
+        if self._is_quiet_time():
+            return "quiet hours"
+        return self._failing_condition()
+
+    @property
+    def is_blocked(self) -> bool:
+        return self._is_blocked()
 
     @property
     def basic_config(self) -> dict:
@@ -968,6 +1079,9 @@ class GregCoordinator:
             CONF_QUIET_HOURS_ENABLED: cfg.get(CONF_QUIET_HOURS_ENABLED, True),
             CONF_QUIET_START: cfg.get(CONF_QUIET_START, DEFAULT_QUIET_START),
             CONF_QUIET_END: cfg.get(CONF_QUIET_END, DEFAULT_QUIET_END),
+            # Cleaned rather than raw, so the panel renders what Greg will
+            # actually act on rather than what happens to be stored.
+            CONF_CONDITIONS: self._conditions(),
             # The configured value, which may be empty meaning follow Home
             # Assistant. The panel edits this. self.language is what that
             # resolves to, which is a different question and reported below.
