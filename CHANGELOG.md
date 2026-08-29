@@ -3,7 +3,7 @@
 All notable changes to Greg. He would like it noted that he did not ask to be
 versioned.
 
-## [1.7.0]
+## [1.6.5]
 
 ### Added
 - **Conditions.** Greg can now consult the same core conditions the rest of
