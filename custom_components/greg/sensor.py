@@ -77,6 +77,9 @@ class GregMoodSensor(_GregBase):
             # automations already read it and it should keep meaning that.
             "blocked": self.coordinator.is_blocked,
             "blocked_by": self.coordinator.blocked_by,
+            # Why the last line did not come out, if it did not. Blocked is
+            # Greg choosing not to speak; this is Greg trying and failing.
+            "speech_problem": self.coordinator.speech_problem,
             "enabled": self.coordinator.enabled,
             # The panel reads the running version from here. sw_version lives in
             # DeviceInfo, which the frontend cannot see from an entity state, so

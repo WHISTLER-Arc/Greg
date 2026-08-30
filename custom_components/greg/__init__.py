@@ -89,6 +89,8 @@ from .const import (
     CONDITION_OPS,
     CONDITIONS_MAX,
     CONDITION_SKIP_STATES,
+    SPEAKER_DEAD_STATES,
+    ATTR_AUDIO_BLOCKED,
     CONF_CUSTOM_LINES,
     CONF_CUSTOM_ONLY,
     DEFAULT_CUSTOM_ONLY,
@@ -433,6 +435,9 @@ class GregCoordinator:
         self.mood_level = 0
         self.last_line = ""
         self.vibrations_today = 0
+        # Why the last thing he tried to say did not come out, or None. Read by
+        # the panel so a silent Greg can explain himself.
+        self.speech_problem = None
         # Timers / listeners
         self._reset_handle = None
         self._silence_handle = None
@@ -899,6 +904,16 @@ class GregCoordinator:
         if not will_speak:
             return
 
+        # After the event, so an automation listening for greg_line still hears
+        # about the line even when Greg himself cannot deliver it.
+        problem = self._speaker_problem()
+        if problem:
+            self.speech_problem = problem
+            _LOGGER.warning("Greg could not speak: %s", problem)
+            self._notify()
+            return
+        self.speech_problem = None
+
         try:
             if suppress_chime:
                 await self.hass.services.async_call(
@@ -950,6 +965,8 @@ class GregCoordinator:
             )
         except Exception as err:
             _LOGGER.error("Greg failed to speak: %s", err)
+            self.speech_problem = f"The speaker refused the line: {err}"
+            self._notify()
 
     # ---- the gate --------------------------------------------------------
 
@@ -1006,6 +1023,29 @@ class GregCoordinator:
                 matches = not matches
             if not matches:
                 return f"{entity_id} is {actual}"
+        return None
+
+    def _speaker_problem(self) -> str | None:
+        """Why the configured speaker cannot be spoken to, or None.
+
+        This is a pre-flight rather than error handling, because tts.speak is
+        called with blocking=False and never reports back. Everything here is a
+        states lookup, so it costs nothing and cannot itself fail.
+        """
+        player = self._config.get(CONF_MEDIA_PLAYER)
+        if not player:
+            return "No speaker is set."
+
+        state = self.hass.states.get(player)
+        if state is None:
+            return f"{player} does not exist any more."
+        if state.state in SPEAKER_DEAD_STATES:
+            return f"{player} is {state.state}."
+        if state.attributes.get(ATTR_AUDIO_BLOCKED):
+            return (
+                f"{player} is not allowed to play audio yet. Open the page it "
+                "runs on and tap it once."
+            )
         return None
 
     def _is_blocked(self) -> bool:

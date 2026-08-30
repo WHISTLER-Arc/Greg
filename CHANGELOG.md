@@ -3,6 +3,39 @@
 All notable changes to Greg. He would like it noted that he did not ask to be
 versioned.
 
+## [1.7.0]
+
+### Added
+- **Greg on your phone.** Not a new ability, an explanation and a shortcut. He
+  has always spoken through any `media_player`, so a phone only needs something
+  on it for him to speak through. The README now covers the three ways to do
+  that, browser_mod being the least invasive, along with the four steps that
+  fail silently if you miss them.
+- **Speak on this device.** When the browser showing Greg's panel has a
+  browser_mod player of its own, a button appears under the Speaker dropdown
+  that switches him to it in one tap.
+- **Greg says why he was silent.** He checks his speaker before speaking now,
+  and reports it in the panel when he cannot: a speaker that has been renamed,
+  one that has gone unavailable, or a browser that is refusing to play audio
+  until somebody taps the page. All of those used to leave him reporting a line
+  he never delivered.
+- `speech_problem` attribute on the mood sensor, carrying the same thing.
+
+### Changed
+- The speaker, sensor and text-to-speech dropdowns no longer offer entities
+  that are not there, and show the entity id beside any two that share a name.
+  Whatever is currently saved always stays in the list even if it has gone
+  unavailable, so applying an unrelated setting cannot quietly move Greg onto
+  a different speaker. (#7)
+
+### Notes
+- browser_mod needs the page open and visible. Android freezes a backgrounded
+  webview and Greg goes quiet with it, so it suits showing him off rather than
+  being a permanent speaker.
+- The Companion app cannot do this on its own. Its TTS notifications use the
+  phone's own voice, and it registers no Assist satellite, so there is nothing
+  to push his real voice to.
+
 ## [1.6.5]
 
 ### Added

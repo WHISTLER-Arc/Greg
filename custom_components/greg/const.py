@@ -152,6 +152,19 @@ CONDITIONS_MAX = 20
 # for good looks broken.
 CONDITION_SKIP_STATES = ("unavailable", "unknown")
 
+# A speaker in one of these states cannot be spoken to. Checked before Greg
+# says anything, because tts.speak is fired with blocking=False: the call
+# returns straight away and anything that fails afterwards lands in Home
+# Assistant's log rather than in Greg's own error handling. Without the check
+# he reports having spoken and the room stays silent, which is the hardest
+# thing about him to debug and the thing behind issue #2.
+SPEAKER_DEAD_STATES = ("unavailable", "unknown")
+
+# Published by browser_mod, and by anything else playing through a browser,
+# when the page has not been interacted with yet. Browsers refuse to play audio
+# that no user gesture asked for, so the line is accepted and silently dropped.
+ATTR_AUDIO_BLOCKED = "audio_interaction_required"
+
 SERVICE_SET_LINES = "set_lines"
 
 # Mood states

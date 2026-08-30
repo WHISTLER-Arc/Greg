@@ -13,6 +13,10 @@ const MOODS = {
 // because a house has twenty core conditions.
 const CONDITIONS_MAX = 20;
 
+// Matches SPEAKER_DEAD_STATES in const.py. An entity in one of these is not
+// something anyone chose on purpose.
+const DEAD_STATES = ["unavailable", "unknown"];
+
 const POKE_LABELS = [
   "Disturb Greg", "Disturb again?", "Please stop",
   "I felt that one too", "We are past disturbing now",
@@ -173,6 +177,11 @@ class GregPanel extends HTMLElement {
         .taphint { font-size:11px; color:var(--secondary-text-color); margin-top:8px; opacity:.75; }
         .detail { display:flex; flex-direction:column; justify-content:center;
           border-top:1px solid var(--divider-color); }
+        .speechwarn { margin:0 18px 12px; padding:10px 12px; font-size:12px; line-height:1.5;
+          border-radius:11px; background:var(--secondary-background-color);
+          border-left:3px solid var(--warning-color, #e5a50a);
+          color:var(--primary-text-color); }
+        .speechwarn.hidden, #speak-here.hidden { display:none; }
         .quote { margin:16px 18px; padding:16px 20px; font-style:italic; font-size:15px; line-height:1.55;
           border-left:3px solid var(--success-color, #7cc36e); background:var(--secondary-background-color);
           border-radius:0 10px 10px 0; transition:opacity .4s; color:var(--primary-text-color); }
@@ -387,6 +396,7 @@ class GregPanel extends HTMLElement {
             </div>
             <div class="detail">
               <blockquote class="quote" id="quote">…</blockquote>
+              <div class="speechwarn hidden" id="speechwarn"></div>
               <div class="controls">
                 <div class="toggle"><span>Greg enabled</span><div class="sw" id="sw"></div></div>
                 <button class="poke" id="poke">Disturb Greg</button>
@@ -532,6 +542,7 @@ class GregPanel extends HTMLElement {
       <div class="gfield">
         <label>Speaker</label>
         <div class="gselwrap"><select class="gctl" data-key="media_player" data-domain="media_player"></select></div>
+        <button class="full hidden" id="speak-here" type="button">Speak on this device</button>
       </div>
 
       <div class="gfield">
@@ -570,15 +581,68 @@ class GregPanel extends HTMLElement {
     return (s && s.attributes && s.attributes.config) || null;
   }
 
-  _entityOptions(domain) {
+  // `keep` is whatever is currently saved, and stays in the list even when it
+  // has gone unavailable. Dropping it would leave the select showing its first
+  // option instead, so applying any unrelated setting would quietly move Greg
+  // onto a different speaker.
+  _entityOptions(domain, keep) {
     if (!this._hass) return [];
-    return Object.keys(this._hass.states)
-      .filter((id) => id.startsWith(domain + "."))
-      .map((id) => ({
-        id,
-        name: (this._hass.states[id].attributes || {}).friendly_name || id,
-      }))
+    const states = this._hass.states;
+    const all = Object.keys(states).filter((id) => id.startsWith(domain + "."));
+
+    // Integrations that re-register entities leave the old rows behind, so the
+    // same name can appear several times over. Count them, and show the entity
+    // id alongside any name that is not unique.
+    const seen = {};
+    all.forEach((id) => {
+      const name = (states[id].attributes || {}).friendly_name || id;
+      seen[name] = (seen[name] || 0) + 1;
+    });
+
+    return all
+      .filter((id) => id === keep || !DEAD_STATES.includes(states[id].state))
+      .map((id) => {
+        const name = (states[id].attributes || {}).friendly_name || id;
+        const label = seen[name] > 1 ? `${name} (${id})` : name;
+        return {
+          id,
+          name: DEAD_STATES.includes(states[id].state)
+            ? `${label} — not available`
+            : label,
+        };
+      })
       .sort((a, b) => a.name.localeCompare(b.name));
+  }
+
+  // The browser_mod player belonging to the browser this panel is running in,
+  // or null. Asks browser_mod directly if it will say, and otherwise falls back
+  // to the only connected one: these players are unavailable unless their own
+  // browser is showing Home Assistant, so on a device looking at this panel a
+  // single live one is almost certainly this device.
+  _thisDevicePlayer() {
+    if (!this._hass) return null;
+    const states = this._hass.states;
+    const players = Object.keys(states).filter(
+      (id) =>
+        id.startsWith("media_player.") &&
+        (states[id].attributes || {}).type === "browser_mod" &&
+        !DEAD_STATES.includes(states[id].state)
+    );
+    if (!players.length) return null;
+
+    let here = null;
+    try {
+      here = window.browser_mod && window.browser_mod.browserID;
+    } catch (e) {
+      here = null;
+    }
+    if (here) {
+      const match = players.find(
+        (id) => (states[id].attributes || {}).browserID === here
+      );
+      if (match) return match;
+    }
+    return players.length === 1 ? players[0] : null;
   }
 
   // Selects are rebuilt only when the entity list actually changes, so a state
@@ -596,9 +660,12 @@ class GregPanel extends HTMLElement {
     const r = this.shadowRoot;
     this._fillEntityList();
     r.querySelectorAll("select.gctl").forEach((sel) => {
+      const saved = this._savedConfig();
       const opts = sel.dataset.optkey
         ? this._listOptions(sel.dataset.optkey)
-        : this._entityOptions(sel.dataset.domain);
+        : this._entityOptions(
+            sel.dataset.domain, saved && saved[sel.dataset.key]
+          );
       const sig = opts.map((o) => o.id).join(",");
       if (sel.dataset.sig === sig) return;
       sel.dataset.sig = sig;
@@ -792,6 +859,15 @@ class GregPanel extends HTMLElement {
     const apply = r.querySelector(".gapply");
     apply.disabled = !dirty;
     apply.textContent = dirty ? "Apply" : "No changes";
+
+    // Offer the browser this panel is running in as a speaker, when there is
+    // one and it is not already the one chosen.
+    const here = this._thisDevicePlayer();
+    const speakHere = r.getElementById("speak-here");
+    if (speakHere) {
+      const chosen = r.querySelector('.gctl[data-key="media_player"]').value;
+      speakHere.classList.toggle("hidden", !here || here === chosen);
+    }
 
     const note = r.querySelector('[data-out="langnote"]');
     if (note) {
@@ -1319,6 +1395,19 @@ class GregPanel extends HTMLElement {
       (el) => (el.onclick = () => this._applySettings())
     );
 
+    const speakHere = r.getElementById("speak-here");
+    if (speakHere) {
+      speakHere.onclick = () => {
+        const here = this._thisDevicePlayer();
+        if (!here) return;
+        r.querySelector('.gctl[data-key="media_player"]').value = here;
+        this._onSettingInput();
+        // Applied rather than left for the Apply button. It says "speak on this
+        // device", so it should do that rather than tee it up.
+        this._applySettings();
+      };
+    }
+
     this._wireQuiet();
     this._wireLines();
     const cog = r.getElementById("cog"), panel = r.getElementById("settings");
@@ -1440,6 +1529,16 @@ class GregPanel extends HTMLElement {
       // own conditions is holding him.
       ? `Greg is holding his tongue. ${blockedBy} does not meet a condition you set.`
       : "";
+
+    // Not the same thing as being blocked. Blocked is Greg deciding not to
+    // speak; this is Greg having tried and produced no sound, which until now
+    // he had no way of telling anybody.
+    const warn = r.getElementById("speechwarn");
+    if (warn) {
+      const problem = attrs.speech_problem || "";
+      warn.textContent = problem;
+      warn.classList.toggle("hidden", !problem);
+    }
 
     // firmware gag bound to actual installed version (device sw_version)
     const fw = r.getElementById("firmware");
