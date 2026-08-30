@@ -47,7 +47,7 @@ versioned.
 - **The settings closed on every touch below 1000px.** The click-outside
   handler asked whether the click was inside the panel using `contains`, which
   cannot see into a shadow DOM: every click looked like it was outside, so the
-  settings shut the moment you touched one. Reported by WHISTLER-Arc. (#5)
+  settings shut the moment you touched one. (#5)
 - **The settings could not be scrolled**, so on a short screen the bottom of
   them was unreachable. They now have their own scroll and stay inside it. (#5)
 - The panel leaked one document listener per teardown.
@@ -58,12 +58,11 @@ versioned.
   shipped in 1.6.0.
 
 ### Notes
-- An entity that is missing, unavailable or unknown does not block Greg. A
-  renamed entity leaving him permanently silent is the worse failure by a
-  distance.
-- Twenty conditions is the cap, which is there to stop a malformed automation
-  writing thousands of rows into the config entry rather than because a house
-  has twenty core conditions.
+- An entity that is missing, unavailable or unknown does not block Greg. Rename
+  something and he carries on talking, rather than going quiet for good with
+  nothing to say why.
+- Twenty conditions is the cap. That is there to stop a stray automation writing
+  thousands of rows into the config entry, not because anyone will reach it.
 
 ## [1.6.0]
 
