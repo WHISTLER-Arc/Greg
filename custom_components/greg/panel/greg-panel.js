@@ -110,35 +110,36 @@ class GregPanel extends HTMLElement {
           gap:12px; flex-wrap:wrap; margin-bottom:12px; }
         .lineshead h3 { margin:0; font-size:15px; letter-spacing:.02em; }
         .pooltabs { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:10px; }
-        .pooltab { padding:6px 12px; border-radius:20px; cursor:pointer; font-size:13px;
-          background:transparent; color:var(--secondary-text-color);
-          border:1px solid var(--divider-color); }
-        .pooltab.active { background:var(--primary-color); color:var(--text-primary-color, #fff);
-          border-color:var(--primary-color); }
+        .pooltab { padding:7px 13px; border-radius:9px; cursor:pointer; font-size:12px;
+          font-family:inherit; background:var(--secondary-background-color);
+          color:var(--primary-text-color); border:1px solid var(--divider-color); }
+        .pooltab.active { background:var(--success-color, #7cc36e); color:#14301a;
+          border-color:var(--success-color, #7cc36e); font-weight:600; }
         .poolnote { font-size:12px; color:var(--secondary-text-color); margin-bottom:10px; }
         .lineslist { display:flex; flex-direction:column; gap:6px; margin-bottom:10px; }
-        .lineitem { display:flex; align-items:flex-start; gap:10px; padding:8px 10px;
-          border:1px solid var(--divider-color); border-radius:10px; font-size:13px;
+        .lineitem { display:flex; align-items:flex-start; gap:10px; padding:10px 12px;
+          background:var(--secondary-background-color); border-radius:11px; font-size:13px;
           line-height:1.45; }
         .lineitem span { flex:1; word-break:break-word; }
         .lineitem button { background:none; border:none; cursor:pointer; font-size:16px;
           line-height:1; color:var(--secondary-text-color); padding:0 2px; }
-        .lineitem button:hover { color:var(--error-color, #d33); }
+        .lineitem button:hover { color:var(--error-color, #c0504c); }
         .linesempty { font-size:13px; color:var(--secondary-text-color); font-style:italic;
           padding:10px 0; }
         .lineadd { display:flex; gap:8px; align-items:flex-start; }
-        .lineadd textarea { flex:1; resize:vertical; padding:8px 10px; border-radius:10px;
+        .lineadd textarea { flex:1; resize:vertical; padding:9px 10px; border-radius:9px;
           font:inherit; font-size:13px; color:var(--primary-text-color);
           background:var(--secondary-background-color); border:1px solid var(--divider-color); }
         .linesonly { margin-top:14px; }
         .linesonly .ghint { display:block; }
         .linesfoot { display:flex; gap:8px; flex-wrap:wrap; margin-top:14px; }
-        .linescard .btn { padding:8px 16px; border-radius:20px; cursor:pointer; font-size:13px;
-          background:transparent; color:var(--primary-text-color);
-          border:1px solid var(--divider-color); }
-        .linescard .btn.primary { background:var(--primary-color);
-          color:var(--text-primary-color, #fff); border-color:var(--primary-color); }
-        .linescard .btn:disabled { opacity:.5; cursor:default; }
+        .linescard .btn { padding:11px 18px; border-radius:11px; cursor:pointer; font-size:13px;
+          font-family:inherit; background:var(--secondary-background-color);
+          color:var(--primary-text-color); border:1px solid var(--divider-color);
+          transition:opacity .2s; }
+        .linescard .btn.primary { background:var(--success-color, #7cc36e); color:#14301a;
+          border:0; padding:11px 22px; font-weight:700; }
+        .linescard .btn:disabled { opacity:.32; cursor:default; }
         .head { text-align:center; margin:6px 0 20px; }
         .badge { display:inline-flex; align-items:center; gap:10px; padding:10px 22px;
           background:var(--card-background-color); border:1px solid var(--divider-color);
@@ -333,8 +334,10 @@ class GregPanel extends HTMLElement {
           padding:10px 12px; display:flex; flex-direction:column; gap:4px;
           border-left:3px solid var(--success-color, #7cc36e); }
         .qsummary .qline { font-size:13px; }
-        .qsummary button { background:none; border:0; color:var(--primary-color);
-          font-size:12px; font-family:inherit; text-align:left; padding:2px 0 0; cursor:pointer; }
+        .qsummary button { align-self:flex-start; margin-top:4px;
+          background:var(--secondary-background-color); color:var(--primary-text-color);
+          border:1px solid var(--divider-color); border-radius:9px; padding:6px 11px;
+          font-size:12px; font-family:inherit; cursor:pointer; }
         .cardfoot { border-top:1px solid var(--divider-color); padding:14px 18px;
           display:flex; align-items:center; gap:12px; flex-wrap:wrap; }
         .cardfoot p { margin:0; flex:1; min-width:220px; font-size:12px;

@@ -42,6 +42,11 @@ versioned.
   layout at a wider size instead of a two-column arrangement nobody asked for.
 - Uninstall is a card-level action rather than the last thing in a popover you
   could not reach the bottom of.
+- **The lines editor looks like the rest of the panel now.** It was built
+  before everything else settled on a look and had kept its own: blue buttons
+  where the rest of Greg is green, pill-shaped controls where the rest is
+  softly rounded, and outlined rows where every other list is filled. Nothing
+  moved, it just stopped looking like it came from somewhere else.
 
 ### Fixed
 - **The settings closed on every touch below 1000px.** The click-outside
