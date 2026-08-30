@@ -3,7 +3,7 @@
 All notable changes to Greg. He would like it noted that he did not ask to be
 versioned.
 
-## [1.7.0]
+## [1.6.5]
 
 ### Added
 - **Greg on your phone.** Not a new ability, an explanation and a shortcut. He
@@ -14,31 +14,12 @@ versioned.
 - **Speak on this device.** When the browser showing Greg's panel has a
   browser_mod player of its own, a button appears under the Speaker dropdown
   that switches him to it in one tap.
-- **Greg says why he was silent.** He checks his speaker before speaking now,
+- **Greg says why he was silent.** He checks his speaker before speaking now
   and reports it in the panel when he cannot: a speaker that has been renamed,
-  one that has gone unavailable, or a browser that is refusing to play audio
-  until somebody taps the page. All of those used to leave him reporting a line
-  he never delivered.
+  one that has gone unavailable, or a browser refusing to play audio until
+  somebody taps the page. All of those used to leave him reporting a line he
+  never delivered.
 - `speech_problem` attribute on the mood sensor, carrying the same thing.
-
-### Changed
-- The speaker, sensor and text-to-speech dropdowns no longer offer entities
-  that are not there, and show the entity id beside any two that share a name.
-  Whatever is currently saved always stays in the list even if it has gone
-  unavailable, so applying an unrelated setting cannot quietly move Greg onto
-  a different speaker. (#7)
-
-### Notes
-- browser_mod needs the page open and visible. Android freezes a backgrounded
-  webview and Greg goes quiet with it, so it suits showing him off rather than
-  being a permanent speaker.
-- The Companion app cannot do this on its own. Its TTS notifications use the
-  phone's own voice, and it registers no Assist satellite, so there is nothing
-  to push his real voice to.
-
-## [1.6.5]
-
-### Added
 - **Conditions.** Greg can now consult the same core conditions the rest of
   your automations use, rather than only his own clock. Rows of entity /
   `is` or `is not` / state in his panel, all of which have to hold or he keeps
@@ -82,6 +63,13 @@ versioned.
   moved, it just stopped looking like it came from somewhere else.
 
 ### Fixed
+- **The speaker dropdown offered entities that were not there.** It listed
+  every entity in the domain regardless of state, and several of them can share
+  a name, so picking the right one was guesswork. Dead entities are gone now
+  and duplicates carry their entity id. Whatever is currently saved stays in the
+  list even when unavailable: dropping it would leave the select on its first
+  option, so applying an unrelated setting could quietly move Greg onto a
+  different speaker. (#7)
 - **The settings closed on every touch below 1000px.** The click-outside
   handler asked whether the click was inside the panel using `contains`, which
   cannot see into a shadow DOM: every click looked like it was outside, so the
@@ -96,6 +84,12 @@ versioned.
   shipped in 1.6.0.
 
 ### Notes
+- browser_mod needs the page open and visible. Android freezes a backgrounded
+  webview and Greg goes quiet with it, so it suits showing him off rather than
+  being a permanent speaker.
+- The Companion app cannot do this on its own. Its TTS notifications use the
+  phone's own voice, and it registers no Assist satellite, so there is nothing
+  to push his real voice to.
 - An entity that is missing, unavailable or unknown does not block Greg. Rename
   something and he carries on talking, rather than going quiet for good with
   nothing to say why.
