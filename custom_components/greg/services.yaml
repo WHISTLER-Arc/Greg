@@ -80,6 +80,17 @@ set_options:
       example: "08:00"
       selector:
         text:
+    conditions:
+      name: Conditions
+      description: >
+        Conditions that must all hold or Greg keeps quiet, on top of quiet
+        hours rather than instead of them. Each is an entity_id, an op of is or
+        is_not, and a state. Sending an empty list clears them. A row pointing
+        at an entity that is missing or unavailable never blocks him.
+      example: >
+        [{"entity_id": "input_select.home_mode", "op": "is", "state": "day"}]
+      selector:
+        object:
 
 set_lines:
   name: Set custom lines

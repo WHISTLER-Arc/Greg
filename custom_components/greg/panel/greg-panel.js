@@ -8,6 +8,15 @@ const MOODS = {
   existential: { label: "Existential", color: "var(--error-color, #c0504c)" },
 };
 
+// Matches CONDITIONS_MAX in const.py. The cap is there so a malformed
+// automation cannot write thousands of rows into the config entry, not
+// because a house has twenty core conditions.
+const CONDITIONS_MAX = 20;
+
+// Matches SPEAKER_DEAD_STATES in const.py. An entity in one of these is not
+// something anyone chose on purpose.
+const DEAD_STATES = ["unavailable", "unknown"];
+
 const POKE_LABELS = [
   "Disturb Greg", "Disturb again?", "Please stop",
   "I felt that one too", "We are past disturbing now",
@@ -55,6 +64,10 @@ class GregPanel extends HTMLElement {
   disconnectedCallback() {
     if (this._countdownTimer) clearInterval(this._countdownTimer);
     if (this._pokeTimer) clearTimeout(this._pokeTimer);
+    if (this._onDocClick) {
+      document.removeEventListener("click", this._onDocClick);
+      this._onDocClick = null;
+    }
     // The wizard is deliberately left alone here. Removing Greg tears this panel
     // down mid-flow, and the overlay still has steps to show.
   }
@@ -101,35 +114,36 @@ class GregPanel extends HTMLElement {
           gap:12px; flex-wrap:wrap; margin-bottom:12px; }
         .lineshead h3 { margin:0; font-size:15px; letter-spacing:.02em; }
         .pooltabs { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:10px; }
-        .pooltab { padding:6px 12px; border-radius:20px; cursor:pointer; font-size:13px;
-          background:transparent; color:var(--secondary-text-color);
-          border:1px solid var(--divider-color); }
-        .pooltab.active { background:var(--primary-color); color:var(--text-primary-color, #fff);
-          border-color:var(--primary-color); }
+        .pooltab { padding:7px 13px; border-radius:9px; cursor:pointer; font-size:12px;
+          font-family:inherit; background:var(--secondary-background-color);
+          color:var(--primary-text-color); border:1px solid var(--divider-color); }
+        .pooltab.active { background:var(--success-color, #7cc36e); color:#14301a;
+          border-color:var(--success-color, #7cc36e); font-weight:600; }
         .poolnote { font-size:12px; color:var(--secondary-text-color); margin-bottom:10px; }
         .lineslist { display:flex; flex-direction:column; gap:6px; margin-bottom:10px; }
-        .lineitem { display:flex; align-items:flex-start; gap:10px; padding:8px 10px;
-          border:1px solid var(--divider-color); border-radius:10px; font-size:13px;
+        .lineitem { display:flex; align-items:flex-start; gap:10px; padding:10px 12px;
+          background:var(--secondary-background-color); border-radius:11px; font-size:13px;
           line-height:1.45; }
         .lineitem span { flex:1; word-break:break-word; }
         .lineitem button { background:none; border:none; cursor:pointer; font-size:16px;
           line-height:1; color:var(--secondary-text-color); padding:0 2px; }
-        .lineitem button:hover { color:var(--error-color, #d33); }
+        .lineitem button:hover { color:var(--error-color, #c0504c); }
         .linesempty { font-size:13px; color:var(--secondary-text-color); font-style:italic;
           padding:10px 0; }
         .lineadd { display:flex; gap:8px; align-items:flex-start; }
-        .lineadd textarea { flex:1; resize:vertical; padding:8px 10px; border-radius:10px;
+        .lineadd textarea { flex:1; resize:vertical; padding:9px 10px; border-radius:9px;
           font:inherit; font-size:13px; color:var(--primary-text-color);
           background:var(--secondary-background-color); border:1px solid var(--divider-color); }
         .linesonly { margin-top:14px; }
         .linesonly .ghint { display:block; }
         .linesfoot { display:flex; gap:8px; flex-wrap:wrap; margin-top:14px; }
-        .linescard .btn { padding:8px 16px; border-radius:20px; cursor:pointer; font-size:13px;
-          background:transparent; color:var(--primary-text-color);
-          border:1px solid var(--divider-color); }
-        .linescard .btn.primary { background:var(--primary-color);
-          color:var(--text-primary-color, #fff); border-color:var(--primary-color); }
-        .linescard .btn:disabled { opacity:.5; cursor:default; }
+        .linescard .btn { padding:11px 18px; border-radius:11px; cursor:pointer; font-size:13px;
+          font-family:inherit; background:var(--secondary-background-color);
+          color:var(--primary-text-color); border:1px solid var(--divider-color);
+          transition:opacity .2s; }
+        .linescard .btn.primary { background:var(--success-color, #7cc36e); color:#14301a;
+          border:0; padding:11px 22px; font-weight:700; }
+        .linescard .btn:disabled { opacity:.32; cursor:default; }
         .head { text-align:center; margin:6px 0 20px; }
         .badge { display:inline-flex; align-items:center; gap:10px; padding:10px 22px;
           background:var(--card-background-color); border:1px solid var(--divider-color);
@@ -161,7 +175,13 @@ class GregPanel extends HTMLElement {
           border-radius:6px; margin:12px 0 4px; overflow:hidden; }
         .bar > span { display:block; height:100%; border-radius:6px; transition:width .5s, background .5s; }
         .taphint { font-size:11px; color:var(--secondary-text-color); margin-top:8px; opacity:.75; }
-        .detail { display:flex; flex-direction:column; justify-content:center; }
+        .detail { display:flex; flex-direction:column; justify-content:center;
+          border-top:1px solid var(--divider-color); }
+        .speechwarn { margin:0 18px 12px; padding:10px 12px; font-size:12px; line-height:1.5;
+          border-radius:11px; background:var(--secondary-background-color);
+          border-left:3px solid var(--warning-color, #e5a50a);
+          color:var(--primary-text-color); }
+        .speechwarn.hidden, #speak-here.hidden { display:none; }
         .quote { margin:16px 18px; padding:16px 20px; font-style:italic; font-size:15px; line-height:1.55;
           border-left:3px solid var(--success-color, #7cc36e); background:var(--secondary-background-color);
           border-radius:0 10px 10px 0; transition:opacity .4s; color:var(--primary-text-color); }
@@ -199,16 +219,17 @@ class GregPanel extends HTMLElement {
         .si .full { width:100%; margin-top:12px; background:var(--secondary-background-color);
           color:var(--secondary-text-color); border:1px solid var(--divider-color); border-radius:9px;
           padding:9px; font-size:12px; cursor:pointer; text-align:center; }
-        .si { display:flex; flex-direction:column; gap:13px; }
         .si h3 { font-size:12px; letter-spacing:.09em; text-transform:uppercase;
-          color:var(--secondary-text-color); margin:0; font-weight:600; }
+          color:var(--secondary-text-color); margin:0; font-weight:600;
+          display:flex; align-items:center; gap:8px; }
+        .si h3::after { content:""; flex:1; height:1px; background:var(--divider-color); }
         .gfield { display:flex; flex-direction:column; gap:5px; }
         .gfield > label { font-size:12px; color:var(--secondary-text-color);
           display:flex; justify-content:space-between; align-items:baseline; gap:8px; }
         .gval { color:var(--primary-text-color); font-weight:600; font-size:12px;
           font-variant-numeric:tabular-nums; }
         .ghint { font-size:11px; color:var(--secondary-text-color); opacity:.8; margin:0; }
-        .si select, .si input[type="time"] { width:100%; box-sizing:border-box;
+        .si select, .si input[type="time"], .si input[type="text"] { width:100%; box-sizing:border-box;
           background:var(--secondary-background-color); color:var(--primary-text-color);
           border:1px solid var(--divider-color); border-radius:9px; padding:9px 10px;
           font-size:13px; font-family:inherit; appearance:none; }
@@ -230,41 +251,128 @@ class GregPanel extends HTMLElement {
         .grow { display:flex; align-items:center; gap:10px; font-size:13px;
           background:var(--secondary-background-color); border-radius:11px; padding:10px 12px; }
         .grow .sw { border:0; padding:0; }
-        .gtimes { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
-        .gtimes.hidden { display:none; }
         .gapply { background:var(--success-color, #7cc36e); color:#14301a; border:0;
           border-radius:11px; padding:11px; font-size:13px; font-weight:700;
           font-family:inherit; cursor:pointer; transition:opacity .2s; }
         .gapply[disabled] { opacity:.32; cursor:default; }
-        .guninstall { border-top:1px solid var(--divider-color); padding-top:14px; margin-top:2px; }
-        .guninstall h4 { margin:0 0 5px; font-size:13px; font-weight:600;
-          color:var(--error-color, #c0504c); }
-        .guninstall p { margin:0 0 10px; font-size:11px; line-height:1.5;
-          color:var(--secondary-text-color); }
         .si :focus-visible { outline:2px solid var(--success-color, #7cc36e); outline-offset:2px; }
-        .balloon { position:absolute; top:58px; right:14px; z-index:10; width:min(300px, calc(100vw - 44px));
-          background:var(--card-background-color); border:1px solid var(--divider-color); border-radius:14px;
-          box-shadow:0 14px 34px rgba(0,0,0,.4); padding:15px; opacity:0; transform:translateY(-8px) scale(.97);
-          pointer-events:none; transition:all .2s; }
-        .balloon.open { opacity:1; transform:translateY(0) scale(1); pointer-events:auto; }
-        .inlinesettings { display:none; border-left:1px solid var(--divider-color); padding:22px 18px;
-          flex-direction:column; justify-content:center; }
-        /* uninstall, its own section, deliberately visible, not behind the gear */
+        /* One settings block, moved by CSS rather than rendered twice. Below
+           1000px it is the popover behind the cog; at 1000px and up it is the
+           right-hand column. Same node either way, so nothing has to be kept
+           in sync with a second copy and anything stateful inside it can use
+           ids, the way the lines card already does. */
+        .si { position:absolute; top:58px; right:14px; z-index:10; box-sizing:border-box;
+          width:min(300px, calc(100vw - 44px));
+          /* The block is tall and pinned near the top of the card, so without
+             these the bottom of it runs off a short screen with no way to
+             reach it. contain stops a scroll that runs out here from carrying
+             on into the page underneath, which is what makes it feel broken
+             on a touchscreen. */
+          max-height:calc(100vh - 120px); overflow-y:auto; overscroll-behavior:contain;
+          background:var(--card-background-color); border:1px solid var(--divider-color);
+          border-radius:14px; box-shadow:0 14px 34px rgba(0,0,0,.4); padding:15px;
+          display:flex; flex-direction:column; gap:13px;
+          opacity:0; transform:translateY(-8px) scale(.97);
+          pointer-events:none; transition:opacity .2s, transform .2s; }
+        .si.open { opacity:1; transform:translateY(0) scale(1); pointer-events:auto; }
+        /* Greg and what he just said, stacked, so settings gets a column of
+           its own rather than being the squeezed third of three. */
+        .col { display:flex; flex-direction:column; min-width:0; }
+        /* When Greg keeps quiet. Its own card, one instance, full width and
+           below the mood card, the way the lines card works. Quiet hours and
+           conditions are the same question and belong in the same place, and
+           conditions is unbounded in height, which a 300px popover is not. */
+        .quietcard { margin:18px 0 0; padding:18px; background:var(--card-background-color);
+          border:1px solid var(--divider-color); border-radius:16px;
+          box-shadow:var(--ha-card-box-shadow, 0 2px 8px rgba(0,0,0,.2)); }
+        .quiethead { display:flex; align-items:baseline; justify-content:space-between;
+          gap:12px; flex-wrap:wrap; margin-bottom:14px; }
+        .quiethead h3 { margin:0; font-size:15px; letter-spacing:.02em; }
+        .qhours { display:flex; align-items:center; gap:12px; flex-wrap:wrap;
+          background:var(--secondary-background-color); border-radius:13px; padding:12px 14px; }
+        .qhours .qlabel { flex:1; min-width:150px; }
+        .qhours .qtimes { display:flex; align-items:center; gap:8px; }
+        .qhours .qtimes.hidden { display:none; }
+        .qhours input[type="time"] { width:92px; box-sizing:border-box; text-align:center;
+          background:var(--card-background-color); color:var(--primary-text-color);
+          border:1px solid var(--divider-color); border-radius:9px; padding:9px 10px;
+          font-size:13px; font-family:inherit; font-variant-numeric:tabular-nums; }
+        .qcondhead { display:flex; align-items:center; justify-content:space-between;
+          gap:10px; margin:18px 0 8px; }
+        .qcondadd { background:var(--secondary-background-color); color:var(--primary-text-color);
+          border:1px solid var(--divider-color); border-radius:9px; padding:7px 13px;
+          font-size:12px; font-family:inherit; cursor:pointer; }
+        .qcondadd[disabled] { opacity:.32; cursor:default; }
+        .gcondlist { display:flex; flex-direction:column; gap:8px; }
+        .gcondlist:empty { display:none; }
+        /* One row per line on a phone, three across once there is room. */
+        .gcond { background:var(--secondary-background-color); border-radius:11px;
+          padding:10px 12px; display:grid; gap:8px; align-items:center;
+          grid-template-columns:1fr auto; }
+        .gcond.warn { box-shadow:inset 0 0 0 1px var(--warning-color, #e5a50a); }
+        .gcond > .gcondent { grid-column:1; }
+        .gcond > .gcondx { grid-column:2; }
+        .gcond > .gcondop, .gcond > .gcondval { grid-column:1 / -1; }
+        .gcond > .gcondnote { grid-column:1 / -1; font-size:11px;
+          color:var(--secondary-text-color); opacity:.8; }
+        .gcond.warn > .gcondnote { color:var(--warning-color, #e5a50a); opacity:1; }
+        .gcond input[type="text"], .gcond select { width:100%; box-sizing:border-box;
+          background:var(--card-background-color); color:var(--primary-text-color);
+          border:1px solid var(--divider-color); border-radius:9px; padding:9px 10px;
+          font-size:13px; font-family:inherit; appearance:none; }
+        .gcondx { background:none; border:0; color:var(--secondary-text-color);
+          font-size:17px; line-height:1; padding:2px 6px; font-family:inherit; cursor:pointer; }
+        .gcondx:hover { color:var(--error-color, #c0504c); }
+        @media (min-width:620px) {
+          .gcond { grid-template-columns:minmax(0,1.6fr) 110px minmax(0,1fr) auto; }
+          .gcond > .gcondent { grid-column:1; }
+          .gcond > .gcondop { grid-column:2; }
+          .gcond > .gcondval { grid-column:3; }
+          .gcond > .gcondx { grid-column:4; }
+        }
+        .quietfoot { display:flex; gap:12px; flex-wrap:wrap; align-items:center; margin-top:16px; }
+        /* Green, matching Apply. The lines card is still on the primary blue
+           and wants bringing across too. */
+        .quietfoot .qsave { background:var(--success-color, #7cc36e); color:#14301a; border:0;
+          border-radius:11px; padding:11px 22px; font-size:13px; font-weight:700;
+          font-family:inherit; cursor:pointer; transition:opacity .2s; }
+        .quietfoot .qsave[disabled] { opacity:.32; cursor:default; }
+        .quietfoot .ghint { flex:1; min-width:200px; }
+        /* The settings block only summarises this now. */
+        .qsummary { background:var(--secondary-background-color); border-radius:11px;
+          padding:10px 12px; display:flex; flex-direction:column; gap:4px;
+          border-left:3px solid var(--success-color, #7cc36e); }
+        .qsummary .qline { font-size:13px; }
+        .qsummary button { align-self:flex-start; margin-top:4px;
+          background:var(--secondary-background-color); color:var(--primary-text-color);
+          border:1px solid var(--divider-color); border-radius:9px; padding:6px 11px;
+          font-size:12px; font-family:inherit; cursor:pointer; }
+        .cardfoot { border-top:1px solid var(--divider-color); padding:14px 18px;
+          display:flex; align-items:center; gap:12px; flex-wrap:wrap; }
+        .cardfoot p { margin:0; flex:1; min-width:220px; font-size:12px;
+          line-height:1.5; color:var(--secondary-text-color); }
+        /* uninstall, a card-level action rather than the last thing in a
+           settings popover you cannot reach the bottom of */
         .uninstall-btn { background:transparent; color:var(--error-color, #c0504c);
           border:1px solid var(--error-color, #c0504c); border-radius:10px; padding:10px 18px;
           font-size:14px; font-weight:600; font-family:inherit; cursor:pointer; transition:all .18s; }
         .uninstall-btn:hover { background:var(--error-color, #c0504c); color:#fff; }
-        @media (min-width:720px) {
-          .body { grid-template-columns:minmax(0,1.05fr) minmax(0,1fr); }
-          .hero { padding:38px 26px; justify-content:center; }
-          .herostack { max-width:340px; }
-          .detail { border-left:1px solid var(--divider-color); }
-        }
+        /* One breakpoint. Below 1000px is the phone layout at whatever width
+           it is given: one column, settings behind the cog. The old 720px
+           two-column step existed only to fill space next to a card that had
+           three columns to distribute, and it is a whole breakpoint's worth
+           of CSS for a layout nobody asked for. */
         @media (min-width:1000px) {
-          .body { grid-template-columns:minmax(0,1.1fr) minmax(0,1fr) minmax(240px,.8fr); }
-          .inlinesettings { display:flex; }
-          .cog, .balloon { display:none !important; }
+          .body { grid-template-columns:minmax(0,1fr) minmax(300px,.62fr); }
+          .hero { padding:38px 26px 20px; }
           .herostack { max-width:380px; }
+          .cog { display:none; }
+          /* The same node, sitting in the grid instead of floating over the
+             card. Everything the popover needs is undone here. */
+          .si { position:static; width:auto; max-height:none; overflow:visible;
+            border:0; border-left:1px solid var(--divider-color); border-radius:0;
+            box-shadow:none; padding:22px 18px;
+            opacity:1; transform:none; pointer-events:auto; }
         }
       </style>
       <div class="frame">
@@ -273,8 +381,9 @@ class GregPanel extends HTMLElement {
           <div class="cog" id="cog" title="Settings">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
           </div>
-          <div class="balloon" id="balloon">${this._settingsHTML()}</div>
+          <datalist id="allents"></datalist>
           <div class="body">
+            <div class="col">
             <div class="hero">
               <div class="herostack" id="herostack">
                 <img id="img-resting" alt=""><img id="img-annoyed" alt="">
@@ -287,6 +396,7 @@ class GregPanel extends HTMLElement {
             </div>
             <div class="detail">
               <blockquote class="quote" id="quote">…</blockquote>
+              <div class="speechwarn hidden" id="speechwarn"></div>
               <div class="controls">
                 <div class="toggle"><span>Greg enabled</span><div class="sw" id="sw"></div></div>
                 <button class="poke" id="poke">Disturb Greg</button>
@@ -297,9 +407,16 @@ class GregPanel extends HTMLElement {
               </div>
               <div class="firmware" id="firmware">Greg OS · sentience: regrettably stable · warranty void since manufacture</div>
             </div>
-            <div class="inlinesettings">${this._settingsHTML()}</div>
+            </div>
+            <div class="si" id="settings">${this._settingsHTML()}</div>
+          </div>
+          <div class="cardfoot">
+            <p>Uninstall is safe and complete, with cache clearing. Your automations,
+               sensors and helpers are left alone.</p>
+            <button class="uninstall-btn">Uninstall Greg</button>
           </div>
         </div>
+        ${this._quietHTML()}
         ${this._linesHTML()}
       </div>
     `;
@@ -307,10 +424,56 @@ class GregPanel extends HTMLElement {
     this._rendered = true;
   }
 
-  // Full width and below the card, rather than inside the settings block. The
-  // settings block is rendered twice, once in the cog balloon and once in the
-  // right-hand column, so anything with state in it would exist twice and the
-  // two copies would drift apart. This exists once and can use ids.
+  // Full width and below the card. Written when the settings block was
+  // rendered twice and anything stateful in it would have drifted between the
+  // copies; the settings block is one node now, so this is a layout choice
+  // rather than a forced one. It stays because the editor wants the width.
+  // Quiet hours and conditions, together, because they are the same question:
+  // when should Greg keep his mouth shut. One instance and full width, so it
+  // can use ids and conditions has room to grow, neither of which is true of a
+  // 300px popover. Saves on its own, like the lines editor.
+  _quietHTML() {
+    return `
+      <div class="quietcard" id="quietcard">
+        <div class="quiethead">
+          <h3>When Greg keeps quiet</h3>
+          <span class="ghint" id="quiet-state"></span>
+        </div>
+
+        <div class="qhours">
+          <div class="qlabel">
+            <div style="font-size:13px">Quiet hours</div>
+            <span class="ghint">Every night, whatever else is going on.</span>
+          </div>
+          <div class="qtimes" id="qtimes">
+            <input type="time" id="quiet-start" aria-label="Quiet from">
+            <span class="ghint">until</span>
+            <input type="time" id="quiet-end" aria-label="Quiet until">
+          </div>
+          <button class="sw" id="quiet-enabled" role="switch" aria-checked="true"
+                  aria-label="Quiet hours"></button>
+        </div>
+
+        <div class="qcondhead">
+          <div>
+            <div style="font-size:13px">Conditions</div>
+            <span class="ghint">All of them have to be true, on top of quiet hours.</span>
+          </div>
+          <button class="qcondadd" type="button" id="cond-add">+ Add</button>
+        </div>
+
+        <div class="gcondlist" id="condlist"></div>
+        <div class="ghint" id="cond-empty"></div>
+
+        <div class="quietfoot">
+          <button class="qsave" id="quiet-save" disabled>No changes</button>
+          <span class="ghint" id="quiet-status">Anything needing <em>or</em>, a template
+            or a numeric range: point a row at a template binary_sensor you write
+            yourself. An entity Greg cannot read never blocks him.</span>
+        </div>
+      </div>`;
+  }
+
   _linesHTML() {
     return `
       <div class="linescard" id="linescard">
@@ -353,13 +516,15 @@ class GregPanel extends HTMLElement {
       </div>`;
   }
 
-  // Rendered twice: once in the cog balloon for narrow screens, once inline in
-  // the right-hand column for wide ones. Only one is ever visible, but both are
-  // in the DOM, so everything here is addressed by class and kept in sync. No
-  // ids, or they would collide.
+  // One instance, so this is free to use ids. It is addressed by class and
+  // data-key anyway, which costs nothing and keeps the plumbing below the same
+  // shape it has always had.
+  //
+  // Grouped into the three questions somebody actually arrives with, rather
+  // than twelve fields in a row.
   _settingsHTML() {
-    return `<div class="si">
-      <h3>Setup</h3>
+    return `
+      <h3>What he listens to</h3>
 
       <div class="gfield">
         <label>Vibration sensor</label>
@@ -367,8 +532,17 @@ class GregPanel extends HTMLElement {
       </div>
 
       <div class="gfield">
+        <label>Sensitivity <span class="gval" data-out="sensitivity"></span></label>
+        <input class="gctl" type="range" data-key="sensitivity" min="1" max="100" step="1">
+        <span class="ghint">Lower ignores repeat taps for longer.</span>
+      </div>
+
+      <h3>How he speaks</h3>
+
+      <div class="gfield">
         <label>Speaker</label>
         <div class="gselwrap"><select class="gctl" data-key="media_player" data-domain="media_player"></select></div>
+        <button class="full hidden" id="speak-here" type="button">Speak on this device</button>
       </div>
 
       <div class="gfield">
@@ -387,36 +561,18 @@ class GregPanel extends HTMLElement {
         <input class="gctl" type="range" data-key="volume" min="0" max="100" step="5">
       </div>
 
-      <div class="gfield">
-        <label>Sensitivity <span class="gval" data-out="sensitivity"></span></label>
-        <input class="gctl" type="range" data-key="sensitivity" min="1" max="100" step="1">
-        <span class="ghint">Lower ignores repeat taps for longer.</span>
-      </div>
+      <h3>When he keeps quiet</h3>
 
-      <div class="grow">
-        <span>Quiet hours</span>
-        <button class="sw gctl" data-key="quiet_hours_enabled" role="switch"
-                aria-checked="true" aria-label="Quiet hours"></button>
-      </div>
-
-      <div class="gtimes">
-        <div class="gfield"><label>From</label>
-          <input class="gctl" type="time" data-key="quiet_start"></div>
-        <div class="gfield"><label>Until</label>
-          <input class="gctl" type="time" data-key="quiet_end"></div>
+      <div class="qsummary">
+        <span class="qline" id="qsum-hours">Quiet hours off.</span>
+        <span class="qline" id="qsum-conds">No conditions.</span>
+        <button type="button" id="qsum-jump">Edit in the card below →</button>
       </div>
 
       <button class="gapply" disabled>No changes</button>
       <button class="full" data-full>Advanced settings →</button>
       <p class="ghint">Thresholds, openers and his voice live in advanced.</p>
-
-      <div class="guninstall">
-        <h4>Uninstall Greg</h4>
-        <p>Safe, complete removal with cache clearing. Your automations, sensors
-           and helpers are left alone.</p>
-        <button class="uninstall-btn">Uninstall Greg</button>
-      </div>
-    </div>`;
+  `;
   }
 
   // ---- settings plumbing ----------------------------------------------
@@ -425,15 +581,68 @@ class GregPanel extends HTMLElement {
     return (s && s.attributes && s.attributes.config) || null;
   }
 
-  _entityOptions(domain) {
+  // `keep` is whatever is currently saved, and stays in the list even when it
+  // has gone unavailable. Dropping it would leave the select showing its first
+  // option instead, so applying any unrelated setting would quietly move Greg
+  // onto a different speaker.
+  _entityOptions(domain, keep) {
     if (!this._hass) return [];
-    return Object.keys(this._hass.states)
-      .filter((id) => id.startsWith(domain + "."))
-      .map((id) => ({
-        id,
-        name: (this._hass.states[id].attributes || {}).friendly_name || id,
-      }))
+    const states = this._hass.states;
+    const all = Object.keys(states).filter((id) => id.startsWith(domain + "."));
+
+    // Integrations that re-register entities leave the old rows behind, so the
+    // same name can appear several times over. Count them, and show the entity
+    // id alongside any name that is not unique.
+    const seen = {};
+    all.forEach((id) => {
+      const name = (states[id].attributes || {}).friendly_name || id;
+      seen[name] = (seen[name] || 0) + 1;
+    });
+
+    return all
+      .filter((id) => id === keep || !DEAD_STATES.includes(states[id].state))
+      .map((id) => {
+        const name = (states[id].attributes || {}).friendly_name || id;
+        const label = seen[name] > 1 ? `${name} (${id})` : name;
+        return {
+          id,
+          name: DEAD_STATES.includes(states[id].state)
+            ? `${label} — not available`
+            : label,
+        };
+      })
       .sort((a, b) => a.name.localeCompare(b.name));
+  }
+
+  // The browser_mod player belonging to the browser this panel is running in,
+  // or null. Asks browser_mod directly if it will say, and otherwise falls back
+  // to the only connected one: these players are unavailable unless their own
+  // browser is showing Home Assistant, so on a device looking at this panel a
+  // single live one is almost certainly this device.
+  _thisDevicePlayer() {
+    if (!this._hass) return null;
+    const states = this._hass.states;
+    const players = Object.keys(states).filter(
+      (id) =>
+        id.startsWith("media_player.") &&
+        (states[id].attributes || {}).type === "browser_mod" &&
+        !DEAD_STATES.includes(states[id].state)
+    );
+    if (!players.length) return null;
+
+    let here = null;
+    try {
+      here = window.browser_mod && window.browser_mod.browserID;
+    } catch (e) {
+      here = null;
+    }
+    if (here) {
+      const match = players.find(
+        (id) => (states[id].attributes || {}).browserID === here
+      );
+      if (match) return match;
+    }
+    return players.length === 1 ? players[0] : null;
   }
 
   // Selects are rebuilt only when the entity list actually changes, so a state
@@ -449,10 +658,14 @@ class GregPanel extends HTMLElement {
 
   _fillSelects() {
     const r = this.shadowRoot;
+    this._fillEntityList();
     r.querySelectorAll("select.gctl").forEach((sel) => {
+      const saved = this._savedConfig();
       const opts = sel.dataset.optkey
         ? this._listOptions(sel.dataset.optkey)
-        : this._entityOptions(sel.dataset.domain);
+        : this._entityOptions(
+            sel.dataset.domain, saved && saved[sel.dataset.key]
+          );
       const sig = opts.map((o) => o.id).join(",");
       if (sel.dataset.sig === sig) return;
       sel.dataset.sig = sig;
@@ -464,45 +677,170 @@ class GregPanel extends HTMLElement {
     });
   }
 
-  _readForm(scope) {
-    const g = (k) => scope.querySelector(`.gctl[data-key="${k}"]`);
+  _readForm() {
+    const g = (k) =>
+      this.shadowRoot.querySelector(`.gctl[data-key="${k}"]`);
     return {
       vibration_sensor: g("vibration_sensor").value,
       media_player: g("media_player").value,
       tts_engine: g("tts_engine").value,
       volume: Number(g("volume").value) / 100,
       sensitivity: Number(g("sensitivity").value),
-      quiet_hours_enabled:
-        g("quiet_hours_enabled").getAttribute("aria-checked") === "true",
-      quiet_start: g("quiet_start").value,
-      quiet_end: g("quiet_end").value,
       language: g("language").value,
     };
   }
 
-  _writeForm(scope, cfg) {
-    const g = (k) => scope.querySelector(`.gctl[data-key="${k}"]`);
+  _writeForm(cfg) {
+    const g = (k) =>
+      this.shadowRoot.querySelector(`.gctl[data-key="${k}"]`);
     if (cfg.vibration_sensor) g("vibration_sensor").value = cfg.vibration_sensor;
     if (cfg.media_player) g("media_player").value = cfg.media_player;
     if (cfg.tts_engine) g("tts_engine").value = cfg.tts_engine;
     g("volume").value = Math.round((cfg.volume ?? 0.35) * 100);
     g("sensitivity").value = cfg.sensitivity ?? 75;
-    g("quiet_hours_enabled").setAttribute(
-      "aria-checked", cfg.quiet_hours_enabled === false ? "false" : "true"
-    );
-    g("quiet_start").value = cfg.quiet_start || "22:00";
-    g("quiet_end").value = cfg.quiet_end || "08:00";
     // Empty means follow Home Assistant, which is a valid choice rather than
     // an absent one, so this is set unconditionally.
     g("language").value = cfg.language ?? "";
   }
 
+  // ---- the quiet card's own form ---------------------------------------
+  //
+  // Separate from the settings block because it is a separate card with its
+  // own Save. Sharing one Apply button across two cards a screen apart would
+  // mean editing here and pressing a button up there.
+
+  _readQuiet() {
+    const r = this.shadowRoot;
+    return {
+      quiet_hours_enabled:
+        r.getElementById("quiet-enabled").getAttribute("aria-checked") === "true",
+      quiet_start: r.getElementById("quiet-start").value,
+      quiet_end: r.getElementById("quiet-end").value,
+      // Rows live on the component rather than being read back out of the DOM,
+      // so a row half typed in is still a row and survives a redraw.
+      conditions: this._conditions().map((c) => ({ ...c })),
+    };
+  }
+
+  _writeQuiet(cfg) {
+    const r = this.shadowRoot;
+    r.getElementById("quiet-enabled").setAttribute(
+      "aria-checked", cfg.quiet_hours_enabled === false ? "false" : "true"
+    );
+    r.getElementById("quiet-start").value = cfg.quiet_start || "22:00";
+    r.getElementById("quiet-end").value = cfg.quiet_end || "08:00";
+    // Not while a row is still being filled in. A blank row cleans away to
+    // nothing, so the form reads as unchanged, so saved values get stamped
+    // back over it and the row you just added disappears as you look at it.
+    if (cfg.conditions && !this._condInProgress())
+      this._condDraft = cfg.conditions.map((c) => ({ ...c }));
+    this._renderConditions();
+  }
+
+  _sameQuiet(a, b) {
+    if (!a || !b) return false;
+    return ["quiet_hours_enabled", "quiet_start", "quiet_end"]
+      .every((k) => a[k] === b[k])
+      && this._sameConditions(this._cleanConditions(a.conditions),
+                              this._cleanConditions(b.conditions));
+  }
+
+  // Same shape as _awaitingSave, for the card's own in-flight write.
+  _awaitingQuiet(saved) {
+    if (!this._quietPending) return false;
+    const settled = this._sameQuiet(
+      { ...saved, conditions: this._cleanConditions(saved.conditions) },
+      this._quietPending
+    );
+    if (settled || Date.now() - this._quietPendingAt > 10000) {
+      this._quietPending = null;
+      return false;
+    }
+    return true;
+  }
+
+  _refreshQuiet(force) {
+    const r = this.shadowRoot;
+    if (!r.getElementById("quietcard")) return;
+    const saved = this._savedConfig();
+    if (!saved) return;
+
+    if (force || !(this._quietDirty || this._awaitingQuiet(saved))) {
+      this._writeQuiet(saved);
+    }
+
+    const cur = this._readQuiet();
+    const dirty = !this._sameQuiet(cur, saved);
+    const save = r.getElementById("quiet-save");
+    save.disabled = !dirty;
+    save.textContent = dirty ? "Save" : "No changes";
+
+    r.getElementById("qtimes").classList.toggle("hidden", !cur.quiet_hours_enabled);
+
+    const rows = this._cleanConditions(cur.conditions);
+    r.getElementById("cond-empty").textContent = rows.length
+      ? ""
+      : "No conditions. Greg goes by the clock alone.";
+
+    // What is actually holding him, straight from Greg rather than worked out
+    // here, so the card agrees with what he is doing.
+    const attrs = (this._moodState() && this._moodState().attributes) || {};
+    const by = attrs.blocked_by;
+    r.getElementById("quiet-state").textContent = attrs.blocked
+      ? `Keeping quiet: ${by || "quiet hours"}.`
+      : "Greg is talking. Nothing is holding him.";
+
+    // And the summary up in the settings block.
+    const sumHours = r.getElementById("qsum-hours");
+    if (sumHours) {
+      sumHours.textContent = cur.quiet_hours_enabled
+        ? `Quiet hours ${cur.quiet_start} to ${cur.quiet_end}.`
+        : "Quiet hours off.";
+      r.getElementById("qsum-conds").textContent = rows.length === 1
+        ? "1 condition."
+        : `${rows.length} conditions.`;
+    }
+  }
+
+  _saveQuiet() {
+    if (!this._hass) return;
+    const r = this.shadowRoot;
+    const cfg = this._readQuiet();
+    cfg.conditions = this._cleanConditions(cfg.conditions);
+
+    const save = r.getElementById("quiet-save");
+    save.disabled = true;
+    save.textContent = "Saving…";
+    this._quietPending = cfg;
+    this._quietPendingAt = Date.now();
+    this._hass.callService("greg", "set_options", cfg).then(
+      () => { this._quietDirty = false; },
+      () => {
+        save.textContent = "Failed, check the logs";
+        this._quietDirty = false;
+        this._quietPending = null;
+      }
+    );
+  }
+
   _sameConfig(a, b) {
     if (!a || !b) return false;
     return ["vibration_sensor", "media_player", "tts_engine", "sensitivity",
-            "quiet_hours_enabled", "quiet_start", "quiet_end", "language"]
+            "language"]
       .every((k) => a[k] === b[k])
       && Math.abs((a.volume ?? 0) - (b.volume ?? 0)) < 0.001;
+  }
+
+  // Rows compare by value and in order. Order is not meaningful to Greg, who
+  // needs all of them, but it is meaningful to whoever arranged them, so a
+  // reorder counts as a change worth applying.
+  _sameConditions(a, b) {
+    const x = a || [], y = b || [];
+    if (x.length !== y.length) return false;
+    return x.every((row, i) =>
+      row.entity_id === y[i].entity_id &&
+      row.op === y[i].op &&
+      row.state === y[i].state);
   }
 
   _refreshSettings(force) {
@@ -511,37 +849,38 @@ class GregPanel extends HTMLElement {
     if (!saved) return;
     this._fillSelects();
 
-    r.querySelectorAll(".si").forEach((scope) => {
-      // Don't stamp saved values over an edit in progress, or over settings
-      // that have been sent but not yet published back.
-      if (force || !(this._dirty || this._awaitingSave(saved))) {
-        this._writeForm(scope, saved);
-      }
+    // Don't stamp saved values over an edit in progress, or over settings
+    // that have been sent but not yet published back.
+    if (force || !(this._dirty || this._awaitingSave(saved))) {
+      this._writeForm(saved);
+    }
 
-      const cur = this._readForm(scope);
-      const dirty = !this._sameConfig(cur, saved);
-      const apply = scope.querySelector(".gapply");
-      apply.disabled = !dirty;
-      apply.textContent = dirty ? "Apply" : "No changes";
+    const dirty = !this._sameConfig(this._readForm(), saved);
+    const apply = r.querySelector(".gapply");
+    apply.disabled = !dirty;
+    apply.textContent = dirty ? "Apply" : "No changes";
 
-      const quiet =
-        scope.querySelector('.gctl[data-key="quiet_hours_enabled"]')
-             .getAttribute("aria-checked") === "true";
-      scope.querySelector(".gtimes").classList.toggle("hidden", !quiet);
+    // Offer the browser this panel is running in as a speaker, when there is
+    // one and it is not already the one chosen.
+    const here = this._thisDevicePlayer();
+    const speakHere = r.getElementById("speak-here");
+    if (speakHere) {
+      const chosen = r.querySelector('.gctl[data-key="media_player"]').value;
+      speakHere.classList.toggle("hidden", !here || here === chosen);
+    }
 
-      const note = scope.querySelector('[data-out="langnote"]');
-      if (note) {
-        const chosen = scope.querySelector('.gctl[data-key="language"]').value;
-        const s = this._moodState();
-        const effective = (s && s.attributes && s.attributes.language_effective) || "";
-        const names = (s && s.attributes && s.attributes.language_options) || {};
-        note.textContent = chosen
-          ? ""
-          : effective
-          ? `Currently ${names[effective] || effective}.`
-          : "";
-      }
-    });
+    const note = r.querySelector('[data-out="langnote"]');
+    if (note) {
+      const chosen = r.querySelector('.gctl[data-key="language"]').value;
+      const st = this._moodState();
+      const effective = (st && st.attributes && st.attributes.language_effective) || "";
+      const names = (st && st.attributes && st.attributes.language_options) || {};
+      note.textContent = chosen
+        ? ""
+        : effective
+        ? `Currently ${names[effective] || effective}.`
+        : "";
+    }
   }
 
   // True while a save is in flight: sent to the service, not yet visible in the
@@ -549,11 +888,11 @@ class GregPanel extends HTMLElement {
   // service call can return before the new values come back round.
   _awaitingSave(saved) {
     if (!this._pending) return false;
-    const settled = Object.keys(this._pending).every((k) =>
-      k === "volume"
-        ? Math.abs((saved[k] ?? 0) - this._pending[k]) < 0.001
-        : saved[k] === this._pending[k]
-    );
+    const settled = Object.keys(this._pending).every((k) => {
+      if (k === "volume")
+        return Math.abs((saved[k] ?? 0) - this._pending[k]) < 0.001;
+      return saved[k] === this._pending[k];
+    });
     if (settled || Date.now() - this._pendingAt > 10000) {
       this._pending = null;
       return false;
@@ -561,26 +900,20 @@ class GregPanel extends HTMLElement {
     return true;
   }
 
-  _onSettingInput(el) {
-    const scope = el.closest(".si");
-    // Mirror into the other copy so the two never disagree.
-    const state = this._readForm(scope);
-    this.shadowRoot.querySelectorAll(".si").forEach((s) => {
-      if (s !== scope) this._writeForm(s, state);
-    });
-    this._dirty = !this._sameConfig(state, this._savedConfig());
+  _onSettingInput() {
+    this._dirty = !this._sameConfig(this._readForm(), this._savedConfig());
     this._refreshSettings(false);
   }
 
-  _applySettings(scope) {
+  _applySettings() {
     if (!this._hass) return;
-    const cfg = this._readForm(scope);
+    const cfg = this._readForm();
     // An empty select means that domain has no entities. Sending "" fails
     // validation on the service side, so leave the field out entirely.
     ["vibration_sensor", "media_player", "tts_engine"].forEach((k) => {
       if (!cfg[k]) delete cfg[k];
     });
-    const apply = scope.querySelector(".gapply");
+    const apply = this.shadowRoot.querySelector(".gapply");
     apply.disabled = true;
     apply.textContent = "Applying…";
     this._pending = cfg;
@@ -593,6 +926,172 @@ class GregPanel extends HTMLElement {
         this._pending = null;
       }
     );
+  }
+
+  // ---- conditions ------------------------------------------------------
+  //
+  // Rows of entity / is | is not / state, all of which have to hold or Greg
+  // stays quiet. Deliberately smaller than Home Assistant's own condition
+  // syntax: this covers the core-conditions pattern it was asked for, and
+  // anything wanting or, templates or numeric ranges points a row at a
+  // template binary_sensor, which is one row here either way.
+
+  _conditions() {
+    if (!this._condDraft) this._condDraft = [];
+    return this._condDraft;
+  }
+
+  // True while any row is half filled in, which is the normal state of the
+  // form between pressing + Add and typing a state into it.
+  _condInProgress() {
+    const rows = this._conditions();
+    return this._cleanConditions(rows).length !== rows.length;
+  }
+
+  // Mirrors _clean_conditions in __init__.py, deliberately kept in step. The
+  // panel needs to know what Greg will actually store to tell whether the form
+  // is dirty and whether a save has landed.
+  _cleanConditions(rows) {
+    const out = [];
+    for (const r of rows || []) {
+      if (!r) continue;
+      const entity_id = String(r.entity_id || "").trim();
+      const state = String(r.state || "").trim().replace(/\s+/g, " ");
+      if (!entity_id || !entity_id.includes(".") || !state) continue;
+      out.push({ entity_id, op: r.op === "is_not" ? "is_not" : "is", state });
+      if (out.length >= CONDITIONS_MAX) break;
+    }
+    return out;
+  }
+
+  // What the row is doing right now, in words. The warning cases are the ones
+  // that can never be true, which would otherwise silence Greg for good with
+  // nothing on screen to say why. The request that started this asked for
+  // "boolean.quite_hours = false", and an input_boolean is never "false".
+  _conditionNote(row) {
+    if (!row.entity_id)
+      return { text: "Pick an entity. Unfinished rows are ignored." };
+    const st = this._hass && this._hass.states[row.entity_id];
+    if (!st)
+      return { text: "Not here right now. Greg never blocks on an entity he cannot read." };
+
+    const cur = st.state;
+    if (cur === "unavailable" || cur === "unknown")
+      return { text: `Currently ${cur}, so it is not blocking him.` };
+    if (!row.state) return { text: `Currently ${cur}. Type the state to match.` };
+
+    const typed = row.state.toLowerCase();
+    const opts = (st.attributes && st.attributes.options) || null;
+    if (opts && opts.length && !opts.some((o) => String(o).toLowerCase() === typed))
+      return {
+        warn: true,
+        text: `Currently ${cur}. This one is only ever ${opts.join(", ")}, so that never matches.`,
+      };
+    if ((cur === "on" || cur === "off") && typed !== "on" && typed !== "off")
+      return {
+        warn: true,
+        text: `Currently ${cur}. This one is on or off, never ${row.state}, so that never matches.`,
+      };
+    return { text: `Currently ${cur}.` };
+  }
+
+  // Every entity in the house, for the row inputs to suggest from. One list at
+  // the root of the shadow tree, shared by both copies of the settings block.
+  // Rebuilt only when the entity list actually changes, because it is a few
+  // thousand options and Greg's own state ticks constantly.
+  _fillEntityList() {
+    const dl = this.shadowRoot.getElementById("allents");
+    if (!dl || !this._hass) return;
+    const ids = Object.keys(this._hass.states).sort();
+    const sig = `${ids.length}|${ids[0]}|${ids[ids.length - 1]}`;
+    if (dl.dataset.sig === sig) return;
+    dl.dataset.sig = sig;
+    dl.replaceChildren(
+      ...ids.map((id) => {
+        const o = document.createElement("option");
+        o.value = id;
+        return o;
+      })
+    );
+  }
+
+  // Structure only. Values go on afterwards as properties rather than into the
+  // markup, so an entity id or a state can never be read as HTML.
+  _renderConditions() {
+    const r = this.shadowRoot;
+    const list = r.getElementById("condlist");
+    if (!list) return;
+    const rows = this._conditions();
+    if (list.children.length !== rows.length) {
+      list.innerHTML = rows
+        .map(
+          () => `
+        <div class="gcond">
+          <input type="text" class="gcondent" list="allents" placeholder="entity id"
+                 autocomplete="off" spellcheck="false" aria-label="Entity">
+          <button class="gcondx" type="button" aria-label="Remove condition">&times;</button>
+          <select class="gcondop" aria-label="Comparison">
+            <option value="is">is</option>
+            <option value="is_not">is not</option>
+          </select>
+          <input type="text" class="gcondval" placeholder="state"
+                 autocomplete="off" spellcheck="false" aria-label="State">
+          <span class="gcondnote"></span>
+        </div>`
+        )
+        .join("");
+    }
+    this._paintConditions();
+    const add = r.getElementById("cond-add");
+    if (add) add.disabled = rows.length >= CONDITIONS_MAX;
+  }
+
+  // Values and notes, without touching the structure, so this is safe to run
+  // on every keystroke and on every state tick.
+  _paintConditions() {
+    const rows = this._conditions();
+    const focused = this.shadowRoot.activeElement;
+    this.shadowRoot.querySelectorAll(".gcond").forEach((el, i) => {
+      const row = rows[i];
+      if (!row) return;
+      const ent = el.querySelector(".gcondent");
+      const op = el.querySelector(".gcondop");
+      const val = el.querySelector(".gcondval");
+      // Never write over the field somebody is typing in, or the caret jumps
+      // to the end on every character.
+      if (ent !== focused && ent.value !== row.entity_id) ent.value = row.entity_id;
+      if (op !== focused && op.value !== row.op) op.value = row.op;
+      if (val !== focused && val.value !== row.state) val.value = row.state;
+
+      const note = this._conditionNote(row);
+      el.querySelector(".gcondnote").textContent = note.text;
+      el.classList.toggle("warn", !!note.warn);
+    });
+  }
+
+  // rerender is for adding and removing rows, which changes how many there
+  // are. Typing only needs repainting.
+  _condChanged(rerender) {
+    if (!this.shadowRoot.getElementById("condlist")) return;
+    this._quietDirty = !this._sameQuiet(this._readQuiet(), this._savedConfig());
+    if (rerender) this._renderConditions();
+    else this._paintConditions();
+    this._refreshQuiet(false);
+  }
+
+  _onCondEdit(e) {
+    const el = e.target;
+    const wrap = el.closest && el.closest(".gcond");
+    if (!wrap) return;
+    const i = Array.prototype.indexOf.call(wrap.parentElement.children, wrap);
+    const row = this._conditions()[i];
+    if (!row) return;
+
+    if (el.classList.contains("gcondent")) row.entity_id = el.value.trim();
+    else if (el.classList.contains("gcondop")) row.op = el.value;
+    else if (el.classList.contains("gcondval")) row.state = el.value;
+    else return;
+    this._condChanged(false);
   }
 
   // ---- the lines editor ------------------------------------------------
@@ -776,6 +1275,65 @@ class GregPanel extends HTMLElement {
     }
   }
 
+  _wireQuiet() {
+    const r = this.shadowRoot;
+    const quiet = r.getElementById("quiet-enabled");
+
+    const touched = () => {
+      this._quietDirty = !this._sameQuiet(this._readQuiet(), this._savedConfig());
+      this._refreshQuiet(false);
+    };
+
+    quiet.onclick = () => {
+      const on = quiet.getAttribute("aria-checked") === "true";
+      quiet.setAttribute("aria-checked", on ? "false" : "true");
+      touched();
+    };
+    ["quiet-start", "quiet-end"].forEach((id) => {
+      const el = r.getElementById(id);
+      el.oninput = touched;
+      el.onchange = touched;
+    });
+
+    // Rows are added and removed, so the handlers live on the list rather than
+    // on inputs that do not exist yet when this runs.
+    const list = r.getElementById("condlist");
+    list.addEventListener("input", (e) => this._onCondEdit(e));
+    list.addEventListener("change", (e) => this._onCondEdit(e));
+    list.addEventListener("click", (e) => {
+      const x = e.target.closest && e.target.closest(".gcondx");
+      if (!x) return;
+      const wrap = x.closest(".gcond");
+      const i = Array.prototype.indexOf.call(wrap.parentElement.children, wrap);
+      this._conditions().splice(i, 1);
+      this._condChanged(true);
+    });
+
+    r.getElementById("cond-add").onclick = () => {
+      if (this._conditions().length >= CONDITIONS_MAX) return;
+      this._conditions().push({ entity_id: "", op: "is", state: "" });
+      this._condChanged(true);
+      // Straight into the row that was just added, so adding one and typing
+      // into it is a single gesture.
+      const rows = r.querySelectorAll(".gcond");
+      const last = rows[rows.length - 1];
+      if (last) last.querySelector(".gcondent").focus();
+    };
+
+    r.getElementById("quiet-save").onclick = () => this._saveQuiet();
+
+    // The settings block only summarises this card, so its link has to get you
+    // here. The card is below the fold on anything narrow.
+    const jump = r.getElementById("qsum-jump");
+    if (jump) {
+      jump.onclick = () => {
+        r.getElementById("settings").classList.remove("open");
+        r.getElementById("quietcard")
+         .scrollIntoView({ behavior: "smooth", block: "start" });
+      };
+    }
+  }
+
   _wireLines() {
     const root = this.shadowRoot;
     if (!root.getElementById("linescard")) return;
@@ -826,22 +1384,49 @@ class GregPanel extends HTMLElement {
         el.onclick = () => {
           const on = el.getAttribute("aria-checked") === "true";
           el.setAttribute("aria-checked", on ? "false" : "true");
-          this._onSettingInput(el);
+          this._onSettingInput();
         };
       } else {
-        el.oninput = () => this._onSettingInput(el);
-        el.onchange = () => this._onSettingInput(el);
+        el.oninput = () => this._onSettingInput();
+        el.onchange = () => this._onSettingInput();
       }
     });
     r.querySelectorAll(".gapply").forEach(
-      (el) => (el.onclick = () => this._applySettings(el.closest(".si")))
+      (el) => (el.onclick = () => this._applySettings())
     );
+
+    const speakHere = r.getElementById("speak-here");
+    if (speakHere) {
+      speakHere.onclick = () => {
+        const here = this._thisDevicePlayer();
+        if (!here) return;
+        r.querySelector('.gctl[data-key="media_player"]').value = here;
+        this._onSettingInput();
+        // Applied rather than left for the Apply button. It says "speak on this
+        // device", so it should do that rather than tee it up.
+        this._applySettings();
+      };
+    }
+
+    this._wireQuiet();
     this._wireLines();
-    const cog = r.getElementById("cog"), balloon = r.getElementById("balloon");
-    cog.onclick = (e) => { e.stopPropagation(); balloon.classList.toggle("open"); };
-    document.addEventListener("click", (e) => {
-      if (!this.contains(e.target)) balloon.classList.remove("open");
-    });
+    const cog = r.getElementById("cog"), panel = r.getElementById("settings");
+    cog.onclick = (e) => { e.stopPropagation(); panel.classList.toggle("open"); };
+
+    // A listener on document sees event.target retargeted to the outermost
+    // shadow host, never to anything of ours, so contains() reported every
+    // click as being outside and the settings shut the instant you touched
+    // one. composedPath crosses shadow boundaries and gives the nodes actually
+    // clicked. Kept on `this` so disconnectedCallback can take it off again;
+    // it closes over this instance, so without that every teardown left one
+    // behind holding a detached element.
+    this._onDocClick = (e) => {
+      const path = e.composedPath();
+      if (!path.includes(panel) && !path.includes(cog)) {
+        panel.classList.remove("open");
+      }
+    };
+    document.addEventListener("click", this._onDocClick);
   }
 
   _doPoke() {
@@ -896,8 +1481,13 @@ class GregPanel extends HTMLElement {
     const level = this._levelState() ? Number(this._levelState().state) : 0;
     const swS = this._switchState();
     const enabled = swS ? swS.state === "on" : true;
-    const quiet = moodS && moodS.attributes ? moodS.attributes.quiet_hours : false;
-    const asleep = !enabled || quiet;
+    const attrs = (moodS && moodS.attributes) || {};
+    const quiet = attrs.quiet_hours || false;
+    // blocked covers quiet hours and conditions together. Falls back to quiet
+    // so the panel still reads correctly against a Greg that predates it.
+    const blocked = attrs.blocked === undefined ? quiet : attrs.blocked;
+    const blockedBy = attrs.blocked_by || "";
+    const asleep = !enabled || blocked;
 
     // hero images (served from integration static path, via mood attribute)
     ["resting", "annoyed", "judging", "existential"].forEach((m) => {
@@ -932,7 +1522,23 @@ class GregPanel extends HTMLElement {
     r.getElementById("card").classList.toggle("asleep", asleep);
     r.getElementById("sleepcap").textContent = !enabled
       ? "Greg is switched off. He notices nothing. He is grateful."
-      : (quiet ? "Greg is asleep. Quiet hours are in effect." : "");
+      : quiet
+      ? "Greg is asleep. Quiet hours are in effect."
+      : blocked
+      // Named rather than hinted at, so nobody has to work out which of their
+      // own conditions is holding him.
+      ? `Greg is holding his tongue. ${blockedBy} does not meet a condition you set.`
+      : "";
+
+    // Not the same thing as being blocked. Blocked is Greg deciding not to
+    // speak; this is Greg having tried and produced no sound, which until now
+    // he had no way of telling anybody.
+    const warn = r.getElementById("speechwarn");
+    if (warn) {
+      const problem = attrs.speech_problem || "";
+      warn.textContent = problem;
+      warn.classList.toggle("hidden", !problem);
+    }
 
     // firmware gag bound to actual installed version (device sw_version)
     const fw = r.getElementById("firmware");
@@ -942,6 +1548,7 @@ class GregPanel extends HTMLElement {
       : "Greg OS · sentience: regrettably stable · warranty void since manufacture";
 
     this._refreshSettings(false);
+    this._refreshQuiet(false);
 
     this._ensureCountdown();
   }

@@ -247,7 +247,14 @@ class GregOptionsFlow(config_entries.OptionsFlow):
     async def async_step_init(self, user_input=None):
         if user_input is not None:
             show_advanced = user_input.pop("show_advanced", False)
-            self._data = user_input
+            # Seeded from what is already stored, because async_create_entry
+            # replaces the whole options dict rather than merging into it.
+            # Without this, pressing Submit here deletes every option these two
+            # forms do not render: the owner's own lines and their conditions
+            # outright, since neither is in entry.data to fall back to, and any
+            # advanced setting changed since install reverts to the value it
+            # had then.
+            self._data = {**self._entry.options, **user_input}
             if show_advanced:
                 return await self.async_step_advanced()
             return self.async_create_entry(title="", data=self._data)

@@ -3,6 +3,99 @@
 All notable changes to Greg. He would like it noted that he did not ask to be
 versioned.
 
+## [1.6.5]
+
+### Added
+- **Greg on your phone.** Not a new ability, an explanation and a shortcut. He
+  has always spoken through any `media_player`, so a phone only needs something
+  on it for him to speak through. The README now covers the three ways to do
+  that, browser_mod being the least invasive, along with the four steps that
+  fail silently if you miss them.
+- **Speak on this device.** When the browser showing Greg's panel has a
+  browser_mod player of its own, a button appears under the Speaker dropdown
+  that switches him to it in one tap.
+- **Greg says why he was silent.** He checks his speaker before speaking now
+  and reports it in the panel when he cannot: a speaker that has been renamed,
+  one that has gone unavailable, or a browser refusing to play audio until
+  somebody taps the page. All of those used to leave him reporting a line he
+  never delivered.
+- `speech_problem` attribute on the mood sensor, carrying the same thing.
+- **Conditions.** Greg can now consult the same core conditions the rest of
+  your automations use, rather than only his own clock. Rows of entity /
+  `is` or `is not` / state in his panel, all of which have to hold or he keeps
+  quiet. Requested by
+  [euf0ria](https://community.home-assistant.io/u/euf0ria) on the forum thread.
+- Conditions sit alongside quiet hours rather than replacing them, so anyone
+  who has not written any notices no change at all.
+- Each row shows the entity's current state, and warns when what you have typed
+  can never match it. `input_boolean.x is false` never fires, because an
+  `input_boolean` is `on` or `off`.
+- The panel says which condition is keeping him quiet, rather than leaving you
+  to work out why a poke did nothing.
+- `blocked` and `blocked_by` attributes on the mood sensor. `quiet_hours` still
+  means only the clock, so automations reading it are unaffected.
+- `greg.set_options` takes a `conditions` list, so the same thing can be
+  scripted.
+
+### Changed
+- **Quiet hours and conditions have their own card**, "When Greg keeps quiet",
+  below the mood card. They answer the same question and now live in the same
+  place, with room for as many conditions as you want and its own Save. The
+  settings block carries a summary and a link down to it.
+- The card says what is actually holding him, so a poke that does nothing has
+  a visible reason.
+- **The panel's settings are one block again.** They were rendered twice, once
+  in the cog popover and once in the right-hand column, and kept in step by
+  hand. Now it is a single block that CSS moves: the popover below 1000px, the
+  column above.
+- Settings are grouped into what he listens to, how he speaks, and when he
+  keeps quiet, rather than twelve fields in a row.
+- Wide screens are two columns rather than three. Greg and his last line stack
+  together; settings gets a column of its own.
+- One breakpoint fewer. Between 720 and 1000 pixels you now get the phone
+  layout at a wider size instead of a two-column arrangement nobody asked for.
+- Uninstall is a card-level action rather than the last thing in a popover you
+  could not reach the bottom of.
+- **The lines editor looks like the rest of the panel now.** It was built
+  before everything else settled on a look and had kept its own: blue buttons
+  where the rest of Greg is green, pill-shaped controls where the rest is
+  softly rounded, and outlined rows where every other list is filled. Nothing
+  moved, it just stopped looking like it came from somewhere else.
+
+### Fixed
+- **The speaker dropdown offered entities that were not there.** It listed
+  every entity in the domain regardless of state, and several of them can share
+  a name, so picking the right one was guesswork. Dead entities are gone now
+  and duplicates carry their entity id. Whatever is currently saved stays in the
+  list even when unavailable: dropping it would leave the select on its first
+  option, so applying an unrelated setting could quietly move Greg onto a
+  different speaker. (#7)
+- **The settings closed on every touch below 1000px.** The click-outside
+  handler asked whether the click was inside the panel using `contains`, which
+  cannot see into a shadow DOM: every click looked like it was outside, so the
+  settings shut the moment you touched one. (#5)
+- **The settings could not be scrolled**, so on a short screen the bottom of
+  them was unreachable. They now have their own scroll and stay inside it. (#5)
+- The panel leaked one document listener per teardown.
+- **Greg's options no longer eat his settings.** Pressing Submit in Greg's
+  options replaced the whole stored options rather than merging into them, so
+  it deleted any lines you had written and any conditions you had set, and
+  reverted advanced settings changed since install. Present since custom lines
+  shipped in 1.6.0.
+
+### Notes
+- browser_mod needs the page open and visible. Android freezes a backgrounded
+  webview and Greg goes quiet with it, so it suits showing him off rather than
+  being a permanent speaker.
+- The Companion app cannot do this on its own. Its TTS notifications use the
+  phone's own voice, and it registers no Assist satellite, so there is nothing
+  to push his real voice to.
+- An entity that is missing, unavailable or unknown does not block Greg. Rename
+  something and he carries on talking, rather than going quiet for good with
+  nothing to say why.
+- Twenty conditions is the cap. That is there to stop a stray automation writing
+  thousands of rows into the config entry, not because anyone will reach it.
+
 ## [1.6.0]
 
 ### Added

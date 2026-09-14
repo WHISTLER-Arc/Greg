@@ -72,6 +72,14 @@ class GregMoodSensor(_GregBase):
             "image": f"{IMG_STATIC_URL_BASE}/{MOOD_IMAGES.get(mood)}",
             "image_file": MOOD_IMAGES.get(mood),
             "quiet_hours": self.coordinator.is_quiet_now,
+            # The gate as a whole, which is quiet hours or a condition that is
+            # not met. quiet_hours above still means only the clock, because
+            # automations already read it and it should keep meaning that.
+            "blocked": self.coordinator.is_blocked,
+            "blocked_by": self.coordinator.blocked_by,
+            # Why the last line did not come out, if it did not. Blocked is
+            # Greg choosing not to speak; this is Greg trying and failing.
+            "speech_problem": self.coordinator.speech_problem,
             "enabled": self.coordinator.enabled,
             # The panel reads the running version from here. sw_version lives in
             # DeviceInfo, which the frontend cannot see from an entity state, so

@@ -224,6 +224,37 @@ others, and Greg's **Voice** field takes whichever you pick.
 
 ---
 
+## Greg on your phone
+
+Greg speaks through whatever you set as his Speaker, and that can be any `media_player` entity in Home Assistant. He has never cared what it is. So getting him onto a phone or a tablet isn't a feature he needs, it's a matter of giving him something on that device to speak through.
+
+Three ways, roughly in order of how much bother they are.
+
+**An ordinary speaker.** If there's already a smart speaker in the room, you're done, and this whole section is beneath you.
+
+**browser_mod.** [browser_mod](https://github.com/thomasloven/hass-browser_mod) turns whatever browser is showing Home Assistant into a real `media_player`. Greg then speaks out of your phone in his own voice, Piper and all, with nothing else installed and no code involved. It's free, it's in HACS, and it doesn't take the device over.
+
+Four things all have to be true, and if you miss any one of them it fails without telling you:
+
+1. Install browser_mod, restart, add the integration, restart again.
+2. On a phone, clear the Companion app's cache **and** force-close it. Otherwise the Browser Mod panel opens as a blank black page. Pulling to refresh isn't enough, the app holds the frontend far harder than a browser does.
+3. In the Browser Mod panel, tick **Register**, then refresh the page. Turn on **Sync session** too, or the browser ID drifts and you collect a new dead device every time it reconnects.
+4. In the Companion app, Settings → Companion app → Other settings, turn on **Autoplay videos**. Without it your browser blocks the audio, and Greg will cheerfully report that he spoke while making no sound whatsoever.
+
+Then open Greg's panel on that device and press **Speak on this device**, which appears under the Speaker dropdown whenever there's a browser to offer. One tap and he's talking out of your hand.
+
+The catch is that the page has to be open and visible. Android freezes a backgrounded webview, and Greg goes quiet with it. Fine for showing him off, no good as a permanent speaker.
+
+**Fully Kiosk Browser.** Same idea and it survives backgrounding better, which makes it the right answer for a wall tablet. It takes the device over as a kiosk and wants the paid version for media playback, so it's a lot to ask of a phone you actually use.
+
+**Not the Companion app on its own.** It can speak, via `notify.mobile_app_*` with `message: "TTS"`, but only in your phone's own voice using your phone's own engine, which loses Greg entirely. The voice is most of him. It also can't be an Assist satellite, so there's nothing for `assist_satellite.announce` to target either. If that ever changes it becomes the neatest route of the lot, because announce takes a media id and would carry his real voice.
+
+### When he goes quiet
+
+Greg now checks his speaker before he speaks, and says so in his panel when something is wrong. A speaker that's been renamed, one that's gone unavailable, a browser that hasn't been tapped yet: all of those used to be silent, and he'd report a line he never actually delivered. The speaker dropdown also stops offering entities that aren't there, and shows the entity id next to any two that share a name.
+
+---
+
 ## A heads-up about Google speakers
 
 Greg tries to suppress the little connection chime that Google and Nest speakers play before TTS. It doesn't always work, and that's not Greg's fault. The chime is baked into the device firmware by Google, and there's nothing the integration can do about it. If it won't suppress on your speaker, that's the hardware doing it, nothing Greg can fix.
@@ -256,6 +287,28 @@ His four faces:
 ## Quiet mode
 
 Greg respects quiet hours (you set them during setup), and you can flip quiet mode on or off straight from the dashboard card without digging into HA settings. Even a depressed table needs to sleep.
+
+### Conditions
+
+A clock is a poor model of an evening. Guests arrive, somebody works late, the house is empty.
+
+If you already keep a few core conditions that the rest of your automations consult, Greg can consult them too. In his panel, under **When Greg keeps quiet**, add rows: an entity, `is` or `is not`, and a state. Quiet hours live in the same card, because they answer the same question.
+
+```
+switch.home_occupancy      is      on
+input_boolean.focus_mode   is not  on
+input_select.home_mode     is      day
+```
+
+All of them have to be true or he keeps quiet. They sit on top of quiet hours rather than replacing them, so if you have not written any, nothing about Greg changes. A blocked Greg reacts to nothing at all: no line, no tally, no mood movement, exactly as quiet hours has always behaved.
+
+Each row shows the entity's current state underneath it, and warns you when what you have typed can never match. `input_boolean.something is false` looks reasonable and never fires, because an `input_boolean` is `on` or `off`.
+
+**An entity Greg cannot read never blocks him.** Rename one, unplug one, and he carries on rather than going silent for good with nothing to say why. The panel says which condition is holding him when one is.
+
+One row, one entity, all ANDed. For anything needing `or`, a template or a numeric range, point a row at a template `binary_sensor` you write yourself. That logic then belongs to your house rather than to a coffee table, and it is one row here either way.
+
+> Conditions were requested by **[euf0ria](https://community.home-assistant.io/u/euf0ria)** on the forum thread.
 
 ---
 
@@ -409,7 +462,8 @@ There's also a `greg.uninstall` service if you'd rather script it. It takes an o
 
 - **v1.4.** Single room, no Blueprints, works with any protocol, and he brings his own sidebar panel.
 - **v1.5.** Greg is a supercomputer, so he speaks more than one language. English, Dutch and European Portuguese, with every line written natively in each rather than translated into it.
-- **v1.6.** Current release. Write your own lines in his panel, and share the good ones with everyone else.
+- **v1.6.** Current release. Write your own lines in his panel, and share the good ones with everyone else. Since 1.6.5 he speaks on your phone too, through ~~the Companion app~~ **a browser on it**, in his own voice rather than your phone's.
+- **v1.7.** Your lines, yours to keep, and everything in one place. Export what you have written and carry it between Gregs, and thresholds and timing move out of the options dialog into his panel, with soft, medium and chaos on one track rather than three sliders that can quietly contradict each other.
 - **v1.x.** Small improvements as they come. Feedback very welcome.
 - **v2.0.** Multi-room, multiple Gregs, a full mood dashboard. (One Greg might be plenty for some households. I respect that.)
 
