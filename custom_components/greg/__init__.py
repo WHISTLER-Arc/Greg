@@ -59,6 +59,10 @@ from .const import (
     CONF_TTS_VOICE,
     tts_voice_key,
     CONF_LANGUAGE,
+    normalise_thresholds,
+    DEFAULT_SOFT_THRESHOLD,
+    DEFAULT_MEDIUM_THRESHOLD,
+    DEFAULT_CHAOS_THRESHOLD,
     DEFAULT_SENSITIVITY,
     DEFAULT_VOLUME,
     DEFAULT_EMIT_EVENTS,
@@ -607,9 +611,7 @@ class GregCoordinator:
         await self._react()
 
     async def _react(self) -> None:
-        soft = self._config.get(CONF_SOFT_THRESHOLD, 1)
-        medium = self._config.get(CONF_MEDIUM_THRESHOLD, 3)
-        chaos = self._config.get(CONF_CHAOS_THRESHOLD, 6)
+        soft, medium, chaos = self.thresholds
 
         if self._counter >= chaos:
             await self._speak("chaos")
@@ -649,9 +651,7 @@ class GregCoordinator:
     @callback
     def _update_mood(self) -> None:
         """Compute mood + level from the session counter and notify entities."""
-        medium = self._config.get(CONF_MEDIUM_THRESHOLD, 3)
-        chaos = self._config.get(CONF_CHAOS_THRESHOLD, 6)
-        soft = self._config.get(CONF_SOFT_THRESHOLD, 1)
+        soft, medium, chaos = self.thresholds
 
         if self._counter >= chaos:
             self.mood = MOOD_EXISTENTIAL
@@ -1057,6 +1057,22 @@ class GregCoordinator:
         movement, exactly as quiet hours has always behaved.
         """
         return self._is_quiet_time() or self._failing_condition() is not None
+
+    @property
+    def thresholds(self) -> tuple[int, int, int]:
+        """Soft, medium and chaos, in an order Greg can actually climb.
+
+        Normalised here rather than trusted, because the advanced dialog has
+        always allowed any order and an install that crossed them years ago
+        never passes back through the panel that now prevents it. Everything
+        that reads a threshold reads this, so a crossed pair is impossible to
+        act on rather than merely discouraged.
+        """
+        return normalise_thresholds(
+            self._config.get(CONF_SOFT_THRESHOLD, DEFAULT_SOFT_THRESHOLD),
+            self._config.get(CONF_MEDIUM_THRESHOLD, DEFAULT_MEDIUM_THRESHOLD),
+            self._config.get(CONF_CHAOS_THRESHOLD, DEFAULT_CHAOS_THRESHOLD),
+        )
 
     @property
     def language_options(self) -> dict:

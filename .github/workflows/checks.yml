@@ -64,3 +64,9 @@ jobs:
 
       - name: Line pools intact
         run: python3 .github/scripts/check_lines.py
+
+      # Plain unittest, no pytest and no Home Assistant: the tests load the
+      # modules they need straight off disk, so this runs on a bare runner and
+      # on a laptop with the same command.
+      - name: Tests
+        run: python3 -m unittest discover -s tests -v

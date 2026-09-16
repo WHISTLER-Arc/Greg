@@ -36,6 +36,46 @@ DEFAULT_QUIET_END = "08:00"
 DEFAULT_SOFT_THRESHOLD = 1
 DEFAULT_MEDIUM_THRESHOLD = 3
 DEFAULT_CHAOS_THRESHOLD = 6
+
+# The ladder has to climb. Greg checks chaos first, so a stored chaos below
+# medium means he skips medium entirely and nothing on screen says why: the
+# advanced dialog has always let the three be set in any order, and installs
+# out there already hold values that cross.
+#
+# Sorted rather than pushed apart, because the numbers are likelier to be what
+# somebody meant than the labels are. Soft 1, medium 6, chaos 4 reads as "he
+# escalates at 1, 4 and 6", so that is what it becomes, rather than shoving
+# chaos out to 7 where it was never asked to be.
+#
+# Called from the panel, the set_options service and the options dialog, so
+# the rule exists once. Also applied when Greg reads his own config, because
+# an install that crossed them before this shipped never passes back through
+# any of the three.
+THRESHOLD_MIN = 1
+
+
+def normalise_thresholds(soft, medium, chaos) -> tuple[int, int, int]:
+    """Three thresholds that strictly increase, from whatever was stored."""
+    defaults = (DEFAULT_SOFT_THRESHOLD, DEFAULT_MEDIUM_THRESHOLD, DEFAULT_CHAOS_THRESHOLD)
+    values = []
+    for raw, fallback in zip((soft, medium, chaos), defaults):
+        try:
+            values.append(int(raw))
+        except (TypeError, ValueError):
+            values.append(fallback)
+
+    values.sort()
+    # Equal is as broken as crossed: two pools sharing a number means the lower
+    # one can never be reached. Each is pushed to at least one above the last.
+    out = []
+    floor = THRESHOLD_MIN
+    for value in values:
+        value = max(value, floor)
+        out.append(value)
+        floor = value + 1
+    return tuple(out)
+
+
 DEFAULT_RESET_DELAY = 8
 DEFAULT_SILENCE_TIMEOUT = 20
 DEFAULT_EXISTENTIAL_INTERVAL = 42
