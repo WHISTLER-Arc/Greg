@@ -69,4 +69,6 @@ jobs:
       # modules they need straight off disk, so this runs on a bare runner and
       # on a laptop with the same command.
       - name: Tests
-        run: python3 -m unittest discover -s tests -v
+        run: |
+          python3 -m unittest discover -s tests -v
+          node tests/ladder.test.mjs

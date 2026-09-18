@@ -52,6 +52,7 @@ DEFAULT_CHAOS_THRESHOLD = 6
 # an install that crossed them before this shipped never passes back through
 # any of the three.
 THRESHOLD_MIN = 1
+THRESHOLD_KEYS = (CONF_SOFT_THRESHOLD, CONF_MEDIUM_THRESHOLD, CONF_CHAOS_THRESHOLD)
 
 
 def normalise_thresholds(soft, medium, chaos) -> tuple[int, int, int]:
@@ -79,6 +80,40 @@ def normalise_thresholds(soft, medium, chaos) -> tuple[int, int, int]:
 DEFAULT_RESET_DELAY = 8
 DEFAULT_SILENCE_TIMEOUT = 20
 DEFAULT_EXISTENTIAL_INTERVAL = 42
+
+# What the ladder's track shows by default, in taps. Chosen because the useful
+# range is the low end: the counter resets after a few quiet seconds, so
+# reaching twelve taps in one go already takes determination.
+#
+# An install whose chaos was set higher in the advanced dialog, which allowed
+# up to 20, gets a track that stretches to fit it rather than having its
+# setting quietly dragged down the first time the panel saves.
+LADDER_TRACK_MAX = 12
+THRESHOLD_MAX = 20
+
+# Low, high and fallback for each timing value, matching the advanced dialog's
+# own sliders. Kept here so the service, the dialog and the panel agree on what
+# is acceptable rather than each carrying its own numbers.
+TIMING_LIMITS = {
+    CONF_RESET_DELAY: (2, 30, DEFAULT_RESET_DELAY),
+    CONF_SILENCE_TIMEOUT: (5, 60, DEFAULT_SILENCE_TIMEOUT),
+    CONF_EXISTENTIAL_INTERVAL: (10, 120, DEFAULT_EXISTENTIAL_INTERVAL),
+}
+
+
+def clamp_timing(key: str, value) -> int:
+    """One timing value, forced inside its limits.
+
+    Junk falls back to the default rather than raising: these arrive from a
+    config entry somebody can edit by hand and from a service any automation
+    can call, and neither should be able to stop Greg loading.
+    """
+    low, high, fallback = TIMING_LIMITS[key]
+    try:
+        number = int(value)
+    except (TypeError, ValueError):
+        return fallback
+    return max(low, min(high, number))
 DEFAULT_SENSITIVITY = 75
 # Sensitivity is a refractory window, not a gain. Once Greg registers a
 # disturbance he ignores further sensor events for a moment, so a sensor that
@@ -232,8 +267,15 @@ SERVICE_POKE = "poke"
 SERVICE_UNINSTALL = "uninstall"
 SERVICE_SET_OPTIONS = "set_options"
 
-# The settings Greg's own panel can change. Everything else stays in the options
-# flow, because the panel has no business rendering twelve sliders.
+# The settings Greg's own panel can change. The thresholds and the three timing
+# values joined them in 1.7: as one ladder and three numbers they are four
+# controls rather than six sliders, which is what kept them out of a 300px
+# column before. They remain in the advanced dialog as well, like every other
+# setting here.
+#
+# What is still dialog-only is the stuff with no sensible panel shape: the
+# per-language voice names, openers, the chime workaround, and the two switches
+# for people wiring Greg into their own automations.
 BASIC_OPTION_KEYS = (
     CONF_VIBRATION_SENSOR,
     CONF_MEDIA_PLAYER,
@@ -245,6 +287,12 @@ BASIC_OPTION_KEYS = (
     CONF_QUIET_END,
     CONF_CONDITIONS,
     CONF_LANGUAGE,
+    CONF_SOFT_THRESHOLD,
+    CONF_MEDIUM_THRESHOLD,
+    CONF_CHAOS_THRESHOLD,
+    CONF_RESET_DELAY,
+    CONF_SILENCE_TIMEOUT,
+    CONF_EXISTENTIAL_INTERVAL,
 )
 
 # Greg's mood images live here once installed. This is the only path outside

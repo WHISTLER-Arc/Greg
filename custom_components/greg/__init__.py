@@ -60,6 +60,12 @@ from .const import (
     tts_voice_key,
     CONF_LANGUAGE,
     normalise_thresholds,
+    clamp_timing,
+    THRESHOLD_KEYS,
+    THRESHOLD_MIN,
+    THRESHOLD_MAX,
+    LADDER_TRACK_MAX,
+    TIMING_LIMITS,
     DEFAULT_SOFT_THRESHOLD,
     DEFAULT_MEDIUM_THRESHOLD,
     DEFAULT_CHAOS_THRESHOLD,
@@ -308,6 +314,9 @@ def _async_register_services(hass: HomeAssistant) -> None:
         fields = {key: call.data[key] for key in BASIC_OPTION_KEYS if key in call.data}
         if CONF_CONDITIONS in fields:
             fields[CONF_CONDITIONS] = _clean_conditions(fields[CONF_CONDITIONS])
+        for key in TIMING_LIMITS:
+            if key in fields:
+                fields[key] = clamp_timing(key, fields[key])
         if not fields:
             return
 
@@ -318,6 +327,19 @@ def _async_register_services(hass: HomeAssistant) -> None:
             if entry is None:
                 continue
             merged = {**entry.options, **fields}
+            # Against what is stored rather than only what was sent, so a call
+            # naming one threshold cannot cross it with the two it left alone.
+            # The panel sends all three together; an automation need not.
+            if any(key in fields for key in THRESHOLD_KEYS):
+                current = {**entry.data, **merged}
+                soft, medium, chaos = normalise_thresholds(
+                    current.get(CONF_SOFT_THRESHOLD, DEFAULT_SOFT_THRESHOLD),
+                    current.get(CONF_MEDIUM_THRESHOLD, DEFAULT_MEDIUM_THRESHOLD),
+                    current.get(CONF_CHAOS_THRESHOLD, DEFAULT_CHAOS_THRESHOLD),
+                )
+                merged[CONF_SOFT_THRESHOLD] = soft
+                merged[CONF_MEDIUM_THRESHOLD] = medium
+                merged[CONF_CHAOS_THRESHOLD] = chaos
             if merged != dict(entry.options):
                 hass.config_entries.async_update_entry(entry, options=merged)
 
@@ -413,6 +435,22 @@ def _async_register_services(hass: HomeAssistant) -> None:
                 vol.Optional(CONF_LANGUAGE): vol.In(
                     ["", *available_languages().keys()]
                 ),
+                # Thresholds are range-checked but not order-checked here. A
+                # crossed pair is sorted out in the handler instead of failing
+                # the call, because an automation that nudges one threshold
+                # should not error just because the result needs tidying.
+                **{
+                    vol.Optional(key): vol.All(
+                        vol.Coerce(int), vol.Range(min=THRESHOLD_MIN, max=THRESHOLD_MAX)
+                    )
+                    for key in THRESHOLD_KEYS
+                },
+                **{
+                    vol.Optional(key): vol.All(
+                        vol.Coerce(int), vol.Range(min=low, max=high)
+                    )
+                    for key, (low, high, _default) in TIMING_LIMITS.items()
+                },
             }
         ),
     )
@@ -463,7 +501,11 @@ class GregCoordinator:
             self.hass, [sensor], self._handle_vibration
         )
 
-        interval = self._config.get(CONF_EXISTENTIAL_INTERVAL, 37)
+        # Was 37 here and 42 in const.py, so a fresh install that never
+        # opened the dialog ran five minutes fast. One clamp, one default.
+        interval = clamp_timing(
+            CONF_EXISTENTIAL_INTERVAL, self._config.get(CONF_EXISTENTIAL_INTERVAL)
+        )
         self._existential_handle = async_track_time_interval(
             self.hass, self._handle_existential, timedelta(minutes=interval)
         )
@@ -593,7 +635,7 @@ class GregCoordinator:
         if self._silence_handle:
             self._silence_handle.cancel()
 
-        reset_delay = self._config.get(CONF_RESET_DELAY, 8)
+        reset_delay = clamp_timing(CONF_RESET_DELAY, self._config.get(CONF_RESET_DELAY))
         self._reset_handle = self.hass.loop.call_later(
             reset_delay, lambda: self.hass.async_create_task(self._reset_counter())
         )
@@ -623,7 +665,9 @@ class GregCoordinator:
     async def _reset_counter(self) -> None:
         self._counter = 0
         self._update_mood()
-        silence_mins = self._config.get(CONF_SILENCE_TIMEOUT, 20)
+        silence_mins = clamp_timing(
+            CONF_SILENCE_TIMEOUT, self._config.get(CONF_SILENCE_TIMEOUT)
+        )
         self._silence_handle = self.hass.loop.call_later(
             silence_mins * 60,
             lambda: self.hass.async_create_task(self._handle_silence()),
@@ -1126,6 +1170,7 @@ class GregCoordinator:
         states and nothing else. It has no route to the config entry.
         """
         cfg = self._config
+        soft, medium, chaos = self.thresholds
         return {
             CONF_VIBRATION_SENSOR: cfg.get(CONF_VIBRATION_SENSOR),
             CONF_MEDIA_PLAYER: cfg.get(CONF_MEDIA_PLAYER),
@@ -1142,4 +1187,27 @@ class GregCoordinator:
             # Assistant. The panel edits this. self.language is what that
             # resolves to, which is a different question and reported below.
             CONF_LANGUAGE: cfg.get(CONF_LANGUAGE, DEFAULT_LANGUAGE),
+            # Normalised, so the ladder draws the thresholds Greg will act on.
+            # An install that crossed them in the dialog years ago sees them
+            # already sorted rather than seeing its own broken order drawn
+            # back at it, and saving makes that permanent.
+            CONF_SOFT_THRESHOLD: soft,
+            CONF_MEDIUM_THRESHOLD: medium,
+            CONF_CHAOS_THRESHOLD: chaos,
+            # How far the ladder's track runs. Twelve taps normally, stretched
+            # when an existing chaos sits above it, so nothing anybody set in
+            # the dialog is quietly dragged down by a panel that cannot draw
+            # it. Published rather than hardcoded in the panel so the two
+            # cannot drift.
+            "ladder_max": max(LADDER_TRACK_MAX, chaos),
+            CONF_RESET_DELAY: clamp_timing(
+                CONF_RESET_DELAY, cfg.get(CONF_RESET_DELAY, DEFAULT_RESET_DELAY)
+            ),
+            CONF_SILENCE_TIMEOUT: clamp_timing(
+                CONF_SILENCE_TIMEOUT, cfg.get(CONF_SILENCE_TIMEOUT, DEFAULT_SILENCE_TIMEOUT)
+            ),
+            CONF_EXISTENTIAL_INTERVAL: clamp_timing(
+                CONF_EXISTENTIAL_INTERVAL,
+                cfg.get(CONF_EXISTENTIAL_INTERVAL, DEFAULT_EXISTENTIAL_INTERVAL),
+            ),
         }

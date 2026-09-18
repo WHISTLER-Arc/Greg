@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Greg's panel, offline preview</title>
+<!--
+  A dev harness, not a test and not shipped to anyone: it loads the real
+  greg-panel.js and feeds it a Home Assistant that does not exist, so the panel
+  can be looked at without a Home Assistant to hand.
+
+  Open it straight off disk. Service calls are printed in the log at the bottom
+  and applied to the fake state, so Apply behaves the way it does in anger.
+
+  What it does NOT prove: anything about Home Assistant itself. The theme
+  variables here are approximations of the default dark theme, and a real
+  install can override any of them.
+-->
+<style>
+  :root {
+    color-scheme: dark;
+    --primary-text-color: #e1e1e1;
+    --secondary-text-color: #9b9b9b;
+    --disabled-text-color: #6f6f6f;
+    --primary-background-color: #111111;
+    --secondary-background-color: #202020;
+    --card-background-color: #1c1c1c;
+    --divider-color: rgba(225,225,225,0.12);
+    --success-color: #7cc36e;
+    --error-color: #c0504c;
+    --warning-color: #e5a50a;
+    --primary-color: #03a9f4;
+  }
+  body { margin: 0; background: var(--primary-background-color);
+    color: var(--primary-text-color);
+    font-family: Roboto, "Helvetica Neue", Arial, sans-serif; }
+  .bar { display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+    padding: 10px 14px; background: #181818; border-bottom: 1px solid var(--divider-color);
+    font-size: 13px; position: sticky; top: 0; z-index: 50; }
+  .bar button { background: #262626; color: inherit; border: 1px solid var(--divider-color);
+    border-radius: 8px; padding: 6px 11px; font: inherit; font-size: 12px; cursor: pointer; }
+  .bar span { color: var(--secondary-text-color); font-size: 12px; }
+  #log { font-family: ui-monospace, Consolas, monospace; font-size: 12px;
+    white-space: pre-wrap; padding: 12px 16px; color: var(--secondary-text-color);
+    border-top: 1px solid var(--divider-color); }
+  .wrap { max-width: 1400px; margin: 0 auto; }
+</style>
+</head>
+<body>
+<div class="bar">
+  <button id="w-wide">Wide, 1200px</button>
+  <button id="w-narrow">Phone, 390px</button>
+  <button id="crossed">Load a crossed ladder (1 / 6 / 4)</button>
+  <button id="stretched">Load chaos 20</button>
+  <span id="state"></span>
+</div>
+<div class="wrap" id="wrap"></div>
+<div id="log">Service calls appear here.</div>
+
+<script>
+// A config entry's worth of settings, as the integration publishes them.
+const config = {
+  vibration_sensor: "binary_sensor.table_vibration",
+  media_player: "media_player.kitchen",
+  tts_engine: "tts.piper",
+  volume: 0.35,
+  sensitivity: 75,
+  quiet_hours_enabled: true,
+  quiet_start: "22:00",
+  quiet_end: "08:00",
+  conditions: [],
+  language: "",
+  soft_threshold: 1,
+  medium_threshold: 3,
+  chaos_threshold: 6,
+  ladder_max: 12,
+  reset_delay: 8,
+  silence_timeout: 20,
+  existential_interval: 42,
+};
+
+const log = (msg) => {
+  const el = document.getElementById("log");
+  el.textContent = `${new Date().toLocaleTimeString()}  ${msg}\n` + el.textContent;
+};
+
+function states() {
+  return {
+    "sensor.greg_mood": {
+      state: "annoyed",
+      attributes: {
+        friendly_name: "Greg Mood",
+        config: { ...config },
+        language_options: { "": "Follow Home Assistant", en: "English", nl: "Nederlands" },
+        language_effective: "en",
+        custom_lines: {},
+        custom_only: false,
+        pool_sizes: {
+          soft: { built_in: 50, mine: 0, in_use: 50 },
+          medium: { built_in: 50, mine: 0, in_use: 50 },
+          chaos: { built_in: 50, mine: 0, in_use: 50 },
+          existential: { built_in: 50, mine: 0, in_use: 50 },
+          silence: { built_in: 50, mine: 0, in_use: 50 },
+        },
+        blocked_by: null,
+        is_blocked: false,
+        quiet_hours: false,
+        speech_problem: null,
+        version: "v1.7.0 (preview)",
+      },
+    },
+    "sensor.greg_mood_level": { state: "35", attributes: {} },
+    "sensor.greg_last_line": {
+      state: "I felt that. I feel everything.",
+      attributes: { mood: "annoyed" },
+    },
+    "sensor.greg_disturbances_today": { state: "12", attributes: {} },
+    "switch.greg_enabled": { state: "on", attributes: {} },
+    "binary_sensor.table_vibration": {
+      state: "off", attributes: { friendly_name: "Table vibration" },
+    },
+    "media_player.kitchen": {
+      state: "idle", attributes: { friendly_name: "Kitchen speaker" },
+    },
+    "tts.piper": { state: "idle", attributes: { friendly_name: "Piper" } },
+  };
+}
+
+const hass = {
+  states: states(),
+  themes: {},
+  language: "en",
+  callService(domain, service, data) {
+    log(`${domain}.${service} ${JSON.stringify(data)}`);
+    Object.assign(config, data);
+    // The integration re-publishes the ladder normalised, and stretches the
+    // track when chaos sits above twelve. Mirrored here so Apply behaves the
+    // way it does against a real Greg.
+    const sorted = [config.soft_threshold, config.medium_threshold, config.chaos_threshold]
+      .map(Number).sort((a, b) => a - b);
+    let floor = 1;
+    const fixed = sorted.map((v) => { const out = Math.max(v, floor); floor = out + 1; return out; });
+    [config.soft_threshold, config.medium_threshold, config.chaos_threshold] = fixed;
+    config.ladder_max = Math.max(12, config.chaos_threshold);
+    push();
+    return Promise.resolve();
+  },
+};
+
+let panel = null;
+function push() {
+  hass.states = states();
+  if (panel) panel.hass = hass;
+  document.getElementById("state").textContent =
+    `soft ${config.soft_threshold} · medium ${config.medium_threshold} · ` +
+    `chaos ${config.chaos_threshold} · track ${config.ladder_max} · ` +
+    `${config.reset_delay}s / ${config.silence_timeout}m / ${config.existential_interval}m`;
+}
+
+function mount() {
+  const wrap = document.getElementById("wrap");
+  wrap.innerHTML = "";
+  panel = document.createElement("greg-panel");
+  wrap.appendChild(panel);
+  push();
+}
+
+document.getElementById("w-wide").onclick = () => {
+  document.getElementById("wrap").style.maxWidth = "1400px";
+};
+document.getElementById("w-narrow").onclick = () => {
+  document.getElementById("wrap").style.maxWidth = "390px";
+};
+document.getElementById("crossed").onclick = () => {
+  // What an install that used the old advanced dialog can be holding. Greg
+  // normalises this on read, so the panel should draw 1 / 4 / 6.
+  Object.assign(config, { soft_threshold: 1, medium_threshold: 4, chaos_threshold: 6 });
+  log("loaded a ladder that was stored crossed as 1 / 6 / 4");
+  push();
+};
+document.getElementById("stretched").onclick = () => {
+  Object.assign(config, { chaos_threshold: 20, ladder_max: 20 });
+  log("loaded chaos 20, so the track should stretch to 20 taps");
+  push();
+};
+</script>
+<script src="../custom_components/greg/panel/greg-panel.js"></script>
+<script>mount();</script>
+</body>
+</html>
