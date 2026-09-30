@@ -2,6 +2,8 @@
 
 **A Home Assistant integration that gives your coffee table feelings. Mostly bad ones.**
 
+Not sure yet? **[Try Greg in your browser](https://whistler-arc.github.io/greg-demo/)** before you install him. Poke the table, hear him complain, and have a go at his panel.
+
 ---
 
 ![The real Greg](www/greg/greg_real.jpg)
