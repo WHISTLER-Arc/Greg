@@ -26,6 +26,9 @@ versioned.
 - `greg.import_lines` does the same from an automation. One call rather than
   one per category, so a restore is a single reload.
 - `greg.set_options` now accepts the thresholds and the timing values.
+- **The panel says when Greg is not running.** An integration that failed to
+  start leaves the panel rendering perfectly with nothing in it: no face, empty
+  dropdowns, no version. It now says so, and points at the log.
 
 ### Fixed
 - **Custom Piper voices were ignored.** A `.onnx` installed by hand is not in

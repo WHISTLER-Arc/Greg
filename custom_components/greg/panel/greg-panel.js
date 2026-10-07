@@ -2071,7 +2071,16 @@ class GregPanel extends HTMLElement {
     // he had no way of telling anybody.
     const warn = r.getElementById("speechwarn");
     if (warn) {
-      const problem = attrs.speech_problem || "";
+      // A Greg who is not running at all looks, from in here, like a Greg
+      // with no images, empty dropdowns and no version: the panel renders
+      // fine and simply has nothing to put in it. Three symptoms of one
+      // cause, and nothing on screen pointing at the cause. So say it.
+      const missing = !moodS || moodS.state === "unavailable";
+      const problem = missing
+        ? "Greg's entities are unavailable, so this panel has nothing to show. " +
+          "He is installed but not running: look in Settings → System → Logs " +
+          "for an error from greg."
+        : attrs.speech_problem || "";
       warn.textContent = problem;
       warn.classList.toggle("hidden", !problem);
     }

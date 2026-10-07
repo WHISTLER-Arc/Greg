@@ -90,7 +90,6 @@ from .const import (
     MOOD_ANNOYED,
     MOOD_JUDGING,
     MOOD_EXISTENTIAL,
-    MOOD_IMAGES,
     SERVICE_POKE,
     SERVICE_UNINSTALL,
     SERVICE_SET_OPTIONS,
@@ -1276,14 +1275,13 @@ class GregCoordinator:
             # it. Published rather than hardcoded in the panel so the two
             # cannot drift.
             "ladder_max": max(LADDER_TRACK_MAX, chaos),
-            CONF_RESET_DELAY: clamp_timing(
-                CONF_RESET_DELAY, cfg.get(CONF_RESET_DELAY, DEFAULT_RESET_DELAY)
-            ),
+            # No default passed: clamp_timing owns the fallback, so the
+            # default for each of these lives in exactly one place.
+            CONF_RESET_DELAY: clamp_timing(CONF_RESET_DELAY, cfg.get(CONF_RESET_DELAY)),
             CONF_SILENCE_TIMEOUT: clamp_timing(
-                CONF_SILENCE_TIMEOUT, cfg.get(CONF_SILENCE_TIMEOUT, DEFAULT_SILENCE_TIMEOUT)
+                CONF_SILENCE_TIMEOUT, cfg.get(CONF_SILENCE_TIMEOUT)
             ),
             CONF_EXISTENTIAL_INTERVAL: clamp_timing(
-                CONF_EXISTENTIAL_INTERVAL,
-                cfg.get(CONF_EXISTENTIAL_INTERVAL, DEFAULT_EXISTENTIAL_INTERVAL),
+                CONF_EXISTENTIAL_INTERVAL, cfg.get(CONF_EXISTENTIAL_INTERVAL)
             ),
         }
