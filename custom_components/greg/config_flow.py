@@ -11,6 +11,8 @@ from .lines import available as available_languages
 
 from .const import (
     DOMAIN,
+    normalise_thresholds,
+    THRESHOLD_KEYS,
     CONF_VIBRATION_SENSOR,
     CONF_MEDIA_PLAYER,
     CONF_TTS_ENGINE,
@@ -99,6 +101,28 @@ def _validate_time(value: str) -> str:
     return value
 
 
+def _ordered_thresholds(user_input: dict) -> dict:
+    """The three thresholds from a form, put back in order if they crossed.
+
+    The panel's ladder cannot express a crossed pair. This form can, because
+    it is three sliders that know nothing about each other, so it gets the
+    same rule applied after the fact rather than a fourth copy of it. Sorted
+    rather than refused: the numbers somebody picked are kept, and all that
+    changes is which label sits on which, which is the only reading of
+    "soft 1, medium 6, chaos 4" that does anything useful.
+
+    Greg normalises these again when he reads them, so this is about what the
+    form stores rather than about safety. Storing something he will silently
+    reinterpret is how the config ends up disagreeing with the panel.
+    """
+    if not any(key in user_input for key in THRESHOLD_KEYS):
+        return user_input
+    soft, medium, chaos = normalise_thresholds(
+        *(user_input.get(key) for key in THRESHOLD_KEYS)
+    )
+    return {**user_input, **dict(zip(THRESHOLD_KEYS, (soft, medium, chaos)))}
+
+
 class GregConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     """Handle the Greg setup flow."""
 
@@ -176,7 +200,7 @@ class GregConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
         if user_input is not None:
             if not errors:
-                self._data.update(user_input)
+                self._data.update(_ordered_thresholds(user_input))
                 return self.async_create_entry(
                     title=f"Greg {VERSION_DISPLAY}",
                     data=self._data,
@@ -282,7 +306,7 @@ class GregOptionsFlow(config_entries.OptionsFlow):
 
     async def async_step_advanced(self, user_input=None):
         if user_input is not None:
-            self._data.update(user_input)
+            self._data.update(_ordered_thresholds(user_input))
             return self.async_create_entry(title="", data=self._data)
 
         schema = vol.Schema({

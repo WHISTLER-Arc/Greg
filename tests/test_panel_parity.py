@@ -15,6 +15,7 @@ import unittest
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 PANEL = ROOT / "custom_components" / "greg" / "panel" / "greg-panel.js"
+CONFIG_FLOW = ROOT / "custom_components" / "greg" / "config_flow.py"
 
 _spec = importlib.util.spec_from_file_location(
     "greg_const", ROOT / "custom_components" / "greg" / "const.py"
@@ -73,6 +74,31 @@ class TestPanelParity(unittest.TestCase):
                     set(found), {str(expected)},
                     f"{key} falls back to {set(found)}, const.py says {expected}",
                 )
+
+
+class TestDialogOrdersThresholds(unittest.TestCase):
+    """The dialog keeps the threshold fields, so it has to keep them in order.
+
+    It is three sliders that know nothing about each other, so it can express
+    a crossed ladder where the panel cannot. Checked by reading the source,
+    because config_flow.py imports Home Assistant and cannot be loaded here.
+    """
+
+    SOURCE = CONFIG_FLOW.read_text(encoding="utf8")
+
+    def test_every_advanced_step_orders_them(self):
+        # Both flows have one: the setup wizard's, and the options dialog's.
+        # Split on the definition rather than matching across it, so a third
+        # one added later is covered without anyone remembering to come here.
+        steps = self.SOURCE.split("async def async_step_advanced(")[1:]
+        self.assertEqual(len(steps), 2, "expected an advanced step in both flows")
+        for i, step in enumerate(steps):
+            with self.subTest(step=i):
+                body = step.split("    async def ")[0]
+                self.assertIn("_ordered_thresholds(user_input)", body)
+
+    def test_it_uses_the_one_rule_rather_than_its_own(self):
+        self.assertIn("normalise_thresholds", self.SOURCE)
 
 
 if __name__ == "__main__":

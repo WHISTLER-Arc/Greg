@@ -14,7 +14,11 @@ import path from "node:path";
 import { loadPanel, run } from "./load-panel.mjs";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
-const SAMPLE = readFileSync(path.join(here, "fixtures", "sample-backup.txt"), "utf8");
+// Newlines normalised on the way in: git hands a Windows checkout the
+// fixture with CRLF, and comparing that against what the panel writes
+// would fail on characters nobody can see.
+const SAMPLE = readFileSync(path.join(here, "fixtures", "sample-backup.txt"), "utf8")
+  .replace(new RegExp(String.fromCharCode(13), "g"), "");
 
 const BLOB = {
   en: {

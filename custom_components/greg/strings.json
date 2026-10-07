@@ -17,6 +17,7 @@
       },
       "advanced": {
         "title": "Greg, advanced settings",
+        "description": "These also live in Greg's own panel, where the three thresholds are one track whose handles cannot cross. Setting them here is fine: if they end up crossed, Greg puts them back in order.",
         "data": {
           "soft_threshold": "Soft reaction threshold",
           "medium_threshold": "Medium reaction threshold",
@@ -67,6 +68,7 @@
       },
       "advanced": {
         "title": "Greg, advanced settings",
+        "description": "These also live in Greg's own panel, where the three thresholds are one track whose handles cannot cross. Setting them here is fine: if they end up crossed, Greg puts them back in order.",
         "data": {
           "soft_threshold": "Soft reaction threshold",
           "medium_threshold": "Medium reaction threshold",
