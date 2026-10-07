@@ -60,6 +60,8 @@ from .const import (
     tts_voice_key,
     CONF_LANGUAGE,
     normalise_thresholds,
+    choose_locale,
+    match_voice,
     clamp_timing,
     THRESHOLD_KEYS,
     THRESHOLD_MIN,
@@ -830,78 +832,61 @@ class GregCoordinator:
             return ""
         return random.choice(openers_for(self.language))
 
-    def _engine_language(self, tts_engine: str, language: str) -> str | None:
+    def _engine_language(self, tts_engine: str, language: str, voice: str = "") -> str | None:
         """A language code this engine has actually advertised, or None.
 
-        Greg's codes are bare, en and nl and pt. Engines advertise locales,
-        en_GB and nl_NL among them, and Home Assistant does not reconcile the
-        two. Hand it a code the engine has not advertised and it raises
-        "Language 'nl' not supported" rather than falling back, which silences
-        Greg completely. That is worse than the accent this was meant to fix,
-        so anything that cannot be confirmed is left out and the engine is
-        allowed to pick for itself, exactly as it did before.
-
-        Region preference matters. Sorting nl alphabetically gives nl_BE, and
-        Greg's Dutch is written for nl_NL, so a locale whose region matches its
-        language wins before falling back to alphabetical order.
+        The choosing is in const.py, where it can be tested without a Home
+        Assistant to hand. This part is only asking the engine what it says it
+        supports, which is the part that can throw.
         """
         try:
             component = self.hass.data.get("tts")
             entity = component.get_entity(tts_engine) if component else None
-            supported = [str(c) for c in (getattr(entity, "supported_languages", None) or ())]
+            supported = getattr(entity, "supported_languages", None)
         except Exception:  # noqa: BLE001 - never let this stop him speaking
             return None
-
-        if not supported:
-            return None
-        if language in supported:
-            return language
-
-        candidates = [c for c in supported if c.lower().split("_")[0] == language.lower()]
-        if not candidates:
-            return None
-        preferred = f"{language}_{language}".lower()
-        for code in candidates:
-            if code.lower() == preferred:
-                return code
-        return sorted(candidates)[0]
+        return choose_locale(language, supported, voice)
 
     def _engine_voice(self, tts_engine: str, engine_language: str | None, voice: str) -> str | None:
-        """The configured voice, if the engine will accept it.
+        """The voice to send, which is very nearly always the one configured.
 
-        Voice names are matched character for character. pt_PT-tugão-medium is
-        not pt_PT-tugao-medium, and a near miss is refused outright, which
-        silences Greg entirely rather than falling back to a default. That is
-        the same trap the language field set, so it gets the same treatment.
+        An engine advertising a voice list is useful, but it is not the whole
+        truth: Piper will happily load a voice file sitting in its share
+        folder that Wyoming never advertised. Refusing those meant a custom
+        voice could not be used at all, which is what rujelus22 ran into on
+        the forum, so an unrecognised name is now sent with a note in the log
+        rather than thrown away.
 
-        An unusable voice is dropped and said so in the log, because a table
-        that has gone quiet gives you nothing to go on, while a table speaking
-        in the wrong voice at least tells you where to look.
+        A name that matches apart from its accents or its case is corrected to
+        the spelling the engine gave, which is the pt_PT-tugao-medium trap
+        from 1.5.5 fixed rather than merely diagnosed.
         """
-        if not voice:
-            return None
         try:
             component = self.hass.data.get("tts")
             entity = component.get_entity(tts_engine) if component else None
             getter = getattr(entity, "async_get_supported_voices", None)
             available = getter(engine_language) if (getter and engine_language) else None
-            names = [str(getattr(v, "voice_id", v)) for v in (available or ())]
         except Exception:  # noqa: BLE001 - never let this stop him speaking
-            return voice
+            return voice or None
 
-        # Nothing advertised means nothing to check against, so trust the user.
-        if not names or voice in names:
-            return voice
-
-        _LOGGER.warning(
-            "Greg's voice for %s, %r, is not one this engine offers, so he is "
-            "letting it choose instead. It must match exactly, accents included. "
-            "Available: %s",
-            engine_language,
-            voice,
-            ", ".join(sorted(names)[:8]) or "none",
-        )
-        return None
+        resolved, how = match_voice(voice, available)
+        if how == "corrected":
+            _LOGGER.info(
+                "Greg's voice for %s was written %r and the engine spells it %r, "
+                "so he is using the engine's spelling.",
+                engine_language, voice, resolved,
+            )
+        elif how == "unlisted":
+            _LOGGER.warning(
+                "Greg's voice for %s, %r, is not one this engine advertises. He is "
+                "asking for it anyway, which is right if you installed it yourself. "
+                "If he goes quiet or sounds wrong, check the spelling: it is matched "
+                "character for character, accents included. Advertised: %s",
+                engine_language,
+                voice,
+                ", ".join(sorted(str(getattr(v, "voice_id", v)) for v in (available or ()))[:8]) or "none",
+            )
+        return resolved
 
     async def _speak(self, pool_key: str) -> None:
         # Resolved once and reused, so the line, the event and the TTS call can
@@ -982,24 +967,27 @@ class GregCoordinator:
             # reading Dutch letters aloud. Only sent when the engine has said it
             # understands it, because an unrecognised code is refused outright
             # and Greg says nothing at all.
-            engine_language = self._engine_language(tts_engine, language)
+            # Worked out before the language, because a voice names the
+            # locale it speaks and is the better authority on which one to
+            # ask for.
+            #
+            # The per-language voice wins, because a voice belongs to a
+            # language. The bare tts_voice only applies to English: it predates
+            # Greg speaking anything else, so anyone who set it set an English
+            # voice, and letting it fall through to Dutch would quietly
+            # recreate the exact bug this is fixing. Existing English setups
+            # are untouched, every other language starts from the engine's own
+            # default until given a voice of its own.
+            voice = self._config.get(tts_voice_key(language)) or ""
+            if not voice and language == FALLBACK_LANGUAGE:
+                voice = self._config.get(CONF_TTS_VOICE, DEFAULT_TTS_VOICE)
+
+            engine_language = self._engine_language(tts_engine, language, voice)
             if engine_language:
                 payload["language"] = engine_language
             # Only sent when the user has actually named a voice. Engines that
             # take no voice option (Google Translate, for one) reject the key
             # outright, so an empty setting has to mean "say nothing about it".
-            #
-            # The per-language voice wins, because a voice belongs to a language.
-            #
-            # The bare tts_voice only applies to English. It predates Greg
-            # speaking anything else, so anyone who set it set an English voice,
-            # and letting it fall through to Dutch would quietly recreate the
-            # exact bug this is fixing. Existing English setups are untouched,
-            # every other language starts from the engine's own default until
-            # given a voice of its own.
-            voice = self._config.get(tts_voice_key(language)) or ""
-            if not voice and language == FALLBACK_LANGUAGE:
-                voice = self._config.get(CONF_TTS_VOICE, DEFAULT_TTS_VOICE)
             voice = self._engine_voice(tts_engine, engine_language, voice)
             if voice:
                 payload["options"] = {"voice": voice}

@@ -1,4 +1,6 @@
 """Constants for Greg integration."""
+import re
+import unicodedata
 
 DOMAIN = "greg"
 VERSION = "1.6.5"
@@ -173,6 +175,103 @@ CONF_TTS_VOICE_PREFIX = "tts_voice_"
 def tts_voice_key(language: str) -> str:
     """Config key holding the voice for one language."""
     return f"{CONF_TTS_VOICE_PREFIX}{language}"
+
+
+# A Piper voice is named for the locale it speaks: en_US-glados-high. That
+# makes the voice the better authority on which locale to ask the engine for,
+# and reported by rujelus22 on the forum it is the difference between Greg
+# using the voice you chose and ignoring it.
+_VOICE_LOCALE = re.compile(r"^([A-Za-z]{2,3})_([A-Za-z]{2,4})[-_]")
+
+
+def voice_locale(voice: str) -> str | None:
+    """The locale a voice name carries, or None if it carries none."""
+    match = _VOICE_LOCALE.match(str(voice or ""))
+    if not match:
+        return None
+    return f"{match.group(1).lower()}_{match.group(2).upper()}"
+
+
+def _fold(name: str) -> str:
+    """A voice name with its accents and its case taken off.
+
+    Only for comparing. What gets sent to the engine is always a real name,
+    either exactly what the user typed or exactly what the engine advertised.
+    """
+    stripped = unicodedata.normalize("NFKD", str(name or ""))
+    return "".join(c for c in stripped if not unicodedata.combining(c)).casefold()
+
+
+def match_voice(voice: str, available) -> tuple[str | None, str]:
+    """Resolve a configured voice against what the engine advertises.
+
+    Returns the name to send and why, one of:
+
+    - "exact", the engine advertises it.
+    - "corrected", it matches one the engine advertises apart from accents or
+      case, so the advertised spelling is sent instead. This is the
+      pt_PT-tugao-medium against pt_PT-tugão-medium trap from 1.5.5, now
+      fixed for the user rather than refused.
+    - "unlisted", nothing matches. It is sent anyway: Piper will load a voice
+      sitting in its share folder that Wyoming never advertised, and refusing
+      those is what stopped a custom voice working at all.
+    - "none", no voice is configured.
+    """
+    if not voice:
+        return None, "none"
+
+    names = [str(getattr(v, "voice_id", v)) for v in (available or ())]
+    if not names or voice in names:
+        return voice, "exact"
+
+    folded = _fold(voice)
+    for name in names:
+        if _fold(name) == folded:
+            return name, "corrected"
+    return voice, "unlisted"
+
+
+def choose_locale(language: str, supported, voice: str = "") -> str | None:
+    """The locale to ask the engine for, or None to let it choose.
+
+    Greg's codes are bare, en and nl and pt. Engines advertise locales, and
+    Home Assistant does not reconcile the two: hand it a code the engine has
+    not advertised and it refuses outright rather than falling back, which
+    silences him completely.
+
+    A configured voice decides this when it can, because a voice belongs to
+    exactly one locale and the whole point of naming one is to be given it.
+    Only when it speaks the language Greg is speaking, so an English voice
+    left over from an English-only setup cannot drag Dutch to en_US.
+
+    Failing that, a locale whose region matches its language wins, which is
+    how nl reaches nl_NL rather than nl_BE. That rule does nothing for
+    English, where en_en does not exist, so what is left is alphabetical: with
+    both installed, en_GB beats en_US. Harmless until you own an en_US voice,
+    at which point Greg checks it against the en_GB voice list and throws it
+    away. Hence the voice going first.
+    """
+    codes = [str(c) for c in (supported or ())]
+    if not codes:
+        return None
+
+    locale = voice_locale(voice)
+    if locale and locale.split("_")[0] == language.lower():
+        for code in codes:
+            if code.lower() == locale.lower():
+                return code
+
+    if language in codes:
+        return language
+
+    candidates = [c for c in codes if c.lower().split("_")[0] == language.lower()]
+    if not candidates:
+        return None
+    preferred = f"{language}_{language}".lower()
+    for code in candidates:
+        if code.lower() == preferred:
+            return code
+    return sorted(candidates)[0]
 
 # Lines written by the person who owns the table, kept in the config entry
 # rather than in a file, so they survive updates and need no filesystem access.
