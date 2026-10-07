@@ -2,7 +2,10 @@ name: Checks
 
 on:
   push:
-    branches: [main]
+    # Working branches too, not only main. A beta is cut from a branch and
+    # released straight off it, so "it passed on main" arrives a release too
+    # late to be any use.
+    branches: [main, "claude/**"]
   pull_request:
   workflow_dispatch:
 
