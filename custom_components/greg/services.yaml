@@ -200,3 +200,39 @@ set_lines:
       required: false
       selector:
         boolean:
+
+import_lines:
+  name: Import lines from a backup
+  description: >
+    Read a backup file's text back into the lines you have written. This is
+    what the Import button in Greg's panel uses. The text is the plain format
+    Greg exports: a language under "## en", a pool under "### soft", and one
+    line per bullet. Anything else in the file is ignored, and a language or
+    pool Greg does not know is skipped rather than failing the import.
+  fields:
+    text:
+      name: The file's text
+      description: The whole backup, headings and all.
+      required: true
+      example: |
+        ## en
+
+        ### soft
+
+        - Oh. You again.
+      selector:
+        text:
+          multiline: true
+    mode:
+      name: Mode
+      description: >
+        Add keeps what you have and adds anything new. Replace makes your lines
+        exactly what the file says, which deletes anything not in it.
+      default: merge
+      selector:
+        select:
+          options:
+            - label: Add them to mine
+              value: merge
+            - label: Replace mine
+              value: replace

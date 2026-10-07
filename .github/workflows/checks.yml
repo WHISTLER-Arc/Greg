@@ -72,3 +72,4 @@ jobs:
         run: |
           python3 -m unittest discover -s tests -v
           node tests/ladder.test.mjs
+          node tests/backup.test.mjs

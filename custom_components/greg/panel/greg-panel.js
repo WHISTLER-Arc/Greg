@@ -287,6 +287,17 @@ class GregPanel extends HTMLElement {
         .gtime input::-webkit-inner-spin-button { appearance:none; margin:0; }
         .gtimeu { font-size:13px; font-weight:600; color:var(--secondary-text-color); }
         .gtimel { font-size:11px; line-height:1.35; color:var(--secondary-text-color); opacity:.8; }
+        /* The import confirmation. Deliberately in the way: one of its two
+           buttons deletes lines somebody wrote. */
+        .importbox { margin-top:12px; padding:12px 14px; border-radius:12px;
+          background:var(--secondary-background-color);
+          border-left:3px solid var(--success-color, #7cc36e); font-size:13px; }
+        .importbox.hidden { display:none; }
+        .importbox .ilang { margin-top:6px; color:var(--secondary-text-color); font-size:12px; }
+        .importbox .iwarn { margin-top:6px; color:var(--error-color, #c0504c); font-size:12px; }
+        .importacts { display:flex; gap:8px; flex-wrap:wrap; margin-top:12px; }
+        .linescard .btn.danger { background:transparent; color:var(--error-color, #c0504c);
+          border:1px solid var(--error-color, #c0504c); }
         .grow { display:flex; align-items:center; gap:10px; font-size:13px;
           background:var(--secondary-background-color); border-radius:11px; padding:10px 12px; }
         .grow .sw { border:0; padding:0; }
@@ -550,8 +561,23 @@ class GregPanel extends HTMLElement {
         <div class="linesfoot">
           <button class="btn primary" id="lines-save">Save lines</button>
           <button class="btn" id="lines-share">Share the good ones</button>
+          <button class="btn" id="lines-export">Export to a file</button>
+          <button class="btn" id="lines-import">Import from a file</button>
+          <input type="file" id="lines-file" accept=".txt,text/plain" hidden>
         </div>
         <div class="ghint" id="lines-status"></div>
+
+        <!-- Filled in and shown only once a file has been read, because
+             Replace throws away lines and that is not a thing to find out
+             about afterwards. -->
+        <div class="importbox hidden" id="importbox">
+          <div id="import-summary"></div>
+          <div class="importacts">
+            <button class="btn primary" id="import-merge">Add them to mine</button>
+            <button class="btn danger" id="import-replace">Replace mine</button>
+            <button class="btn" id="import-cancel">Cancel</button>
+          </div>
+        </div>
       </div>`;
   }
 
@@ -1608,6 +1634,168 @@ class GregPanel extends HTMLElement {
     }
   }
 
+  // ---- backups ---------------------------------------------------------
+  //
+  // Plain text, in the same shape the Share button writes for a GitHub issue
+  // with a language heading added. Readable, editable by hand, and a file
+  // somebody sends you can be pasted straight into an issue.
+  //
+  // The writer is here and the reader is in const.py. They are pinned against
+  // the same file, tests/fixtures/sample-backup.txt, from both sides.
+
+  _backupText() {
+    const saved = this._moodState();
+    const mine = (saved && saved.attributes && saved.attributes.custom_lines) || {};
+    const pools = ["soft", "medium", "chaos", "existential", "silence"];
+    const version = (saved && saved.attributes && saved.attributes.version) || "";
+    const stamp = new Date().toISOString().slice(0, 10);
+
+    const out = [`Greg lines, exported ${stamp}${version ? ` from Greg ${version}` : ""}`];
+    Object.keys(mine).sort().forEach((language) => {
+      const written = pools
+        .map((pool) => [pool, (mine[language] || {})[pool] || []])
+        .filter(([, lines]) => lines.length);
+      if (!written.length) return;
+      out.push(`\n## ${language}`);
+      written.forEach(([pool, lines]) => {
+        out.push(`\n### ${pool}\n`);
+        lines.forEach((line) => out.push(`- ${line}`));
+      });
+    });
+    return out.join("\n").trim() + "\n";
+  }
+
+  _countBackup(text) {
+    const languages = [];
+    let lines = 0;
+    text.split(/\r?\n/).forEach((raw) => {
+      const line = raw.trim();
+      if (line.startsWith("## ")) languages.push(line.slice(3).trim());
+      else if (line.startsWith("- ") && line.slice(2).trim()) lines++;
+    });
+    return { languages, lines };
+  }
+
+  _exportLines() {
+    const status = this.shadowRoot.getElementById("lines-status");
+    const text = this._backupText();
+    const { lines } = this._countBackup(text);
+    if (!lines) {
+      status.textContent = "Nothing to export yet. Write a line first.";
+      return;
+    }
+
+    const name = `greg-lines-${new Date().toISOString().slice(0, 10)}.txt`;
+    const url = URL.createObjectURL(new Blob([text], { type: "text/plain" }));
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = name;
+    link.click();
+    // Freed on the next turn of the loop rather than immediately: revoking it
+    // in the same tick can beat the download to it in some browsers.
+    setTimeout(() => URL.revokeObjectURL(url), 10000);
+    status.textContent = `Exported ${lines} line${lines === 1 ? "" : "s"} to ${name}.`;
+  }
+
+  _offerImport(text, filename) {
+    const r = this.shadowRoot;
+    const box = r.getElementById("importbox");
+    const summary = r.getElementById("import-summary");
+    const status = r.getElementById("lines-status");
+    const { languages, lines } = this._countBackup(text);
+
+    if (!lines) {
+      status.textContent =
+        `${filename} has no lines in it. A backup has lines starting with "- " ` +
+        `under headings like "### soft".`;
+      box.classList.add("hidden");
+      return;
+    }
+
+    this._importText = text;
+    const names = this._listOptions("language_options");
+    const named = languages
+      .map((code) => (names.find((n) => n.id === code) || {}).name || code)
+      .join(", ");
+
+    // Counted from what is saved rather than from the draft, because that is
+    // what Replace would actually be throwing away.
+    const saved = this._moodState();
+    const mine = (saved && saved.attributes && saved.attributes.custom_lines) || {};
+    const have = Object.values(mine).reduce(
+      (n, pools) => n + Object.values(pools || {}).reduce((m, l) => m + (l || []).length, 0), 0
+    );
+
+    summary.innerHTML =
+      `<strong>${filename}</strong> holds ${lines} line${lines === 1 ? "" : "s"}.` +
+      (named ? `<div class="ilang">Languages in the file: ${named}.</div>` : "") +
+      (have
+        ? `<div class="iwarn">Replacing throws away the ${have} line${have === 1 ? "" : "s"} ` +
+          `you have now, in every language.</div>`
+        : "");
+    box.classList.remove("hidden");
+    status.textContent = "";
+  }
+
+  _runImport(mode) {
+    const r = this.shadowRoot;
+    const status = r.getElementById("lines-status");
+    if (!this._hass || !this._importText) return;
+
+    r.getElementById("importbox").classList.add("hidden");
+    status.textContent = "Importing…";
+    this._hass
+      .callService("greg", "import_lines", { text: this._importText, mode })
+      .then(
+        () => {
+          this._importText = null;
+          // The draft is what the editor is showing, and it has just been
+          // overtaken by what Greg now holds.
+          this._linesDirty = false;
+          this._draft = null;
+          this._loadDraft(true);
+          this._renderLines();
+          status.textContent =
+            mode === "replace"
+              ? "Imported. Your lines are now what the file said."
+              : "Imported. Anything new in the file has been added.";
+        },
+        () => {
+          status.textContent = "Import failed, check the logs.";
+        }
+      );
+  }
+
+  _wireBackups() {
+    const r = this.shadowRoot;
+    const picker = r.getElementById("lines-file");
+    if (!picker) return;
+
+    r.getElementById("lines-export").onclick = () => this._exportLines();
+    r.getElementById("lines-import").onclick = () => {
+      // Cleared first, so choosing the same file twice still fires a change.
+      picker.value = "";
+      picker.click();
+    };
+    picker.onchange = () => {
+      const file = picker.files && picker.files[0];
+      if (!file) return;
+      file.text().then(
+        (text) => this._offerImport(text, file.name),
+        () => {
+          r.getElementById("lines-status").textContent = "That file could not be read.";
+        }
+      );
+    };
+    r.getElementById("import-merge").onclick = () => this._runImport("merge");
+    r.getElementById("import-replace").onclick = () => this._runImport("replace");
+    r.getElementById("import-cancel").onclick = () => {
+      this._importText = null;
+      r.getElementById("importbox").classList.add("hidden");
+      r.getElementById("lines-status").textContent = "Import cancelled.";
+    };
+  }
+
   _wireQuiet() {
     const r = this.shadowRoot;
     const quiet = r.getElementById("quiet-enabled");
@@ -1688,6 +1876,7 @@ class GregPanel extends HTMLElement {
     };
     root.getElementById("lines-save").onclick = () => this._saveLines();
     root.getElementById("lines-share").onclick = () => this._shareLines();
+    this._wireBackups();
     const only = root.getElementById("custom-only");
     only.onclick = () => {
       const on = only.getAttribute("aria-checked") === "true";

@@ -340,6 +340,111 @@ SPEAKER_DEAD_STATES = ("unavailable", "unknown")
 ATTR_AUDIO_BLOCKED = "audio_interaction_required"
 
 SERVICE_SET_LINES = "set_lines"
+SERVICE_IMPORT_LINES = "import_lines"
+
+# Backups are plain text, in the same shape the Share button already writes
+# for a GitHub issue, with one heading level added for the language:
+#
+#     ## en
+#     ### soft
+#     - Oh. You again.
+#
+# Text rather than JSON so a backup can be read, edited and written by hand in
+# any text editor, and so a file somebody sends you can be pasted straight into
+# an issue and the other way round. Anything that is not a heading or a bullet
+# is ignored, which makes the title line, blank lines and anybody's notes free.
+#
+# custom_only is deliberately not in the file. It is a setting, not a line.
+BACKUP_LANGUAGE_PREFIX = "## "
+BACKUP_POOL_PREFIX = "### "
+BACKUP_LINE_PREFIX = "- "
+
+IMPORT_MERGE = "merge"
+IMPORT_REPLACE = "replace"
+IMPORT_MODES = (IMPORT_MERGE, IMPORT_REPLACE)
+
+
+def format_lines_backup(custom_lines, pools, header: str = "") -> str:
+    """Everything somebody has written, as the text of a backup file.
+
+    The pool order is passed in rather than imported, so this file stays
+    importable on its own and the tests need no Home Assistant.
+    """
+    out = [header] if header else []
+    for language in sorted(custom_lines or {}):
+        per_language = custom_lines.get(language) or {}
+        if not isinstance(per_language, dict):
+            continue
+        written = [(pool, per_language.get(pool) or []) for pool in pools]
+        written = [(pool, lines) for pool, lines in written if lines]
+        if not written:
+            continue
+        out.append(f"\n{BACKUP_LANGUAGE_PREFIX}{language}")
+        for pool, lines in written:
+            out.append(f"\n{BACKUP_POOL_PREFIX}{pool}\n")
+            out.extend(f"{BACKUP_LINE_PREFIX}{line}" for line in lines)
+    return "\n".join(out).strip() + "\n"
+
+
+def parse_lines_backup(text: str, languages, pools) -> tuple[dict, dict]:
+    """Read a backup file into {language: {pool: [line]}}, and what was skipped.
+
+    Deliberately forgiving. This is a file a person may well have typed
+    themselves, and the useful answer to a stray blank line or a note at the
+    top is to get on with it. What cannot be guessed at is counted and
+    reported, so the panel can say "ignored 4 lines under a pool called
+    'funny'" rather than quietly dropping them.
+    """
+    known_languages = {str(code).lower(): str(code) for code in (languages or ())}
+    known_pools = {str(pool).lower(): str(pool) for pool in (pools or ())}
+
+    found: dict[str, dict[str, list[str]]] = {}
+    skipped = {"languages": [], "pools": [], "lines": 0, "orphans": 0}
+    language = None
+    pool = None
+
+    for raw in str(text or "").splitlines():
+        line = raw.strip()
+        if not line:
+            continue
+
+        if line.startswith(BACKUP_POOL_PREFIX):
+            name = line[len(BACKUP_POOL_PREFIX):].strip().lower()
+            pool = known_pools.get(name)
+            if pool is None and name not in skipped["pools"]:
+                skipped["pools"].append(name)
+            continue
+
+        if line.startswith(BACKUP_LANGUAGE_PREFIX):
+            name = line[len(BACKUP_LANGUAGE_PREFIX):].strip().lower()
+            # A language heading ends the pool with it, so lines cannot leak
+            # from one language's pool into the next language.
+            pool = None
+            language = known_languages.get(name)
+            if language is None and name not in skipped["languages"]:
+                skipped["languages"].append(name)
+            continue
+
+        if not line.startswith(BACKUP_LINE_PREFIX):
+            continue
+
+        content = " ".join(line[len(BACKUP_LINE_PREFIX):].split())
+        if not content:
+            continue
+        if language is None or pool is None:
+            # A bullet before any heading, or under one that was not
+            # understood. Counted rather than guessed at.
+            if language is None and pool is None:
+                skipped["orphans"] += 1
+            else:
+                skipped["lines"] += 1
+            continue
+
+        bucket = found.setdefault(language, {}).setdefault(pool, [])
+        if content not in bucket:
+            bucket.append(content)
+
+    return found, skipped
 
 # Mood states
 MOOD_RESTING = "resting"

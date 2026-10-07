@@ -95,6 +95,11 @@ from .const import (
     SERVICE_UNINSTALL,
     SERVICE_SET_OPTIONS,
     SERVICE_SET_LINES,
+    SERVICE_IMPORT_LINES,
+    IMPORT_MERGE,
+    IMPORT_REPLACE,
+    IMPORT_MODES,
+    parse_lines_backup,
     BASIC_OPTION_KEYS,
     CONDITION_IS,
     CONDITION_IS_NOT,
@@ -147,6 +152,28 @@ def _clean_conditions(raw) -> list[dict]:
         if len(rows) >= CONDITIONS_MAX:
             break
     return rows
+
+def _clean_lines(raw) -> list[str]:
+    """Lines as Greg will store them: trimmed, deduplicated and capped.
+
+    Shared by set_lines and import_lines because both are reachable from an
+    automation, and anything reachable from an automation has to defend
+    itself. A blank line goes, a repeat goes, whitespace is collapsed, and the
+    length and the count are capped so a paste accident cannot become Greg's
+    new personality.
+    """
+    seen: set[str] = set()
+    cleaned: list[str] = []
+    for item in raw or []:
+        line = " ".join(str(item).split())[:CUSTOM_LINE_MAX].strip()
+        if not line or line in seen:
+            continue
+        seen.add(line)
+        cleaned.append(line)
+        if len(cleaned) >= CUSTOM_LINES_MAX_PER_POOL:
+            break
+    return cleaned
+
 
 # Dispatcher signals so entities update the instant coordinator state changes.
 SIGNAL_STATE_UPDATED = f"{DOMAIN}_state_updated"
@@ -232,6 +259,7 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
             SERVICE_UNINSTALL,
             SERVICE_SET_OPTIONS,
             SERVICE_SET_LINES,
+            SERVICE_IMPORT_LINES,
         ):
             if hass.services.has_service(DOMAIN, service):
                 hass.services.async_remove(DOMAIN, service)
@@ -360,16 +388,7 @@ def _async_register_services(hass: HomeAssistant) -> None:
         language = call.data[CONF_LANGUAGE]
         pool_key = call.data["pool"]
 
-        seen: set[str] = set()
-        cleaned: list[str] = []
-        for raw in call.data.get("lines", []):
-            line = " ".join(str(raw).split())[:CUSTOM_LINE_MAX].strip()
-            if not line or line in seen:
-                continue
-            seen.add(line)
-            cleaned.append(line)
-            if len(cleaned) >= CUSTOM_LINES_MAX_PER_POOL:
-                break
+        cleaned = _clean_lines(call.data.get("lines", []))
 
         for entry_id, coordinator in list(hass.data.get(DOMAIN, {}).items()):
             if not isinstance(coordinator, GregCoordinator):
@@ -397,7 +416,76 @@ def _async_register_services(hass: HomeAssistant) -> None:
             if merged != dict(entry.options):
                 hass.config_entries.async_update_entry(entry, options=merged)
 
+    async def _handle_import_lines(call) -> None:
+        """Read a backup file's text back into Greg's own lines.
+
+        One service call rather than one per pool, because set_lines takes a
+        single language and pool at a time and a restore touches up to fifteen
+        of them. Each of those would update the config entry and reload him,
+        which is a lot of reloading to watch and a lot of chances to end up
+        half restored.
+
+        Parsing happens here rather than in the panel so that an automation
+        can restore a backup too, and so the thing that decides what a file
+        means is testable without a browser.
+        """
+        text = call.data["text"]
+        mode = call.data.get("mode", IMPORT_MERGE)
+
+        found, _skipped = parse_lines_backup(
+            text, available_languages().keys(), POOL_KEYS
+        )
+
+        for entry_id, coordinator in list(hass.data.get(DOMAIN, {}).items()):
+            if not isinstance(coordinator, GregCoordinator):
+                continue
+            entry = hass.config_entries.async_get_entry(entry_id)
+            if entry is None:
+                continue
+
+            existing = entry.options.get(CONF_CUSTOM_LINES) or {}
+            if not isinstance(existing, dict):
+                existing = {}
+
+            stored: dict[str, dict[str, list[str]]] = {}
+            languages = set(found) if mode == IMPORT_REPLACE else set(found) | set(existing)
+            for language in languages:
+                mine = existing.get(language) or {}
+                if not isinstance(mine, dict):
+                    mine = {}
+                incoming = found.get(language) or {}
+                pools = set(incoming) if mode == IMPORT_REPLACE else set(incoming) | set(mine)
+                for pool in pools:
+                    # Merge keeps what is already there and adds what is new,
+                    # in that order, so nothing somebody wrote is lost to a
+                    # file they were only topping up from. Replace takes the
+                    # file as the whole truth, which is what restoring means.
+                    kept = [] if mode == IMPORT_REPLACE else list(mine.get(pool) or [])
+                    merged = list(kept)
+                    for line in incoming.get(pool) or []:
+                        if line not in merged:
+                            merged.append(line)
+
+                    cleaned = _clean_lines(merged)
+                    if cleaned:
+                        stored.setdefault(language, {})[pool] = cleaned
+
+            merged_options = {**entry.options, CONF_CUSTOM_LINES: stored}
+            if merged_options != dict(entry.options):
+                hass.config_entries.async_update_entry(entry, options=merged_options)
+
     hass.services.async_register(DOMAIN, SERVICE_POKE, _handle_poke)
+    hass.services.async_register(
+        DOMAIN,
+        SERVICE_IMPORT_LINES,
+        _handle_import_lines,
+        schema=vol.Schema(
+            {
+                vol.Required("text"): cv.string,
+                vol.Optional("mode", default=IMPORT_MERGE): vol.In(IMPORT_MODES),
+            }
+        ),
+    )
     hass.services.async_register(
         DOMAIN,
         SERVICE_SET_LINES,

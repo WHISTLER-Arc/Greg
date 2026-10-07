@@ -79,6 +79,12 @@ const config = {
   existential_interval: 42,
 };
 
+// Somebody's written lines, so Export has something to write.
+let customLines = {
+  en: { soft: ["Oh. You again.", "I felt that in my drawers."], chaos: ["This is fine."] },
+  nl: { soft: ["Daar ben je weer."] },
+};
+
 const log = (msg) => {
   const el = document.getElementById("log");
   el.textContent = `${new Date().toLocaleTimeString()}  ${msg}\n` + el.textContent;
@@ -93,7 +99,7 @@ function states() {
         config: { ...config },
         language_options: { "": "Follow Home Assistant", en: "English", nl: "Nederlands" },
         language_effective: "en",
-        custom_lines: {},
+        custom_lines: customLines,
         custom_only: false,
         pool_sizes: {
           soft: { built_in: 50, mine: 0, in_use: 50 },
@@ -131,7 +137,33 @@ const hass = {
   themes: {},
   language: "en",
   callService(domain, service, data) {
-    log(`${domain}.${service} ${JSON.stringify(data)}`);
+    log(`${domain}.${service} ${JSON.stringify(data).slice(0, 300)}`);
+    if (service === "import_lines") {
+      // Stands in for const.py's parser, close enough to drive the panel.
+      const found = {};
+      let language = null, pool = null;
+      for (const raw of String(data.text || "").split(String.fromCharCode(10))) {
+        const line = raw.trim();
+        if (line.startsWith("### ")) { pool = line.slice(4).trim().toLowerCase(); continue; }
+        if (line.startsWith("## ")) { pool = null; language = line.slice(3).trim().toLowerCase(); continue; }
+        if (!line.startsWith("- ") || !language || !pool) continue;
+        const text = line.slice(2).trim();
+        const bucket = ((found[language] = found[language] || {})[pool] = found[language][pool] || []);
+        if (!bucket.includes(text)) bucket.push(text);
+      }
+      if (data.mode === "replace") {
+        customLines = found;
+      } else {
+        for (const [lang, pools] of Object.entries(found)) {
+          for (const [p, lines] of Object.entries(pools)) {
+            const have = ((customLines[lang] = customLines[lang] || {})[p] = customLines[lang][p] || []);
+            lines.forEach((l) => { if (!have.includes(l)) have.push(l); });
+          }
+        }
+      }
+      push();
+      return Promise.resolve();
+    }
     Object.assign(config, data);
     // The integration re-publishes the ladder normalised, and stretches the
     // track when chaos sits above twelve. Mirrored here so Apply behaves the

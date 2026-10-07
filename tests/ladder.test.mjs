@@ -2,34 +2,13 @@
 //
 // Run with `node tests/ladder.test.mjs`, which is what CI does.
 //
-// greg-panel.js is a custom element and expects a DOM, so the few globals it
-// touches while defining itself are stubbed and the class is caught as it
-// registers itself. Nothing here needs a document: the ordering rules work on
-// values held on the component, and the handles are drawn from those.
+// Nothing here needs a document: the ordering rules work on values held on the
+// component, and the handles are drawn from those. The loading of the panel
+// into a stubbed DOM is in load-panel.mjs.
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
-import { fileURLToPath } from "node:url";
-import path from "node:path";
-import vm from "node:vm";
+import { loadPanel, run } from "./load-panel.mjs";
 
-const here = path.dirname(fileURLToPath(import.meta.url));
-const source = readFileSync(
-  path.join(here, "..", "custom_components", "greg", "panel", "greg-panel.js"),
-  "utf8"
-);
-
-let GregPanel = null;
-const sandbox = {
-  HTMLElement: class {},
-  customElements: { define: (_name, cls) => { GregPanel = cls; } },
-  document: { createElement: () => ({ style: {} }) },
-  window: {},
-  console,
-};
-sandbox.globalThis = sandbox;
-vm.createContext(sandbox);
-vm.runInContext(source, sandbox);
-assert.ok(GregPanel, "greg-panel.js should register the panel element");
+const GregPanel = loadPanel();
 
 // A component with just enough on it for the ladder: its own values, and the
 // saved config the track's length is read from.
@@ -49,7 +28,7 @@ function ladderAt(soft, medium, chaos, savedChaos = null) {
   return panel;
 }
 
-const tests = {
+run({
   "defaults sit where the dialog left them"() {
     const p = ladderAt(1, 3, 6);
     assert.equal(p._ladderMax(), 12);
@@ -173,17 +152,4 @@ const tests = {
       );
     }
   },
-};
-
-let failed = 0;
-for (const [name, fn] of Object.entries(tests)) {
-  try {
-    fn();
-    console.log(`ok   ${name}`);
-  } catch (err) {
-    failed++;
-    console.error(`FAIL ${name}\n     ${err.message}`);
-  }
-}
-console.log(`\n${Object.keys(tests).length - failed} passed, ${failed} failed`);
-process.exit(failed ? 1 : 0);
+});
