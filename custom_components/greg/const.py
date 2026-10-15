@@ -3,8 +3,8 @@ import re
 import unicodedata
 
 DOMAIN = "greg"
-VERSION = "1.7.0b2"
-VERSION_DISPLAY = "v1.7.0b2"
+VERSION = "1.7.0"
+VERSION_DISPLAY = "v1.7.0"
 
 # Config keys
 CONF_VIBRATION_SENSOR = "vibration_sensor"

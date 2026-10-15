@@ -497,8 +497,8 @@ There's also a `greg.uninstall` service if you'd rather script it. It takes an o
 
 - **v1.4.** Single room, no Blueprints, works with any protocol, and he brings his own sidebar panel.
 - **v1.5.** Greg is a supercomputer, so he speaks more than one language. English, Dutch and European Portuguese, with every line written natively in each rather than translated into it.
-- **v1.6.** Current release. Write your own lines in his panel, and share the good ones with everyone else. Since 1.6.5 he speaks on your phone too, through ~~the Companion app~~ **a browser on it**, in his own voice rather than your phone's.
-- **v1.7.** Your lines, yours to keep, and everything in one place. Export what you have written and carry it between Gregs, and thresholds and timing come into his panel, with soft, medium and chaos on one track rather than three sliders that can quietly contradict each other. They stay in the options dialog too for now, so nothing anybody relies on moves out from under them.
+- **v1.6.** Write your own lines in his panel, and share the good ones with everyone else. Since 1.6.5 he speaks on your phone too, through ~~the Companion app~~ **a browser on it**, in his own voice rather than your phone's.
+- **v1.7.** Current release. Your lines, yours to keep, and everything in one place. Export what you have written and carry it between Gregs, and thresholds and timing come into his panel, with soft, medium and chaos on one track rather than three sliders that can quietly contradict each other. They stay in the options dialog too for now, so nothing anybody relies on moves out from under them.
 - **v1.x.** Small improvements as they come. Feedback very welcome.
 - **v2.0.** Multi-room, multiple Gregs, a full mood dashboard. (One Greg might be plenty for some households. I respect that.)
 

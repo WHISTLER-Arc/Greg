@@ -59,6 +59,8 @@ versioned.
   which run the real panel in a stubbed DOM. No pytest, no Home Assistant.
 - `tests/preview.html` opens Greg's panel against a fake Home Assistant, for
   looking at a change without an install to hand.
+- pyflakes runs in CI alongside `compileall`, which proves the syntax is
+  valid but not that every name used is imported.
 
 ## [1.6.5]
 
