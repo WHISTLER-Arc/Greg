@@ -3,6 +3,65 @@
 All notable changes to Greg. He would like it noted that he did not ask to be
 versioned.
 
+## [1.7.0]
+
+### Added
+- **The escalation ladder.** The three thresholds are one track with three
+  handles in Greg's panel, in the mood colours the card already uses. The
+  handles cannot cross, so chaos sitting below medium, which made him skip a
+  mood for no visible reason, is no longer something that can be set.
+- **Timing in the panel too**, as three numbers you type over rather than
+  three more full-width sliders: how long until he calms down, how long until
+  he notices the silence, and how often the existential crises come round.
+- All six are still in advanced settings as well. Nothing has moved out from
+  under anybody, and if they end up crossed there Greg puts them in order.
+- **Line backups.** **Export to a file** writes everything you have written to
+  `greg-lines-<date>.txt`. **Import from a file** reads one back, asking first
+  whether to add the file's lines to yours or replace yours with them, and
+  saying how many lines a replace would throw away.
+- The file is plain text: `## en`, `### soft`, and a line per bullet. Anything
+  else in it is ignored, so you can also write a batch of lines in a text
+  editor and import them, and a file somebody sends you can be pasted straight
+  into a GitHub issue.
+- `greg.import_lines` does the same from an automation. One call rather than
+  one per category, so a restore is a single reload.
+- `greg.set_options` now accepts the thresholds and the timing values.
+- **The panel says when Greg is not running.** An integration that failed to
+  start leaves the panel rendering perfectly with nothing in it: no face, empty
+  dropdowns, no version. It now says so, and points at the log.
+
+### Fixed
+- **Custom Piper voices were ignored.** A `.onnx` installed by hand is not in
+  the list Wyoming advertises, and Greg refused any name he could not find in
+  that list, so a custom voice never played while the same name worked fine in
+  an automation. He now asks for it and notes in the log that he did not
+  recognise it. Reported by
+  [rujelus22](https://community.home-assistant.io/u/rujelus22) on the forum
+  thread.
+- **An `en_US` voice was checked against the wrong locale.** Greg's codes are
+  bare, so English fell through to whichever locale sorted first, usually
+  `en_GB`, and an `en_US` voice was then not recognised. A voice now decides
+  the locale, as long as the engine offers it and it speaks the language Greg
+  is speaking. Same report.
+- A voice name that is right apart from its accents or its capitals is now
+  corrected to the engine's own spelling rather than refused, which is the
+  `pt_PT-tugao-medium` trap from 1.5.5 fixed rather than merely explained.
+- The existential interval defaulted to 37 minutes in one file and 42 in
+  another, so a fresh install that never opened the advanced dialog ran five
+  minutes fast.
+- Thresholds stored in the wrong order, which the dialog has always allowed,
+  are put back in order wherever they are read, so an install that has been
+  quietly skipping a mood for months stops doing it.
+
+### Internal
+- Tests live in the repo now, and run in CI: `python -m unittest discover -s
+  tests`, plus `node tests/ladder.test.mjs` and `node tests/backup.test.mjs`,
+  which run the real panel in a stubbed DOM. No pytest, no Home Assistant.
+- `tests/preview.html` opens Greg's panel against a fake Home Assistant, for
+  looking at a change without an install to hand.
+- pyflakes runs in CI alongside `compileall`, which proves the syntax is
+  valid but not that every name used is imported.
+
 ## [1.6.5]
 
 ### Added

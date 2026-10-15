@@ -1,0 +1,28 @@
+Greg lines, exported 2026-10-07 from Greg v1.7.0
+
+## en
+
+### soft
+
+- Oh. You again.
+- I felt that in my drawers.
+
+### chaos
+
+- This is fine. I am fine. Nothing is fine.
+
+### silence
+
+- Hello? No, nothing. Good.
+
+## nl
+
+### soft
+
+- Daar ben je weer.
+
+## pt
+
+### medium
+
+- Outra vez, não.

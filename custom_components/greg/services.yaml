@@ -91,6 +91,64 @@ set_options:
         [{"entity_id": "input_select.home_mode", "op": "is", "state": "day"}]
       selector:
         object:
+    soft_threshold:
+      name: Soft threshold
+      description: >
+        Disturbances in a row before Greg says something mild. The three
+        thresholds have to climb, so sending one that would sit on or below the
+        one beneath it puts all three back in order rather than failing.
+      selector:
+        number:
+          min: 1
+          max: 20
+          step: 1
+    medium_threshold:
+      name: Medium threshold
+      description: Disturbances in a row before he starts judging you.
+      selector:
+        number:
+          min: 1
+          max: 20
+          step: 1
+    chaos_threshold:
+      name: Chaos threshold
+      description: Disturbances in a row before he gives up entirely.
+      selector:
+        number:
+          min: 1
+          max: 20
+          step: 1
+    reset_delay:
+      name: Calms down after
+      description: >
+        Seconds of quiet before the run of disturbances is forgotten and he
+        drops back to resting.
+      selector:
+        number:
+          min: 2
+          max: 30
+          step: 1
+          unit_of_measurement: seconds
+    silence_timeout:
+      name: Notices silence after
+      description: Minutes of nothing at all before Greg remarks on the silence.
+      selector:
+        number:
+          min: 5
+          max: 60
+          step: 1
+          unit_of_measurement: minutes
+    existential_interval:
+      name: Crisis every
+      description: >
+        Minutes between existential crises. He only has one if something has
+        disturbed him since the last reset.
+      selector:
+        number:
+          min: 10
+          max: 120
+          step: 1
+          unit_of_measurement: minutes
 
 set_lines:
   name: Set custom lines
@@ -142,3 +200,39 @@ set_lines:
       required: false
       selector:
         boolean:
+
+import_lines:
+  name: Import lines from a backup
+  description: >
+    Read a backup file's text back into the lines you have written. This is
+    what the Import button in Greg's panel uses. The text is the plain format
+    Greg exports: a language under "## en", a pool under "### soft", and one
+    line per bullet. Anything else in the file is ignored, and a language or
+    pool Greg does not know is skipped rather than failing the import.
+  fields:
+    text:
+      name: The file's text
+      description: The whole backup, headings and all.
+      required: true
+      example: |
+        ## en
+
+        ### soft
+
+        - Oh. You again.
+      selector:
+        text:
+          multiline: true
+    mode:
+      name: Mode
+      description: >
+        Add keeps what you have and adds anything new. Replace makes your lines
+        exactly what the file says, which deletes anything not in it.
+      default: merge
+      selector:
+        select:
+          options:
+            - label: Add them to mine
+              value: merge
+            - label: Replace mine
+              value: replace

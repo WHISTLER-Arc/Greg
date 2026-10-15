@@ -153,7 +153,11 @@ Do this rather than changing Piper's default. The add-on has a single **Voice** 
 | **Voice for Nederlands** | `nl_NL-pim-medium` |
 | **Voice for Português (Portugal)** | `pt_PT-tugão-medium` |
 
-Copy the names from your engine's own voice list. They are matched character for character, accents included, so `pt_PT-tugao-medium` is not `pt_PT-tugão-medium`. Get one wrong and Greg drops it, lets the engine choose, and says so in the log along with the names it does offer.
+Copy the names from your engine's own voice list. They are matched character for character, so get the accents right. As of v1.7 Greg is forgiving about exactly that: a name that matches apart from its accents or its capitals is corrected to the engine's own spelling, so `pt_PT-tugao-medium` reaches `pt_PT-tugão-medium` rather than being thrown away.
+
+**Voices you installed yourself work too.** A `.onnx` you dropped into Piper's share folder is not in the list Wyoming advertises, and before v1.7 Greg refused anything he could not see in that list, which meant a custom voice never played. He now asks for the name you gave him either way, and notes in the log that he did not recognise it. If he goes quiet after you set one, that log line is the first place to look: the name is still matched character for character at Piper's end.
+
+A voice also decides which locale Greg asks for. Name an `en_US` voice and he speaks `en_US`, rather than picking whichever English locale sorted first and then not recognising your voice. Found by [rujelus22](https://community.home-assistant.io/u/rujelus22) on the forum thread.
 
 A voice belongs to one language. An English voice handed a Dutch line does not give you accented Dutch, it gives you an English voice reading Dutch letters aloud, which is why there is a field per language rather than one for all of them.
 
@@ -273,6 +277,14 @@ As of v1.3, Greg installs his own **sidebar panel automatically**. No card-pasti
 
 The card just reads Greg's entities (`sensor.greg_mood`, `switch.greg_enabled`, and friends), so if you'd rather build your own dashboard from those, go for it.
 
+### How quickly he escalates
+
+As of v1.7 the three thresholds are **one track with three handles**, in his settings, in the mood colours the card already uses: where he starts getting annoyed, where he starts judging you, and where he gives up entirely. The handles cannot cross, so a chaos that sits below medium, which used to mean he skipped a mood for no apparent reason, is no longer something you can set.
+
+Underneath are the three timing values as numbers you can type over: how long the room has to be quiet before he calms down, how long before he remarks on the silence, and how often the existential crises come round.
+
+All six are still in advanced settings as well, for anyone who prefers the dialog or whose panel is having a bad day. If they end up crossed there, Greg puts them back in order and gets on with it.
+
 His four faces:
 
 | Mood | Image | Look |
@@ -385,6 +397,29 @@ If you would rather script it, `greg.set_lines` does the same thing.
 
 Your lines live in Greg's config entry, so they survive updates and vanish if you remove him. Two hundred per category, three hundred characters each, both far beyond anything that reads well out loud.
 
+### Keeping your lines
+
+As of v1.7 the lines card has **Export to a file** and **Import from a file**. Export writes everything you have written to `greg-lines-<date>.txt`. Import reads one back, and asks first whether to add the file's lines to yours or replace yours with them. Replacing tells you how many lines it is about to throw away.
+
+The file is plain text and deliberately readable:
+
+```
+Greg lines, exported 2026-10-07 from Greg v1.7.0
+
+## en
+
+### soft
+
+- Oh. You again.
+- I felt that in my drawers.
+```
+
+A `##` heading is a language, a `###` heading is a category, and every line starting with `- ` is a line. Everything else is ignored, so the title, blank lines and any notes you leave yourself cost nothing. Which means you can also write twenty lines in a text editor and import them, and that a file somebody sends you can be pasted straight into a GitHub issue.
+
+Categories or languages Greg does not recognise are skipped rather than failing the whole import. `greg.import_lines` does the same from an automation.
+
+This is for carrying lines between Gregs and for editing them somewhere comfortable. A Home Assistant backup already contains them, since they live in his config entry.
+
 ### Building your own moans
 
 RedKing worked out something rather good on the forum thread. Instead of writing whole lines, write columns of fragments and pick one from each. Four columns of six give you 1,296 combinations without anyone having to write 1,296 sentences.
@@ -464,8 +499,8 @@ There's also a `greg.uninstall` service if you'd rather script it. It takes an o
 
 - **v1.4.** Single room, no Blueprints, works with any protocol, and he brings his own sidebar panel.
 - **v1.5.** Greg is a supercomputer, so he speaks more than one language. English, Dutch and European Portuguese, with every line written natively in each rather than translated into it.
-- **v1.6.** Current release. Write your own lines in his panel, and share the good ones with everyone else. Since 1.6.5 he speaks on your phone too, through ~~the Companion app~~ **a browser on it**, in his own voice rather than your phone's.
-- **v1.7.** Your lines, yours to keep, and everything in one place. Export what you have written and carry it between Gregs, and thresholds and timing move out of the options dialog into his panel, with soft, medium and chaos on one track rather than three sliders that can quietly contradict each other.
+- **v1.6.** Write your own lines in his panel, and share the good ones with everyone else. Since 1.6.5 he speaks on your phone too, through ~~the Companion app~~ **a browser on it**, in his own voice rather than your phone's.
+- **v1.7.** Current release. Your lines, yours to keep, and everything in one place. Export what you have written and carry it between Gregs, and thresholds and timing come into his panel, with soft, medium and chaos on one track rather than three sliders that can quietly contradict each other. They stay in the options dialog too for now, so nothing anybody relies on moves out from under them.
 - **v1.x.** Small improvements as they come. Feedback very welcome.
 - **v2.0.** Multi-room, multiple Gregs, a full mood dashboard. (One Greg might be plenty for some households. I respect that.)
 

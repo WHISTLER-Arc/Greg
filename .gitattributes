@@ -1,0 +1,3 @@
+# The backup fixture is compared byte for byte against what the panel
+# writes, so it stays LF on every platform.
+tests/fixtures/*.txt text eol=lf

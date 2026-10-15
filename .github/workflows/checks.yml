@@ -2,7 +2,10 @@ name: Checks
 
 on:
   push:
-    branches: [main]
+    # Working branches too, not only main. A beta is cut from a branch and
+    # released straight off it, so "it passed on main" arrives a release too
+    # late to be any use.
+    branches: [main, "claude/**"]
   pull_request:
   workflow_dispatch:
 
@@ -45,6 +48,16 @@ jobs:
           print(f"Versions agree: {manifest}")
           PY
 
+      # compileall proves the syntax is valid, which is not the same as the
+      # code working: a name that was used but never imported compiles
+      # perfectly and raises at runtime. That shipped in 1.7.0b1 and took the
+      # whole mood sensor down with it, which looked like three unrelated
+      # panel bugs. pyflakes reads every name.
+      - name: No undefined names
+        run: |
+          pip install pyflakes
+          python3 -m pyflakes custom_components/greg/*.py custom_components/greg/lines/*.py tests/*.py
+
       - name: Everything parses
         run: |
           python3 -m compileall -q custom_components/greg
@@ -64,3 +77,12 @@ jobs:
 
       - name: Line pools intact
         run: python3 .github/scripts/check_lines.py
+
+      # Plain unittest, no pytest and no Home Assistant: the tests load the
+      # modules they need straight off disk, so this runs on a bare runner and
+      # on a laptop with the same command.
+      - name: Tests
+        run: |
+          python3 -m unittest discover -s tests -v
+          node tests/ladder.test.mjs
+          node tests/backup.test.mjs

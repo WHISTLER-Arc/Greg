@@ -248,6 +248,56 @@ class GregPanel extends HTMLElement {
           background:var(--secondary-background-color); }
         .si input[type="range"]::-moz-range-thumb { width:15px; height:15px; border:0;
           border-radius:50%; background:var(--success-color, #7cc36e); cursor:pointer; }
+        /* The ladder. One track carrying all three thresholds, because they
+           are one decision: where he stops being calm, where he starts
+           judging, and where he gives up. Three separate sliders could be set
+           so that chaos sits below medium, which reads as Greg skipping a
+           mood for no reason. Here that is not expressible.
+
+           The track is a plain div rather than three range inputs, because
+           range inputs cannot be stacked on one line without each one
+           swallowing the others' drags. Handles are buttons, so they are
+           focusable and operable from the keyboard for free. */
+        .gladder { display:flex; flex-direction:column; gap:5px; }
+        .llabels { position:relative; height:15px; font-size:11px;
+          font-variant-numeric:tabular-nums; }
+        .llabels span { position:absolute; white-space:nowrap; transform:translateX(-50%);
+          transition:left .12s; }
+        .ltrack { position:relative; height:6px; border-radius:4px; margin:9px 0 4px;
+          background:var(--secondary-background-color); touch-action:none; }
+        .lhandle { position:absolute; top:-7px; width:20px; height:20px; margin-left:-10px;
+          padding:0; border-radius:50%; border:2px solid var(--card-background-color);
+          cursor:grab; touch-action:none; transition:left .12s, transform .12s; }
+        .lhandle:active { cursor:grabbing; transform:scale(1.15); transition:transform .12s; }
+        /* Dragging moves the handle every frame, so the eased left from above
+           would lag the finger. Turned off for the duration of the drag. */
+        .gladder.dragging .lhandle, .gladder.dragging .llabels span { transition:none; }
+        .lscale { display:flex; justify-content:space-between; font-size:11px;
+          color:var(--secondary-text-color); font-variant-numeric:tabular-nums; }
+        .gtiming { display:grid; grid-template-columns:repeat(3, minmax(0,1fr)); gap:8px; }
+        /* Read far more often than they are changed, so they are numbers you
+           can type over rather than three more full-width sliders. */
+        .gtime { background:var(--secondary-background-color); border-radius:11px;
+          padding:9px 10px; display:flex; flex-direction:column; gap:2px; cursor:text; }
+        .gtimev { display:flex; align-items:baseline; gap:1px; }
+        .gtime input[type="number"] { width:100%; min-width:0; background:none; border:0;
+          padding:0; color:var(--primary-text-color); font-family:inherit; font-size:17px;
+          font-weight:600; font-variant-numeric:tabular-nums; appearance:textfield; }
+        .gtime input::-webkit-outer-spin-button,
+        .gtime input::-webkit-inner-spin-button { appearance:none; margin:0; }
+        .gtimeu { font-size:13px; font-weight:600; color:var(--secondary-text-color); }
+        .gtimel { font-size:11px; line-height:1.35; color:var(--secondary-text-color); opacity:.8; }
+        /* The import confirmation. Deliberately in the way: one of its two
+           buttons deletes lines somebody wrote. */
+        .importbox { margin-top:12px; padding:12px 14px; border-radius:12px;
+          background:var(--secondary-background-color);
+          border-left:3px solid var(--success-color, #7cc36e); font-size:13px; }
+        .importbox.hidden { display:none; }
+        .importbox .ilang { margin-top:6px; color:var(--secondary-text-color); font-size:12px; }
+        .importbox .iwarn { margin-top:6px; color:var(--error-color, #c0504c); font-size:12px; }
+        .importacts { display:flex; gap:8px; flex-wrap:wrap; margin-top:12px; }
+        .linescard .btn.danger { background:transparent; color:var(--error-color, #c0504c);
+          border:1px solid var(--error-color, #c0504c); }
         .grow { display:flex; align-items:center; gap:10px; font-size:13px;
           background:var(--secondary-background-color); border-radius:11px; padding:10px 12px; }
         .grow .sw { border:0; padding:0; }
@@ -511,8 +561,23 @@ class GregPanel extends HTMLElement {
         <div class="linesfoot">
           <button class="btn primary" id="lines-save">Save lines</button>
           <button class="btn" id="lines-share">Share the good ones</button>
+          <button class="btn" id="lines-export">Export to a file</button>
+          <button class="btn" id="lines-import">Import from a file</button>
+          <input type="file" id="lines-file" accept=".txt,text/plain" hidden>
         </div>
         <div class="ghint" id="lines-status"></div>
+
+        <!-- Filled in and shown only once a file has been read, because
+             Replace throws away lines and that is not a thing to find out
+             about afterwards. -->
+        <div class="importbox hidden" id="importbox">
+          <div id="import-summary"></div>
+          <div class="importacts">
+            <button class="btn primary" id="import-merge">Add them to mine</button>
+            <button class="btn danger" id="import-replace">Replace mine</button>
+            <button class="btn" id="import-cancel">Cancel</button>
+          </div>
+        </div>
       </div>`;
   }
 
@@ -535,6 +600,23 @@ class GregPanel extends HTMLElement {
         <label>Sensitivity <span class="gval" data-out="sensitivity"></span></label>
         <input class="gctl" type="range" data-key="sensitivity" min="1" max="100" step="1">
         <span class="ghint">Lower ignores repeat taps for longer.</span>
+      </div>
+
+      <h3>How quickly he escalates</h3>
+
+      <div class="gladder">
+        <div class="llabels" id="llabels"></div>
+        <div class="ltrack" id="ltrack">
+          <button class="lhandle" id="lh-soft_threshold" data-key="soft_threshold"
+                  type="button" role="slider" aria-label="Soft"></button>
+          <button class="lhandle" id="lh-medium_threshold" data-key="medium_threshold"
+                  type="button" role="slider" aria-label="Medium"></button>
+          <button class="lhandle" id="lh-chaos_threshold" data-key="chaos_threshold"
+                  type="button" role="slider" aria-label="Chaos"></button>
+        </div>
+        <div class="lscale"><span>1 tap</span><span id="lscale-max">12 taps</span></div>
+        <span class="ghint">How many disturbances in a row before he moves up.
+          They cannot cross.</span>
       </div>
 
       <h3>How he speaks</h3>
@@ -561,6 +643,35 @@ class GregPanel extends HTMLElement {
         <input class="gctl" type="range" data-key="volume" min="0" max="100" step="5">
       </div>
 
+      <h3>Timing</h3>
+
+      <div class="gtiming">
+        <label class="gtime">
+          <span class="gtimev">
+            <input class="gctl" type="number" data-key="reset_delay"
+                   min="2" max="30" step="1" inputmode="numeric" aria-label="Calms down after">
+            <span class="gtimeu">s</span>
+          </span>
+          <span class="gtimel">calms down after</span>
+        </label>
+        <label class="gtime">
+          <span class="gtimev">
+            <input class="gctl" type="number" data-key="silence_timeout"
+                   min="5" max="60" step="1" inputmode="numeric" aria-label="Notices silence after">
+            <span class="gtimeu">m</span>
+          </span>
+          <span class="gtimel">notices silence after</span>
+        </label>
+        <label class="gtime">
+          <span class="gtimev">
+            <input class="gctl" type="number" data-key="existential_interval"
+                   min="10" max="120" step="1" inputmode="numeric" aria-label="Crisis every">
+            <span class="gtimeu">m</span>
+          </span>
+          <span class="gtimel">crisis every</span>
+        </label>
+      </div>
+
       <h3>When he keeps quiet</h3>
 
       <div class="qsummary">
@@ -571,7 +682,7 @@ class GregPanel extends HTMLElement {
 
       <button class="gapply" disabled>No changes</button>
       <button class="full" data-full>Advanced settings →</button>
-      <p class="ghint">Thresholds, openers and his voice live in advanced.</p>
+      <p class="ghint">His voices, openers and the automation switches live in advanced.</p>
   `;
   }
 
@@ -677,17 +788,41 @@ class GregPanel extends HTMLElement {
     });
   }
 
+  // Limits for the three timing boxes, matching TIMING_LIMITS in const.py.
+  // Clamped here as well as there so a typed 900 is corrected in front of you
+  // rather than silently on the way in.
+  _timingLimits() {
+    return {
+      reset_delay: [2, 30, 8],
+      silence_timeout: [5, 60, 20],
+      existential_interval: [10, 120, 42],
+    };
+  }
+
   _readForm() {
     const g = (k) =>
       this.shadowRoot.querySelector(`.gctl[data-key="${k}"]`);
-    return {
+    const saved = this._savedConfig() || {};
+    const out = {
       vibration_sensor: g("vibration_sensor").value,
       media_player: g("media_player").value,
       tts_engine: g("tts_engine").value,
       volume: Number(g("volume").value) / 100,
       sensitivity: Number(g("sensitivity").value),
       language: g("language").value,
+      ...this._ladder(),
     };
+    // A box being typed into is briefly empty, and half a number is not a
+    // setting. Anything unreadable falls back to what is saved, so a partial
+    // edit can never be applied as a value nobody chose.
+    Object.entries(this._timingLimits()).forEach(([key, [low, high, fallback]]) => {
+      const typed = Number(g(key).value);
+      const value = Number.isFinite(typed) && g(key).value !== ""
+        ? typed
+        : Number(saved[key] ?? fallback);
+      out[key] = Math.max(low, Math.min(high, Math.round(value)));
+    });
+    return out;
   }
 
   _writeForm(cfg) {
@@ -701,6 +836,217 @@ class GregPanel extends HTMLElement {
     // Empty means follow Home Assistant, which is a valid choice rather than
     // an absent one, so this is set unconditionally.
     g("language").value = cfg.language ?? "";
+
+    Object.entries(this._timingLimits()).forEach(([key, [, , fallback]]) => {
+      g(key).value = cfg[key] ?? fallback;
+    });
+
+    this._ladderDraft = {
+      soft_threshold: Number(cfg.soft_threshold ?? 1),
+      medium_threshold: Number(cfg.medium_threshold ?? 3),
+      chaos_threshold: Number(cfg.chaos_threshold ?? 6),
+    };
+    this._renderLadder();
+  }
+
+  // ---- the ladder ------------------------------------------------------
+  //
+  // Three thresholds on one track. The values live on the component rather
+  // than in the DOM, because a handle's position is derived from the value and
+  // not the other way round, and because a drag has to be able to read the
+  // other two to know where it must stop.
+
+  _ladderKeys() {
+    return ["soft_threshold", "medium_threshold", "chaos_threshold"];
+  }
+
+  _ladder() {
+    if (!this._ladderDraft) {
+      const saved = this._savedConfig() || {};
+      this._ladderDraft = {
+        soft_threshold: Number(saved.soft_threshold ?? 1),
+        medium_threshold: Number(saved.medium_threshold ?? 3),
+        chaos_threshold: Number(saved.chaos_threshold ?? 6),
+      };
+    }
+    return this._ladderDraft;
+  }
+
+  // Twelve taps unless something is already set higher, in which case the
+  // track stretches to fit it. Published by the integration so the panel
+  // cannot disagree with it about what is storable.
+  _ladderMax() {
+    const saved = this._savedConfig() || {};
+    const published = Number(saved.ladder_max);
+    const chaos = this._ladder().chaos_threshold;
+    return Math.max(Number.isFinite(published) ? published : 12, chaos, 3);
+  }
+
+  // Each handle is penned in by its neighbours, one clear tap apart. This is
+  // the ordering rule from const.py, enforced here as a thing you cannot do
+  // rather than a thing that gets corrected after the fact.
+  _ladderBounds(key) {
+    const v = this._ladder();
+    const max = this._ladderMax();
+    if (key === "soft_threshold") return [1, v.medium_threshold - 1];
+    if (key === "medium_threshold") return [v.soft_threshold + 1, v.chaos_threshold - 1];
+    return [v.medium_threshold + 1, max];
+  }
+
+  _setThreshold(key, value) {
+    const [low, high] = this._ladderBounds(key);
+    const next = Math.max(low, Math.min(high, Math.round(value)));
+    if (next === this._ladder()[key]) return false;
+    this._ladderDraft[key] = next;
+    return true;
+  }
+
+  _renderLadder() {
+    const r = this.shadowRoot;
+    const track = r.getElementById("ltrack");
+    if (!track) return;
+    const v = this._ladder();
+    const max = this._ladderMax();
+    const pct = (value) => ((value - 1) / (max - 1)) * 100;
+
+    // Resting up to soft, then the mood each threshold opens. The same
+    // colours the face and the mood bar already use, so the track reads as
+    // the moods it is setting rather than as an abstract range.
+    const stops = [
+      [MOODS.resting.color, 0, pct(v.soft_threshold)],
+      [MOODS.annoyed.color, pct(v.soft_threshold), pct(v.medium_threshold)],
+      [MOODS.judging.color, pct(v.medium_threshold), pct(v.chaos_threshold)],
+      [MOODS.existential.color, pct(v.chaos_threshold), 100],
+    ];
+    track.style.background = `linear-gradient(to right, ${stops
+      .map(([c, a, b]) => `${c} ${a}% ${b}%`)
+      .join(", ")})`;
+
+    const colours = {
+      soft_threshold: MOODS.annoyed.color,
+      medium_threshold: MOODS.judging.color,
+      chaos_threshold: MOODS.existential.color,
+    };
+    const names = { soft_threshold: "soft", medium_threshold: "medium", chaos_threshold: "chaos" };
+
+    this._ladderKeys().forEach((key) => {
+      const handle = r.getElementById(`lh-${key}`);
+      const [low, high] = this._ladderBounds(key);
+      handle.style.left = `${pct(v[key])}%`;
+      handle.style.background = colours[key];
+      handle.setAttribute("aria-valuenow", v[key]);
+      handle.setAttribute("aria-valuemin", low);
+      handle.setAttribute("aria-valuemax", high);
+      handle.setAttribute("aria-valuetext", `${names[key]} at ${v[key]} taps`);
+    });
+
+    // Labels sit above their handles, but three handles a tap apart would
+    // stack their labels on top of each other, so they are pushed apart to a
+    // readable gap. The label carries its own name, so a nudged one is still
+    // unambiguous.
+    const labels = r.getElementById("llabels");
+    const width = track.getBoundingClientRect().width || 260;
+    labels.innerHTML = this._ladderKeys()
+      .map((key) =>
+        `<span style="color:${colours[key]}">${names[key]} ${v[key]}</span>`)
+      .join("");
+
+    // Placed once they exist, so the spacing can be worked out from how wide
+    // each one actually is. A fixed gap either overlaps the long ones or
+    // shoves the short ones away from the handle they belong to.
+    const spans = [...labels.querySelectorAll("span")];
+    const placed = this._spreadLabels(
+      this._ladderKeys().map((key) => (pct(v[key]) / 100) * width),
+      spans.map((s) => s.getBoundingClientRect().width || 40),
+      width
+    );
+    spans.forEach((span, i) => { span.style.left = `${placed[i]}px`; });
+
+    const scale = r.getElementById("lscale-max");
+    if (scale) scale.textContent = `${max} taps`;
+  }
+
+  // Centres for the three labels: ideally right above their handles, pushed
+  // apart only as far as it takes to stop them overlapping, and never off
+  // either end of the track. Each label carries its own name, so one that has
+  // been nudged is still readable as the threshold it belongs to.
+  //
+  // The edges are part of the spacing rather than a correction applied after
+  // it. Clamping the first label to the left edge afterwards closed the gap
+  // the spacing pass had just opened, which is exactly what went wrong at
+  // 1 / 2 / 3, where the labels are widest relative to the distance between
+  // the handles.
+  _spreadLabels(centres, widths, trackWidth) {
+    const out = centres.slice();
+    const clearance = (i) => (widths[i - 1] + widths[i]) / 2 + 6;
+
+    out[0] = Math.max(out[0], widths[0] / 2);
+    for (let i = 1; i < out.length; i++) {
+      out[i] = Math.max(out[i], out[i - 1] + clearance(i));
+    }
+
+    // Then back from the right, so a run pushed past the end comes home
+    // again rather than being clipped.
+    const last = out.length - 1;
+    out[last] = Math.min(out[last], trackWidth - widths[last] / 2);
+    for (let i = last - 1; i >= 0; i--) {
+      out[i] = Math.min(out[i], out[i + 1] - clearance(i + 1));
+    }
+    return out;
+  }
+
+  _wireLadder() {
+    const r = this.shadowRoot;
+    const track = r.getElementById("ltrack");
+    if (!track) return;
+    const ladder = track.closest(".gladder");
+
+    const valueAt = (clientX) => {
+      const box = track.getBoundingClientRect();
+      if (!box.width) return null;
+      const ratio = (clientX - box.left) / box.width;
+      return 1 + ratio * (this._ladderMax() - 1);
+    };
+
+    this._ladderKeys().forEach((key) => {
+      const handle = r.getElementById(`lh-${key}`);
+
+      // Pointer capture rather than a listener on document: the events keep
+      // coming to the handle itself even once the finger has left it, which
+      // is what makes a drag survive leaving the track, and it needs nothing
+      // taking off again at teardown.
+      handle.onpointerdown = (e) => {
+        e.preventDefault();
+        handle.setPointerCapture(e.pointerId);
+        ladder.classList.add("dragging");
+      };
+      handle.onpointermove = (e) => {
+        if (!handle.hasPointerCapture(e.pointerId)) return;
+        const value = valueAt(e.clientX);
+        if (value === null) return;
+        if (this._setThreshold(key, value)) this._onSettingInput();
+      };
+      const release = (e) => {
+        if (handle.hasPointerCapture(e.pointerId)) handle.releasePointerCapture(e.pointerId);
+        ladder.classList.remove("dragging");
+      };
+      handle.onpointerup = release;
+      handle.onpointercancel = release;
+
+      handle.onkeydown = (e) => {
+        const step = { ArrowLeft: -1, ArrowDown: -1, ArrowRight: 1, ArrowUp: 1 }[e.key];
+        const [low, high] = this._ladderBounds(key);
+        let next = null;
+        if (step) next = this._ladder()[key] + step;
+        else if (e.key === "Home") next = low;
+        else if (e.key === "End") next = high;
+        else if (e.key === "PageDown") next = this._ladder()[key] - 3;
+        else if (e.key === "PageUp") next = this._ladder()[key] + 3;
+        if (next === null) return;
+        e.preventDefault();
+        if (this._setThreshold(key, next)) this._onSettingInput();
+      };
+    });
   }
 
   // ---- the quiet card's own form ---------------------------------------
@@ -828,6 +1174,9 @@ class GregPanel extends HTMLElement {
     return ["vibration_sensor", "media_player", "tts_engine", "sensitivity",
             "language"]
       .every((k) => a[k] === b[k])
+      && ["soft_threshold", "medium_threshold", "chaos_threshold",
+          "reset_delay", "silence_timeout", "existential_interval"]
+        .every((k) => Number(a[k]) === Number(b[k]))
       && Math.abs((a.volume ?? 0) - (b.volume ?? 0)) < 0.001;
   }
 
@@ -854,6 +1203,12 @@ class GregPanel extends HTMLElement {
     if (force || !(this._dirty || this._awaitingSave(saved))) {
       this._writeForm(saved);
     }
+
+    // Redrawn on every refresh rather than only on a change: the label
+    // positions are worked out in pixels, so they need recomputing whenever
+    // the column changes width, and the settings block moves between a 300px
+    // popover and a full column at 1000px.
+    this._renderLadder();
 
     const dirty = !this._sameConfig(this._readForm(), saved);
     const apply = r.querySelector(".gapply");
@@ -902,6 +1257,10 @@ class GregPanel extends HTMLElement {
 
   _onSettingInput() {
     this._dirty = !this._sameConfig(this._readForm(), this._savedConfig());
+    // Before the refresh, because a refresh that decides nothing is dirty
+    // rewrites the form from what is saved, and the ladder has to be drawn
+    // from whatever the drag just did either way.
+    this._renderLadder();
     this._refreshSettings(false);
   }
 
@@ -1275,6 +1634,168 @@ class GregPanel extends HTMLElement {
     }
   }
 
+  // ---- backups ---------------------------------------------------------
+  //
+  // Plain text, in the same shape the Share button writes for a GitHub issue
+  // with a language heading added. Readable, editable by hand, and a file
+  // somebody sends you can be pasted straight into an issue.
+  //
+  // The writer is here and the reader is in const.py. They are pinned against
+  // the same file, tests/fixtures/sample-backup.txt, from both sides.
+
+  _backupText() {
+    const saved = this._moodState();
+    const mine = (saved && saved.attributes && saved.attributes.custom_lines) || {};
+    const pools = ["soft", "medium", "chaos", "existential", "silence"];
+    const version = (saved && saved.attributes && saved.attributes.version) || "";
+    const stamp = new Date().toISOString().slice(0, 10);
+
+    const out = [`Greg lines, exported ${stamp}${version ? ` from Greg ${version}` : ""}`];
+    Object.keys(mine).sort().forEach((language) => {
+      const written = pools
+        .map((pool) => [pool, (mine[language] || {})[pool] || []])
+        .filter(([, lines]) => lines.length);
+      if (!written.length) return;
+      out.push(`\n## ${language}`);
+      written.forEach(([pool, lines]) => {
+        out.push(`\n### ${pool}\n`);
+        lines.forEach((line) => out.push(`- ${line}`));
+      });
+    });
+    return out.join("\n").trim() + "\n";
+  }
+
+  _countBackup(text) {
+    const languages = [];
+    let lines = 0;
+    text.split(/\r?\n/).forEach((raw) => {
+      const line = raw.trim();
+      if (line.startsWith("## ")) languages.push(line.slice(3).trim());
+      else if (line.startsWith("- ") && line.slice(2).trim()) lines++;
+    });
+    return { languages, lines };
+  }
+
+  _exportLines() {
+    const status = this.shadowRoot.getElementById("lines-status");
+    const text = this._backupText();
+    const { lines } = this._countBackup(text);
+    if (!lines) {
+      status.textContent = "Nothing to export yet. Write a line first.";
+      return;
+    }
+
+    const name = `greg-lines-${new Date().toISOString().slice(0, 10)}.txt`;
+    const url = URL.createObjectURL(new Blob([text], { type: "text/plain" }));
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = name;
+    link.click();
+    // Freed on the next turn of the loop rather than immediately: revoking it
+    // in the same tick can beat the download to it in some browsers.
+    setTimeout(() => URL.revokeObjectURL(url), 10000);
+    status.textContent = `Exported ${lines} line${lines === 1 ? "" : "s"} to ${name}.`;
+  }
+
+  _offerImport(text, filename) {
+    const r = this.shadowRoot;
+    const box = r.getElementById("importbox");
+    const summary = r.getElementById("import-summary");
+    const status = r.getElementById("lines-status");
+    const { languages, lines } = this._countBackup(text);
+
+    if (!lines) {
+      status.textContent =
+        `${filename} has no lines in it. A backup has lines starting with "- " ` +
+        `under headings like "### soft".`;
+      box.classList.add("hidden");
+      return;
+    }
+
+    this._importText = text;
+    const names = this._listOptions("language_options");
+    const named = languages
+      .map((code) => (names.find((n) => n.id === code) || {}).name || code)
+      .join(", ");
+
+    // Counted from what is saved rather than from the draft, because that is
+    // what Replace would actually be throwing away.
+    const saved = this._moodState();
+    const mine = (saved && saved.attributes && saved.attributes.custom_lines) || {};
+    const have = Object.values(mine).reduce(
+      (n, pools) => n + Object.values(pools || {}).reduce((m, l) => m + (l || []).length, 0), 0
+    );
+
+    summary.innerHTML =
+      `<strong>${filename}</strong> holds ${lines} line${lines === 1 ? "" : "s"}.` +
+      (named ? `<div class="ilang">Languages in the file: ${named}.</div>` : "") +
+      (have
+        ? `<div class="iwarn">Replacing throws away the ${have} line${have === 1 ? "" : "s"} ` +
+          `you have now, in every language.</div>`
+        : "");
+    box.classList.remove("hidden");
+    status.textContent = "";
+  }
+
+  _runImport(mode) {
+    const r = this.shadowRoot;
+    const status = r.getElementById("lines-status");
+    if (!this._hass || !this._importText) return;
+
+    r.getElementById("importbox").classList.add("hidden");
+    status.textContent = "Importing…";
+    this._hass
+      .callService("greg", "import_lines", { text: this._importText, mode })
+      .then(
+        () => {
+          this._importText = null;
+          // The draft is what the editor is showing, and it has just been
+          // overtaken by what Greg now holds.
+          this._linesDirty = false;
+          this._draft = null;
+          this._loadDraft(true);
+          this._renderLines();
+          status.textContent =
+            mode === "replace"
+              ? "Imported. Your lines are now what the file said."
+              : "Imported. Anything new in the file has been added.";
+        },
+        () => {
+          status.textContent = "Import failed, check the logs.";
+        }
+      );
+  }
+
+  _wireBackups() {
+    const r = this.shadowRoot;
+    const picker = r.getElementById("lines-file");
+    if (!picker) return;
+
+    r.getElementById("lines-export").onclick = () => this._exportLines();
+    r.getElementById("lines-import").onclick = () => {
+      // Cleared first, so choosing the same file twice still fires a change.
+      picker.value = "";
+      picker.click();
+    };
+    picker.onchange = () => {
+      const file = picker.files && picker.files[0];
+      if (!file) return;
+      file.text().then(
+        (text) => this._offerImport(text, file.name),
+        () => {
+          r.getElementById("lines-status").textContent = "That file could not be read.";
+        }
+      );
+    };
+    r.getElementById("import-merge").onclick = () => this._runImport("merge");
+    r.getElementById("import-replace").onclick = () => this._runImport("replace");
+    r.getElementById("import-cancel").onclick = () => {
+      this._importText = null;
+      r.getElementById("importbox").classList.add("hidden");
+      r.getElementById("lines-status").textContent = "Import cancelled.";
+    };
+  }
+
   _wireQuiet() {
     const r = this.shadowRoot;
     const quiet = r.getElementById("quiet-enabled");
@@ -1355,6 +1876,7 @@ class GregPanel extends HTMLElement {
     };
     root.getElementById("lines-save").onclick = () => this._saveLines();
     root.getElementById("lines-share").onclick = () => this._shareLines();
+    this._wireBackups();
     const only = root.getElementById("custom-only");
     only.onclick = () => {
       const on = only.getAttribute("aria-checked") === "true";
@@ -1386,11 +1908,25 @@ class GregPanel extends HTMLElement {
           el.setAttribute("aria-checked", on ? "false" : "true");
           this._onSettingInput();
         };
+      } else if (el.type === "number") {
+        // Clamped when you leave the box, not while you are typing in it:
+        // correcting a 1 to the minimum of 2 mid-keystroke makes 12
+        // impossible to type.
+        el.oninput = () => this._onSettingInput();
+        el.onchange = () => {
+          const [low, high, fallback] = this._timingLimits()[el.dataset.key];
+          const typed = Number(el.value);
+          el.value = el.value === "" || !Number.isFinite(typed)
+            ? fallback
+            : Math.max(low, Math.min(high, Math.round(typed)));
+          this._onSettingInput();
+        };
       } else {
         el.oninput = () => this._onSettingInput();
         el.onchange = () => this._onSettingInput();
       }
     });
+    this._wireLadder();
     r.querySelectorAll(".gapply").forEach(
       (el) => (el.onclick = () => this._applySettings())
     );
@@ -1535,7 +2071,16 @@ class GregPanel extends HTMLElement {
     // he had no way of telling anybody.
     const warn = r.getElementById("speechwarn");
     if (warn) {
-      const problem = attrs.speech_problem || "";
+      // A Greg who is not running at all looks, from in here, like a Greg
+      // with no images, empty dropdowns and no version: the panel renders
+      // fine and simply has nothing to put in it. Three symptoms of one
+      // cause, and nothing on screen pointing at the cause. So say it.
+      const missing = !moodS || moodS.state === "unavailable";
+      const problem = missing
+        ? "Greg's entities are unavailable, so this panel has nothing to show. " +
+          "He is installed but not running: look in Settings → System → Logs " +
+          "for an error from greg."
+        : attrs.speech_problem || "";
       warn.textContent = problem;
       warn.classList.toggle("hidden", !problem);
     }
