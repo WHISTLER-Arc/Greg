@@ -35,6 +35,31 @@ jobs:
           python3 -m compileall -q custom_components/greg
           node --check custom_components/greg/panel/greg-panel.js
 
+      # What HACS actually downloads and installs, since hacs.json sets
+      # zip_release. It is extracted straight into config/custom_components/greg
+      # with no prefix stripping, so the zip root holds the files themselves and
+      # not a custom_components/greg folder. Built from inside the directory for
+      # that reason. The listing is in the log so a wrong layout is visible here
+      # rather than in somebody's config.
+      #
+      # It is also the only reason Greg has a download count at all. GitHub
+      # counts release assets and not the source zipball it generates itself,
+      # so without this there is nothing for anyone to count.
+      - name: Build the HACS release asset
+        run: |
+          set -euo pipefail
+          cd custom_components/greg
+          zip -rq "$GITHUB_WORKSPACE/greg.zip" . -x '*.pyc' -x '*__pycache__*'
+          cd "$GITHUB_WORKSPACE"
+          unzip -l greg.zip | head -20
+          python3 -c "
+          import sys, zipfile
+          names = zipfile.ZipFile('greg.zip').namelist()
+          if 'manifest.json' not in names or any(n.startswith('custom_components/') for n in names):
+              sys.exit('greg.zip has the wrong layout, refusing to release it')
+          print(f'greg.zip: {len(names)} entries, manifest.json at the root')
+          "
+
       - name: Tag and release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -57,7 +82,8 @@ jobs:
             --title "Greg $TAG" \
             --notes-file release-notes.md \
             --target "$SHA" \
-            $FLAGS
+            $FLAGS \
+            greg.zip
 
           echo "Released $TAG at $SHA"
           echo "### Released \`$TAG\`" >> "$GITHUB_STEP_SUMMARY"

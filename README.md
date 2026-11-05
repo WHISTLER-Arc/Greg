@@ -4,6 +4,8 @@
 
 Not sure yet? **[Try Greg in your browser](https://whistler-arc.github.io/greg-demo/)** before you install him. Poke the table, hear him complain, and have a go at his panel.
 
+[![Downloads](https://img.shields.io/github/downloads/WHISTLER-Arc/Greg/total?label=downloads&color=555)](https://github.com/WHISTLER-Arc/Greg/releases)
+
 ---
 
 ![The real Greg](www/greg/greg_real.jpg)
