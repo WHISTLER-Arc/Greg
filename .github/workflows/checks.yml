@@ -78,6 +78,40 @@ jobs:
       - name: Line pools intact
         run: python3 .github/scripts/check_lines.py
 
+      # hacs.json sets zip_release, so HACS installs Greg by extracting
+      # greg.zip straight into config/custom_components/greg with no prefix
+      # stripping. If the zip root held custom_components/greg/ instead of the
+      # files themselves, every new install would land one level too deep and
+      # Greg would not load at all. That is not something to find out at
+      # release time, so the zip is built here too and its root is checked.
+      - name: The HACS release asset has the right shape
+        run: |
+          set -euo pipefail
+          cd custom_components/greg
+          zip -rq "$GITHUB_WORKSPACE/greg.zip" . -x '*.pyc' -x '*__pycache__*'
+          cd "$GITHUB_WORKSPACE"
+          python3 - <<'PY'
+          import sys, zipfile
+
+          names = zipfile.ZipFile("greg.zip").namelist()
+          missing = [
+              n for n in ("manifest.json", "__init__.py", "const.py")
+              if n not in names
+          ]
+          nested = [n for n in names if n.startswith("custom_components/")]
+
+          if missing or nested:
+              print("greg.zip has the wrong layout.")
+              if missing:
+                  print(f"  not at the zip root: {', '.join(missing)}")
+              if nested:
+                  print(f"  nested under custom_components/: {nested[0]} and others")
+              print("  the zip root must hold manifest.json and the rest directly")
+              sys.exit(1)
+
+          print(f"greg.zip looks right: {len(names)} entries, manifest.json at the root")
+          PY
+
       # Plain unittest, no pytest and no Home Assistant: the tests load the
       # modules they need straight off disk, so this runs on a bare runner and
       # on a laptop with the same command.

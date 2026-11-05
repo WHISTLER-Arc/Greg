@@ -3,6 +3,31 @@
 All notable changes to Greg. He would like it noted that he did not ask to be
 versioned.
 
+## [1.7.1]
+
+### Changed
+- **Greg arrives as a zip now.** Every release carries a `greg.zip` and HACS
+  downloads that rather than the source archive GitHub generates. What you
+  install and how you install it are unchanged. The point is that GitHub
+  counts release files and does not count source archives, which is the whole
+  reason Greg has never had a download number beside his name in HACS while
+  other integrations do.
+- The number HACS shows is for the current release only and starts again from
+  nothing every time he is updated, so it says how much traffic one version
+  got rather than how many people have him. There is a running total on the
+  README for the other question. That one only goes up.
+- Both counts start from this release. Nothing before it was ever counted and
+  nothing can go back and count it.
+
+### Internal
+- The release workflow builds the zip and refuses to publish if its layout is
+  wrong, and the ordinary checks build it on every push for the same reason. A
+  zip one level too deep would install to the right place with everything
+  inside it in the wrong one, which produces a perfectly green build and a Greg
+  that does not load.
+- `.github/scripts/downloads.py` prints the all-time total with a line per
+  release, for when the badge is not enough.
+
 ## [1.7.0]
 
 ### Added
