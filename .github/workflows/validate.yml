@@ -1,7 +1,18 @@
 name: Validate
 
 on:
+  # main only. On a working branch this races the release workflow's own
+  # branch cleanup: the run is queued on push, the release deletes the merged
+  # branch a few seconds later, and HACS then asks GitHub for a ref that no
+  # longer exists and fails with "Not Found". A red run for a branch that was
+  # tidied up on purpose, every stable release.
+  #
+  # Nothing is lost that matters. hacs/action checks repository metadata, and
+  # checks.yml already parses hacs.json and the manifest on every branch push,
+  # builds greg.zip and asserts its layout. The HACS-specific rules still run
+  # on pull requests, on main, and nightly.
   push:
+    branches: [main]
   pull_request:
   schedule:
     - cron: "0 0 * * *"
