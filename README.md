@@ -63,15 +63,26 @@ Not much, honestly.
 
 If I did my job right, this is the easy part.
 
-### Via HACS (recommended)
+### Via the Marketplace, or HACS (recommended)
 
-Greg's in the HACS default list, so there's no custom repository faff anymore.
+Greg's in the default list either way, so there's no custom repository faff.
 
-1. Open HACS in Home Assistant
-2. Search for **Greg**
-3. Click **Download**
-4. Restart Home Assistant
-5. Go to **Settings > Devices & Services > Add Integration** and search for **Greg**
+**Home Assistant 2026.11 or later.** The store is built in now, as
+**Settings > Marketplace**. It isn't in the sidebar, and old `/hacs` links
+redirect to it.
+
+**Older than that.** You need [HACS](https://hacs.xyz) installed first, then
+open it from the sidebar. The steps below are the same from either one.
+
+1. Search for **Greg**
+2. Click **Download**
+3. Restart Home Assistant
+4. Go to **Settings > Devices & Services > Add Integration** and search for **Greg**
+
+If that button says **Open integration** instead, you already have him.
+
+Already had Greg through HACS before updating to 2026.11? Nothing to do. Home
+Assistant adopts what HACS installed, Greg included, the first time it starts.
 
 ### Manually (if you'd rather)
 
@@ -240,7 +251,7 @@ Three ways, roughly in order of how much bother they are.
 
 **An ordinary speaker.** If there's already a smart speaker in the room, you're done, and this whole section is beneath you.
 
-**browser_mod.** [browser_mod](https://github.com/thomasloven/hass-browser_mod) turns whatever browser is showing Home Assistant into a real `media_player`. Greg then speaks out of your phone in his own voice, Piper and all, with nothing else installed and no code involved. It's free, it's in HACS, and it doesn't take the device over.
+**browser_mod.** [browser_mod](https://github.com/thomasloven/hass-browser_mod) turns whatever browser is showing Home Assistant into a real `media_player`. Greg then speaks out of your phone in his own voice, Piper and all, with nothing else installed and no code involved. It's free, it's in the Marketplace, and it doesn't take the device over.
 
 Four things all have to be true, and if you miss any one of them it fails without telling you:
 
@@ -489,7 +500,7 @@ As of v1.3.3 Greg can take himself apart. There's an **Uninstall Greg** section 
 4. **The stubborn bits.** Reminds you to force-close the Companion app and hard-refresh your browser, which is the part everyone forgets and then wonders why a ghost of him is still in the sidebar.
 5. **Goodbye.** Greg has something to say about it.
 
-Then remove the repository in HACS. Greg can't delete his own code while he's running it, which he'd tell you is a fitting limitation.
+Then remove Greg from the Marketplace, or from HACS if that's still what you use. Greg can't delete his own code while he's running it, which he'd tell you is a fitting limitation.
 
 **What he will not touch:** your automations, your vibration sensor, your other integrations, and any helper or entity you made yourself. He only removes things his own config entry owns. Nothing is matched by name, so if you happen to have your own helpers called `greg_something`, they're safe.
 

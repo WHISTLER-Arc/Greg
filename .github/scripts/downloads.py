@@ -99,4 +99,13 @@ def main() -> int:
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    try:
+        sys.exit(main())
+    except BrokenPipeError:
+        # Piping into head closes stdout early, and Python's own flush at exit
+        # then raises again on the way out and prints a traceback over the
+        # output you asked for. Point stdout at nothing so that flush is quiet.
+        os.dup2(os.open(os.devnull, os.O_WRONLY), sys.stdout.fileno())
+        sys.exit(0)
+    except KeyboardInterrupt:
+        sys.exit(130)
